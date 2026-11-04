@@ -1,21 +1,4 @@
-/**
- * OGUN CATCHMENT-TO-COAST OBSERVATORY — AUDITED GEE WORKFLOW (2019–2024)
- *
- * Key Guarantees:
- * 1. Partitions intact WWF HydroBASINS Level-7 polygons (hybas_7) within the
- *    Ogun River drainage network (MAIN_BAS) using mutually exclusive centroid
- *    routing rules—zero arbitrary latitude slicing across polygons, zero gaps,
- *    and zero overlaps.
- * 2. Delineates Unit Z5 (Northwest Lagos Lagoon Estuary) as a topologically
- *    disjoint receiving water zone (.difference(catchmentGeom, 30)).
- * 3. Uses schema-preserving masked template images inside the 72-month loop so
- *    empty Sentinel-1 or cloud-locked Sentinel-2 months never throw missing-band
- *    errors and always export genuine null values alongside observation counts.
- */
 
-// ============================================================================
-// 1. TOPOLOGICALLY VALID HYDROBASINS L7 SUB-BASINS & ESTUARINE RECEIVING ZONE
-// ============================================================================
 var hybas7 = ee.FeatureCollection('WWF/HydroSHEDS/v1/Basins/hybas_7');
 var rivers = ee.FeatureCollection('WWF/HydroSHEDS/v1/FreeFlowingRivers');
 var jrc = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('occurrence').unmask(0);
