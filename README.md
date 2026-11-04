@@ -5,6 +5,11 @@
 
 An integrated Earth Observation and hydrological research observatory investigating how monthly rainfall variability and shallow surface soil-moisture conditions across the Ogun River catchment relate to seasonal SAR floodplain inundation indicators and downstream estuarine spectral turbidity dynamics (`NDTI`) in the northwest Lagos Lagoon.
 
+> **Data status: demonstration preview.** The files in `docs/data/` are placeholder values, not an authenticated Google Earth Engine export. `src/02_compile_observatory.py` flags the current time series as `DEMONSTRATION_PREVIEW`, and the website shows a warning banner while that is the case. To publish real results:
+> 1. Run `gee/01_extract_real_ogun_data.js` in the Earth Engine Code Editor and download the `ogun_subbasins` and `ogun_monthly_timeseries` exports from Google Drive.
+> 2. Replace `docs/data/ogun_subbasins.geojson` and `docs/data/ogun_monthly_timeseries.csv` with those exports.
+> 3. Run `python src/02_compile_observatory.py` to regenerate `docs/data/cascade_diagnostics.json`. Commit its output unedited.
+
 ---
 
 ## 1. Research Question & Scientific Scope
