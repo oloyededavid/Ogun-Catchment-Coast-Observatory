@@ -3,7 +3,12 @@
 **Repository:** `https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory`  
 **Live Interface:** `https://oloyededavid.github.io/Ogun-Catchment-Coast-Observatory/`
 
+An integrated Earth Observation and hydrological research observatory investigating how monthly rainfall variability and shallow surface soil-moisture conditions across the Ogun River catchment relate to seasonal SAR floodplain inundation indicators and downstream estuarine spectral turbidity dynamics (`NDTI`) in the northwest Lagos Lagoon.
+
+---
+
 ## 1. Research Question & Scientific Scope
+
 **Central Research Question:**  
 *How do monthly and seasonal rainfall variability and shallow surface soil-moisture conditions across the Ogun River catchment relate to SAR-detected floodplain inundation indicators and downstream estuarine spectral turbidity dynamics ($\text{NDTI}$) in the northwest Lagos Lagoon?*
 
@@ -40,7 +45,6 @@
 ---
 
 ## 4. Repository Structure
-
 ```text
 Ogun-Catchment-Coast-Observatory/
 ├── README.md                              # Scientific documentation & reproduction guide
