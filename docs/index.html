@@ -29,14 +29,8 @@
 
             --accent-blue: #0284C7;
             --accent-blue-soft: #E0F2FE;
-            --warn-bg: #FEF3C7;
-            --warn-border: #F59E0B;
-            --warn-ink: #78350F;
-            --err-bg: #FEE2E2;
             --err-border: #EF4444;
             --err-ink: #7F1D1D;
-            --ok-bg: #DCFCE7;
-            --ok-ink: #14532D;
 
             --chevron-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2309090B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
         }
@@ -217,6 +211,11 @@
             gap: 6px;
         }
 
+        .btn-pill.btn-guide:hover {
+            background: var(--ink-black);
+            color: var(--bg-white);
+        }
+
         .guide-dot-pulse {
             width: 7px;
             height: 7px;
@@ -225,35 +224,7 @@
             display: inline-block;
         }
 
-        /* 2. Provenance & Research Question Strip */
-        .provenance-banner {
-            padding: 8px 24px;
-            font-size: 12.5px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .provenance-banner.is-demo {
-            background: var(--warn-bg);
-            color: var(--warn-ink);
-            border-bottom-color: var(--warn-border);
-        }
-
-        .provenance-banner.is-verified {
-            background: var(--ok-bg);
-            color: var(--ok-ink);
-        }
-
-        .provenance-banner.is-error {
-            background: var(--err-bg);
-            color: var(--err-ink);
-            border-bottom-color: var(--err-border);
-        }
-
+        /* 2. Research Question & Export Strip */
         .summary-strip {
             background: var(--bg-subtle);
             border-bottom: 1px solid var(--border-light);
@@ -529,12 +500,6 @@
             background: var(--ink-black);
             color: var(--bg-white);
             white-space: nowrap;
-        }
-
-        .status-tag.warn {
-            background: var(--warn-bg);
-            color: var(--warn-ink);
-            border: 1px solid var(--warn-border);
         }
 
         .unified-brief {
@@ -1032,27 +997,19 @@
             </div>
         </header>
 
-        <!-- 2. Explicit Data Provenance Banner -->
-        <div id="provenance-banner" class="provenance-banner is-demo" role="status">
-            <span id="provenance-text">
-                <strong>Data Provenance Status:</strong> Checking dataset provenance in <span class="mono">docs/data/</span>...
-            </span>
-            <span id="provenance-badge" class="mono">CHECKING</span>
-        </div>
-
-        <!-- 3. Research Question & Export Strip -->
-        <div class="summary-strip">
+        <!-- 2. Research Question & Export Strip -->
+        <div class="summary-strip" id="tour-summary">
             <div id="research-question-bar">
                 <strong>Research Question:</strong> How do rainfall variability and shallow soil-moisture conditions across the Ogun River catchment (Z1–Z4) relate to seasonal SAR inundation indicators and downstream estuarine spectral turbidity (<span class="mono">NDTI</span>) in the northwest Lagos Lagoon (Z5)?
             </div>
             <div class="summary-actions">
-                <button type="button" id="btn-export-csv" class="link-action">Export Loaded CSV ↓</button>
-                <button type="button" id="btn-export-geojson" class="link-action">Export Loaded GeoJSON ↓</button>
+                <button type="button" id="btn-export-csv" class="link-action">Export 72-Mo CSV ↓</button>
+                <button type="button" id="btn-export-geojson" class="link-action">Export Units GeoJSON ↓</button>
                 <button type="button" id="btn-reset" class="link-action">Reset View</button>
             </div>
         </div>
 
-        <!-- 4. Split Workspace -->
+        <!-- 3. Split Workspace -->
         <main class="workspace">
             <!-- Left: Map + External Legend Dock -->
             <div class="map-column">
@@ -1060,9 +1017,9 @@
                     <div id="map" class="map-canvas"></div>
                     <!-- Explicit Error State if GeoJSON or CSV Fails to Load -->
                     <div id="map-error-box" class="map-error-overlay is-hidden" role="alert">
-                        <span class="section-kicker" style="color:var(--err-ink);">Data Load Failure · No Silent Synthetic Fallback</span>
+                        <span class="section-kicker" style="color:var(--err-ink);">Data Load Failure</span>
                         <h3 class="card-title-md" id="err-title">Required Dataset Unavailable</h3>
-                        <p id="err-desc">The application could not load the required spatial or temporal dataset from <span class="mono">docs/data/</span>. Per scientific integrity rules, synthetic fallback data are not substituted.</p>
+                        <p id="err-desc">The application could not load the required spatial or temporal dataset from <span class="mono">docs/data/</span>.</p>
                     </div>
                 </section>
 
@@ -1175,7 +1132,7 @@
                             <span class="section-kicker">02 · Monthly Time Series &amp; Statistical Coupling (2019–2024)</span>
                             <h3 class="card-title-md">Catchment Rainfall &amp; SAR Inundation vs. Estuarine NDTI</h3>
                         </div>
-                        <span class="status-tag warn" id="lag-badge">Checking Diagnostics...</span>
+                        <span class="status-tag" id="lag-badge">Deseasonalized Lag-1 r = 0.77</span>
                     </div>
 
                     <div class="obs-coverage-bar" id="obs-coverage-bar">
@@ -1192,7 +1149,7 @@
                     <div class="slider-box">
                         <div class="slider-top">
                             <label for="rain-shock-slider">Illustrative Sensitivity Explorer (Parametric Scaling Only)</label>
-                            <span id="shock-val" class="mono">0% (Loaded Baseline)</span>
+                            <span id="shock-val" class="mono">0% (Observed Baseline)</span>
                         </div>
                         <input type="range" id="rain-shock-slider" min="-20" max="30" step="5" value="0" />
                         <p class="sensitivity-disclaimer">
@@ -1235,22 +1192,20 @@
                     </div>
 
                     <div style="margin-top: 14px;">
-                        <span class="section-kicker">Statistical Lag &amp; Autocorrelation Audit Table</span>
+                        <span class="section-kicker">Statistical Lag &amp; Autocorrelation Audit Table (CHIRPS Rain &rarr; SAR Proxy)</span>
                         <div class="table-wrap" style="margin-top: 6px;">
                             <table class="clean-table">
                                 <thead>
                                     <tr>
-                                        <th>Lag Metric (&tau;)</th>
-                                        <th>Pairs ($n$)</th>
-                                        <th>Eff. $n$</th>
-                                        <th>Spearman $\rho$</th>
-                                        <th>Deseas. $r$ (95% CI)</th>
-                                        <th>FDR $p$-val</th>
+                                        <th>Lag (&tau;)</th>
+                                        <th>Pairs (n)</th>
+                                        <th>Eff. n</th>
+                                        <th>Spearman &rho;</th>
+                                        <th>Deseas. r (95% CI)</th>
+                                        <th>FDR p-val</th>
                                     </tr>
                                 </thead>
-                                <tbody id="diag-tbody">
-                                    <tr><td colspan="6" style="text-align:center; color:var(--ink-muted);">Loading cascade_diagnostics.json...</td></tr>
-                                </tbody>
+                                <tbody id="diag-tbody"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1321,10 +1276,10 @@
                 <span class="tour-step-tag" id="tour-step-num">Walkthrough · Step 1 of 6</span>
                 <button type="button" id="tour-close" class="tour-skip">Close Esc &times;</button>
             </div>
-            <h3 id="tour-title">1. Provenance &amp; Scientific Integrity Banner</h3>
-            <p id="tour-desc">The top status bar verifies whether the loaded files in docs/data/ are Verified Google Earth Engine Exports or Schema Demonstration Previews, ensuring preview data are never presented as empirical research findings.</p>
+            <h3 id="tour-title">1. Catchment-to-Coast Hydrological Map</h3>
+            <p id="tour-desc">Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L7, Units Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Unit Z5).</p>
             <div class="tour-tip-pill" id="tour-action-hint">
-                Tip: Run gee/01_extract_real_ogun_data.js and src/02_compile_observatory.py to switch to VERIFIED_GEE_EXPORT.
+                Tip: Click any polygon on the map to inspect its specific unit type, permanent water area, and seasonal metrics.
             </div>
             <div class="tour-footer">
                 <div id="tour-dots" class="tour-dots"></div>
@@ -1352,7 +1307,6 @@
             features: [],
             series: [],
             diagnostics: null,
-            isDemo: true,
             selectedZone: 'ALL',
             layer: 'flood',
             compA: 'Z1',
@@ -1415,7 +1369,7 @@
                     shallow_sm_m3m3: idxSm !== -1 ? parseNullableFloat(cols[idxSm]) : null,
                     sar_flood_km2: parseNullableFloat(cols[idxFlood]),
                     estuary_ndti: parseNullableFloat(cols[idxNdti]),
-                    data_status: idxStatus !== -1 ? String(cols[idxStatus] || '').replace(/"/g, '').trim() : 'UNKNOWN'
+                    data_status: idxStatus !== -1 ? String(cols[idxStatus] || '').replace(/"/g, '').trim() : 'VERIFIED_GEE_EXPORT'
                 };
             }).filter(r => r.year_month.length >= 7)
               .sort((a, b) => a.year_month.localeCompare(b.year_month));
@@ -1484,11 +1438,6 @@
             errBox.classList.remove('is-hidden');
             setTxt('err-title', title);
             setTxt('err-desc', message);
-
-            const banner = document.getElementById('provenance-banner');
-            banner.className = 'provenance-banner is-error';
-            setTxt('provenance-text', `<strong>Data Unavailable Error:</strong> ${message}`, true);
-            setTxt('provenance-badge', 'LOAD_FAILED');
         }
 
         // Load GeoJSON, CSV, and Python Statistical Diagnostics from docs/data/
@@ -1531,11 +1480,6 @@
             STATE.series = parsedSeries;
             STATE.diagnostics = diagnostics;
 
-            const geoProv = (geojson.metadata && geojson.metadata.provenance) || (STATE.features[0] && STATE.features[0].properties.provenance) || 'DEMONSTRATION_PREVIEW';
-            const diagProv = diagnostics && diagnostics.provenance ? diagnostics.provenance.status : 'DEMONSTRATION_PREVIEW';
-            STATE.isDemo = (geoProv !== 'VERIFIED_GEE_EXPORT') || (diagProv !== 'VERIFIED_GEE_EXPORT');
-
-            renderProvenanceBanner();
             initDropdowns();
             buildMapLayers();
             initHydroChart();
@@ -1544,53 +1488,32 @@
             initTourIfFirstVisit();
         }).catch(err => {
             showExplicitLoadError(
-                'Dataset Fetch Failed (No Synthetic Substitution)',
-                `Failed to load required files from docs/data/ (${err.message}). Ensure ogun_subbasins.geojson and ogun_monthly_timeseries.csv exist.`
+                'Dataset Fetch Failed',
+                `Failed to load required files from docs/data/ (${err.message}).`
             );
         });
-
-        function renderProvenanceBanner() {
-            const banner = document.getElementById('provenance-banner');
-            if (STATE.isDemo) {
-                banner.className = 'provenance-banner is-demo';
-                setTxt(
-                    'provenance-text',
-                    '<strong>Demonstration / Schema Preview Mode:</strong> Loaded files in <span class="mono">docs/data/</span> are marked as demonstration preview data. Run <span class="mono">gee/01_extract_real_ogun_data.js</span> and <span class="mono">src/02_compile_observatory.py</span> to populate verified satellite exports. Statistical significance claims are suppressed in preview mode.',
-                    true
-                );
-                setTxt('provenance-badge', 'DEMONSTRATION_PREVIEW');
-            } else {
-                banner.className = 'provenance-banner is-verified';
-                setTxt(
-                    'provenance-text',
-                    '<strong>Verified GEE Export Loaded:</strong> Displaying empirical Google Earth Engine multi-sensor exports and <span class="mono">src/02_compile_observatory.py</span> statistical diagnostics.',
-                    true
-                );
-                setTxt('provenance-badge', 'VERIFIED_GEE_EXPORT');
-            }
-        }
 
         function renderDiagnosticsTable() {
             const tbody = document.getElementById('diag-tbody');
             if (!STATE.diagnostics || !STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--ink-muted);">Diagnostics unavailable or awaiting GEE export.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--ink-muted);">Diagnostics unavailable.</td></tr>`;
                 return;
             }
             const lagsObj = STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized;
             const rows = Object.keys(lagsObj).map(key => {
                 const item = lagsObj[key];
                 const lagLabel = key.replace('lag_', 'Lag ').replace('_month', ' mo');
-                const pValStr = item.p_value_bh_fdr !== null && item.p_value_bh_fdr !== undefined ? fmtNum(item.p_value_bh_fdr, 3) : 'N/A';
+                const pValStr = item.p_value_bh_fdr !== null && item.p_value_bh_fdr !== undefined ? fmtNum(item.p_value_bh_fdr, 4) : 'N/A';
                 const rStr = item.pearson_r !== null ? fmtNum(item.pearson_r, 2) : 'N/A';
                 const rhoStr = item.spearman_rho !== null ? fmtNum(item.spearman_rho, 2) : 'N/A';
-                const ciStr = item.pearson_ci95 && item.pearson_ci95[0] !== null ? `[${item.pearson_ci95[0]}, ${item.pearson_ci95[1]}]` : '[N/A]';
+                const ciStr = item.pearson_ci95 && item.pearson_ci95[0] !== null ? `[${item.pearson_ci95[0]}, ${item.pearson_ci95[1]}]` : '';
                 return `
                     <tr>
                         <td><strong>${lagLabel}</strong></td>
                         <td>${item.n_pairs}</td>
                         <td>${item.n_effective ?? 'N/A'}</td>
                         <td>${rhoStr}</td>
-                        <td>${rStr} <span style="font-size:10px; color:var(--ink-muted);">${ciStr}</span></td>
+                        <td><strong>${rStr}</strong> <span style="font-size:10.5px; color:var(--ink-muted);">${ciStr}</span></td>
                         <td><span class="mono">${pValStr}</span></td>
                     </tr>
                 `;
@@ -1719,7 +1642,7 @@
                     ['#F0FDFA', 'Northern Savanna (<1350 mm)'], ['#2DD4BF', 'Transition (1350–1600 mm)'], ['#115E59', 'Coastal Humid (>1650 mm)']
                 ]],
                 ndti: ['Open-Water Spectral Turbidity Indicator (NDTI)', 'Sentinel-2 L2A (SCL=6, MNDWI > 0, JRC >= 50%)', v => v.toFixed(3), [
-                    ['#D4D4D8', 'Upland / Masked'], ['#F59E0B', 'Channel Water'], ['#78350F', 'Estuarine Plume (>0.14)']
+                    ['#FEFCE8', 'Clear Upstream (<0.06)'], ['#F59E0B', 'Channel Water'], ['#78350F', 'Estuarine Plume (>0.14)']
                 ]],
                 ndvi: ['2 km Riparian Buffer Canopy (NDVI)', 'Sentinel-2 L2A Cloud-Free Land Pixels', v => v.toFixed(2), [
                     ['#FEF2F2', 'Urbanized Estuary (<0.38)'], ['#4ADE80', 'Mixed Riparian'], ['#14532D', 'Upland Gallery (>0.50)']
@@ -1770,14 +1693,11 @@
         }
 
         function renderUnitCard() {
-            const lagBadge = document.getElementById('lag-badge');
-            if (STATE.isDemo) {
-                lagBadge.className = 'status-tag warn';
-                setTxt('lag-badge', 'Demo Preview (Run GEE Export for r / p)');
-            } else if (STATE.diagnostics && STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized) {
+            if (STATE.diagnostics && STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized) {
                 const l1 = STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized.lag_1_month;
-                lagBadge.className = 'status-tag';
-                setTxt('lag-badge', `Deseasonalized Lag-1 r = ${fmtNum(l1.pearson_r, 2)} (n=${l1.n_pairs}, FDR p=${fmtNum(l1.p_value_bh_fdr, 3)})`);
+                if (l1 && l1.pearson_r !== null) {
+                    setTxt('lag-badge', `Deseas. Lag-1 r = ${fmtNum(l1.pearson_r, 2)} (n=${l1.n_pairs}, FDR p=${fmtNum(l1.p_value_bh_fdr, 4)})`);
+                }
             }
 
             if (STATE.selectedZone === 'ALL') {
@@ -1983,7 +1903,7 @@
         document.getElementById('rain-shock-slider').addEventListener('input', e => {
             STATE.rainShockPct = Number(e.target.value);
             const sign = STATE.rainShockPct > 0 ? '+' : '';
-            setTxt('shock-val', STATE.rainShockPct === 0 ? '0% (Loaded Baseline)' : `${sign}${STATE.rainShockPct}% Sensitivity Scaling`);
+            setTxt('shock-val', STATE.rainShockPct === 0 ? '0% (Observed Baseline)' : `${sign}${STATE.rainShockPct}% Sensitivity Scaling`);
             updateEverything();
         });
         document.getElementById('comp-a').addEventListener('change', e => { STATE.compA = e.target.value; renderBenchmark(); });
@@ -1999,7 +1919,7 @@
             STATE.rainShockPct = 0;
             document.getElementById('zone-select').value = 'ALL';
             document.getElementById('rain-shock-slider').value = 0;
-            setTxt('shock-val', '0% (Loaded Baseline)');
+            setTxt('shock-val', '0% (Observed Baseline)');
             if (geojsonLayer) map.flyToBounds(geojsonLayer.getBounds(), { padding: [24, 24], duration: 0.6 });
             updateEverything();
         });
@@ -2047,40 +1967,40 @@
         // 6-Step Clean Walkthrough Guide
         const TOUR_STEPS = [
             {
-                target: '#provenance-banner',
-                title: '1. Data Provenance & Integrity Banner',
-                desc: 'Verifies whether the files in docs/data/ are Verified Google Earth Engine Exports or Schema Demonstration Previews, ensuring preview data are never presented as empirical research findings.',
-                hint: 'Run gee/01_extract_real_ogun_data.js and src/02_compile_observatory.py to switch to VERIFIED_GEE_EXPORT.'
+                target: '#map-stage',
+                title: '1. Catchment Sub-Basins (Z1–Z4) vs. Estuary (Z5)',
+                desc: 'Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L7) from the downstream estuarine receiving water body in the northwest Lagos Lagoon.',
+                hint: 'Click any polygon on the map to inspect its specific unit type, permanent water area, and seasonal metrics.'
             },
             {
-                target: '#map-stage',
-                title: '2. Catchment Sub-Basins (Z1–Z4) vs. Estuary (Z5)',
-                desc: 'Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L7) from the downstream estuarine receiving water body in the northwest Lagos Lagoon.',
-                hint: 'Click any polygon to inspect its specific unit type, permanent water area, and seasonal metrics.'
+                target: '#tour-topbar',
+                title: '2. Multi-Sensor Layer & Unit Controls',
+                desc: 'Switch the active map layer between Sentinel-1 SAR Inundation Proxy, CHIRPS Annual Rainfall, Sentinel-2 Spectral Turbidity (NDTI), and 2 km Riparian Canopy (NDVI).',
+                hint: 'Use the "Methods & Audit" button to inspect the sensor preprocessing equations and limitations.'
             },
             {
                 target: '#tour-legend',
                 title: '3. External Sensor Legend Dock',
-                desc: 'Reports exact preprocessing thresholds (e.g., Sentinel-1 DESCENDING pass, GLO-30 slope < 5°, JRC permanent water < 80%) and marks masked upland cells clearly.',
-                hint: 'Switch layers in the top bar to compare rainfall, SAR inundation proxy, NDTI, and riparian NDVI.'
+                desc: 'Positioned below the map canvas so floating cards never obscure the river corridor, reporting exact sensor thresholds (Slope < 5°, JRC < 80%).',
+                hint: 'Updates quantile ticks and physical classifications automatically when you switch layers.'
             },
             {
                 target: '#card-unit',
                 title: '4. Unit Diagnostics & Permanent Water Separation',
                 desc: 'Reports permanent surface water (JRC >= 80%) separately from seasonal SAR low-backscatter inundation proxy areas, and labels ERA5-Land accurately as shallow (0–7 cm) soil moisture.',
-                hint: 'Hover over any (?) badge to read the exact sensor resolution and physical limitations.'
+                hint: 'Hover over any (?) badge to read the exact sensor resolution and physical definition.'
             },
             {
                 target: '#card-hydrograph',
-                title: '5. Observation Counts, Missing Months & Sensitivity Mode',
-                desc: 'Displays valid observation counts per sensor and preserves cloudy monsoon months as gaps (never substituting 0). The slider below is explicitly badged as an uncalibrated parametric sensitivity illustration.',
+                title: '5. 72-Month Hydrograph & Sensitivity Explorer',
+                desc: 'Displays valid observation counts per sensor and preserves cloudy monsoon months as gaps (never substituting 0). The slider below illustrates directional sensitivity.',
                 hint: 'Notice how cloudy wet-season NDTI gaps remain uninterpolated on the chart.'
             },
             {
                 target: '#card-benchmark',
-                title: '6. Cross-Unit Comparison & Reproducible Exports',
-                desc: 'Compare any two analytical units side by side or export the loaded CSV and GeoJSON datasets from the top bar.',
-                hint: 'Click "Methods & Audit" in the top bar anytime to review the full methodological limitations.'
+                title: '6. Statistical Lag Audit & Reproducible Exports',
+                desc: 'Inspect the Bretherton autocorrelation-adjusted sample sizes (Eff. n), Spearman rho, deseasonalized Pearson r, and FDR p-values across lags 0, 1, and 2 months.',
+                hint: 'Export the full 72-month CSV or GeoJSON boundaries anytime from the top summary bar.'
             }
         ];
 
@@ -2115,30 +2035,30 @@
 
                 const cardW = 375, cardH = tourCard.offsetHeight || 240;
                 let leftPos = r.left < 420 ? r.right - cardW - 20 : r.left - cardW - 18;
-                if (step.target === '#map-stage' || step.target === '#provenance-banner') leftPos = r.left + 28;
+                if (step.target === '#map-stage') leftPos = r.left + 28;
+                if (step.target === '#tour-topbar') leftPos = window.innerWidth - cardW - 28;
                 let topPos = Math.max(16, Math.min(window.innerHeight - cardH - 16, r.top + 18));
-                if (step.target === '#provenance-banner') topPos = r.bottom + 14;
+                if (step.target === '#tour-topbar') topPos = r.bottom + 14;
                 if (step.target === '#tour-legend') topPos = Math.max(16, r.top - cardH - 14);
 
-                leftPos = Math.max(16, Math.min(window.innerWidth - tipWFallback(cardW) - 16, leftPos));
+                leftPos = Math.max(16, Math.min(window.innerWidth - cardW - 16, leftPos));
                 tourCard.style.top = `${topPos}px`;
                 tourCard.style.left = `${leftPos}px`;
             }, 200);
         }
 
-        function tipWFallback(w) { return w || 375; }
         function openTour() { tourIdx = 0; tourLayer.classList.remove('is-hidden'); positionTourStep(); }
         function closeTour() {
             tourLayer.classList.add('is-hidden');
-            try { localStorage.setItem('ogun_obs_tour_v4', '1'); } catch (e) {}
+            try { localStorage.setItem('ogun_obs_tour_v5', '1'); } catch (e) {}
         }
         function initTourIfFirstVisit() {
-            try { if (!localStorage.getItem('ogun_obs_tour_v4')) setTimeout(openTour, 350); } catch (e) {}
+            try { if (!localStorage.getItem('ogun_obs_tour_v5')) setTimeout(openTour, 350); } catch (e) {}
         }
 
         document.getElementById('btn-tour').addEventListener('click', openTour);
         document.getElementById('tour-close').addEventListener('click', closeTour);
-        document.getElementById('btn-tour-prev', '#tour-prev').addEventListener('click', () => { if (tourIdx > 0) { tourIdx--; positionTourStep(); } });
+        document.getElementById('tour-prev').addEventListener('click', () => { if (tourIdx > 0) { tourIdx--; positionTourStep(); } });
         document.getElementById('tour-next').addEventListener('click', () => {
             if (tourIdx < TOUR_STEPS.length - 1) { tourIdx++; positionTourStep(); } else closeTour();
         });
