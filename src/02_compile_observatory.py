@@ -1,16 +1,4 @@
-"""
-Audited Statistical & Hydrological Analysis Module
-Ogun River Catchment-to-Coast Observatory
 
-Responsibilities:
-- Validates schema, observation counts, and provenance of exported GEE CSV data.
-- Preserves missing observations (never imputes zeros or interpolates across cloudy months).
-- Tests normality (Shapiro-Wilk), lag-1 temporal autocorrelation, and effective sample size (n_eff).
-- Computes both raw seasonal correlations and deseasonalized anomaly correlations
-  (Pearson r with 95% Fisher-z CI and Spearman rank rho).
-- Applies Benjamini-Hochberg false discovery rate (FDR) correction across tested lags (0, 1, 2 months).
-- Outputs docs/data/cascade_diagnostics.json consumed directly by docs/index.html.
-"""
 from __future__ import annotations
 
 import json
