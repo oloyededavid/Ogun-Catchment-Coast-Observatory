@@ -1,24 +1,31 @@
 {
   "type": "FeatureCollection",
+  "metadata": {
+    "provenance": "DEMONSTRATION_PREVIEW",
+    "crs": "EPSG:4326",
+    "note": "Illustrative schema preview boundaries. Overwrite with Google Earth Engine export from gee/01_extract_real_ogun_data.js for verified WWF HydroBASINS L7 geometries and satellite zonal statistics."
+  },
   "features": [
     {
       "type": "Feature",
       "properties": {
         "zone_id": "Z1",
         "order": 1,
-        "zone_name": "Upper Ogun Headwaters",
+        "zone_name": "Upper Ogun Headwaters Sub-Basin",
+        "unit_type": "Hydrological Sub-Basin (hybas_7)",
         "regime": "Basement Runoff Core",
         "area_km2": 8420,
         "rain_mm": 1290,
-        "flood_km2": 48.2,
-        "ndti": 0.042,
-        "soil_moisture": 0.285,
+        "sar_inundation_km2": 48.2,
+        "perm_water_km2": 12.4,
+        "ndti": null,
+        "shallow_sm_m3m3": 0.285,
         "ndvi": 0.542,
         "slope_deg": 3.45,
-        "lag_r": 0.74,
         "role_color": "#0284C7",
-        "summary": "Northern Precambrian basement complex across Oyo State (Saki, Iseyin, Sepeteri, Oyo). Thin saprolite soils and steeper inselberg slopes generate rapid overland runoff pulses following convective monsoon storms.",
-        "management": "Priority for agroforestry and contour soil-conservation strips along headwater tributaries to reduce sheet erosion and downstream sediment loading."
+        "provenance": "DEMONSTRATION_PREVIEW",
+        "summary": "Precambrian basement headwaters in northern Oyo State. Shallow saprolite soils and steeper terrain slopes generate seasonal infiltration-excess overland flow.",
+        "management": "Maintain upland gallery forest buffers and contour soil-conservation practices along headwater tributaries."
       },
       "geometry": {
         "type": "Polygon",
@@ -37,19 +44,21 @@
       "properties": {
         "zone_id": "Z2",
         "order": 2,
-        "zone_name": "Oyan-Ofiki Dam Tributary",
-        "regime": "Regulated Tributary",
+        "zone_name": "Oyan-Ofiki Tributary Sub-Basin",
+        "unit_type": "Hydrological Sub-Basin (hybas_7)",
+        "regime": "Regulated Tributary Sub-Basin",
         "area_km2": 5610,
         "rain_mm": 1365,
-        "flood_km2": 64.5,
+        "sar_inundation_km2": 64.5,
+        "perm_water_km2": 44.8,
         "ndti": 0.058,
-        "soil_moisture": 0.312,
+        "shallow_sm_m3m3": 0.312,
         "ndvi": 0.518,
         "slope_deg": 2.60,
-        "lag_r": 0.79,
         "role_color": "#0D9488",
-        "summary": "Western crystalline tributary catchment draining the Ofiki and Oyan rivers into the 400-million m3 Oyan Dam reservoir northwest of Abeokuta.",
-        "management": "Requires automated telemetric stage forecasting to synchronize Oyan Dam wet-season spillway releases with mainstem Ogun River flood peaks."
+        "provenance": "DEMONSTRATION_PREVIEW",
+        "summary": "Western crystalline tributary sub-basin draining the Ofiki and Oyan rivers into the Oyan Reservoir upstream of Abeokuta.",
+        "management": "Integrate telemetric stage monitoring with reservoir operating records where gauge data are available."
       },
       "geometry": {
         "type": "Polygon",
@@ -67,19 +76,21 @@
       "properties": {
         "zone_id": "Z3",
         "order": 3,
-        "zone_name": "Middle Ogun Floodplain",
-        "regime": "Active Fluvial Floodplain",
+        "zone_name": "Middle Ogun Mainstem Sub-Basin",
+        "unit_type": "Hydrological Sub-Basin (hybas_7)",
+        "regime": "Mainstem Fluvial Corridor",
         "area_km2": 4890,
         "rain_mm": 1490,
-        "flood_km2": 112.8,
+        "sar_inundation_km2": 112.8,
+        "perm_water_km2": 18.2,
         "ndti": 0.094,
-        "soil_moisture": 0.354,
+        "shallow_sm_m3m3": 0.354,
         "ndvi": 0.475,
         "slope_deg": 1.85,
-        "lag_r": 0.84,
         "role_color": "#D97706",
-        "summary": "Confluence zone below the Oyan Dam spillway spanning Abeokuta, Papalanto, Ewekoro, and Ifo across the basement-sedimentary transition belt.",
-        "management": "Enforce 500m non-buildable fluvial setback corridors in Abeokuta and Ifo and halt alluvial sand mining along unstable braided channel banks."
+        "provenance": "DEMONSTRATION_PREVIEW",
+        "summary": "Confluence sub-basin below the Oyan tributary junction spanning Abeokuta, Papalanto, Ewekoro, and Ifo across the basement-to-sedimentary transition.",
+        "management": "Preserve non-buildable fluvial setback corridors and monitor bank stability along braided mainstem reaches."
       },
       "geometry": {
         "type": "Polygon",
@@ -98,19 +109,21 @@
       "properties": {
         "zone_id": "Z4",
         "order": 4,
-        "zone_name": "Lower Ogun Alluvial Sink",
-        "regime": "Backwater Wetland Sink",
+        "zone_name": "Lower Ogun Alluvial Corridor",
+        "unit_type": "Hydrological Sub-Basin (hybas_7)",
+        "regime": "Low-Gradient Alluvial Floodplain",
         "area_km2": 2480,
         "rain_mm": 1685,
-        "flood_km2": 146.4,
+        "sar_inundation_km2": 146.4,
+        "perm_water_km2": 29.5,
         "ndti": 0.128,
-        "soil_moisture": 0.418,
+        "shallow_sm_m3m3": 0.418,
         "ndvi": 0.422,
         "slope_deg": 0.72,
-        "lag_r": 0.89,
         "role_color": "#DC2626",
-        "summary": "Flat alluvial floodplain (below 12m elevation, mean slope 0.72 deg) spanning Mowe,ibafo, Kara, Isheri, Akute, and Ikorodu West. Acts as the hydraulic bottleneck where upstream flood waves pond.",
-        "management": "Halt unregulated wetland sand-filling in Isheri-North and preserve natural alluvial retention basins to absorb upstream flood volumes."
+        "provenance": "DEMONSTRATION_PREVIEW",
+        "summary": "Low-gradient alluvial floodplain sub-basin (mean slope 0.72 deg) spanning Mowe, Kara, Isheri, Akute, and Ikorodu West where low gradient promotes seasonal ponding.",
+        "management": "Restrict wetland reclamation in low-lying alluvial floodplains to preserve natural flood storage capacity."
       },
       "geometry": {
         "type": "Polygon",
@@ -127,19 +140,21 @@
       "properties": {
         "zone_id": "Z5",
         "order": 5,
-        "zone_name": "Lagos Lagoon Estuary",
+        "zone_name": "Northwest Lagos Lagoon Estuary",
+        "unit_type": "Estuarine Receiving Zone (Non-Watershed)",
         "regime": "Estuarine Mixing Zone",
         "area_km2": 970,
         "rain_mm": 1840,
-        "flood_km2": 46.5,
+        "sar_inundation_km2": 46.5,
+        "perm_water_km2": 412.0,
         "ndti": 0.164,
-        "soil_moisture": 0.445,
+        "shallow_sm_m3m3": 0.445,
         "ndvi": 0.348,
         "slope_deg": 0.35,
-        "lag_r": 0.86,
         "role_color": "#7C2D12",
-        "summary": "Freshwater-brackish discharge delta into the northwest Lagos Lagoon (Kosofe, Oworo, Ikorodu bay). Receives concentrated suspended sediment plumes (NDTI +0.164) and urban nutrient loads.",
-        "management": "Restore estuarine mangrove fringes and monitor seasonal turbidity spikes affecting lagoon artisanal fisheries and coastal water quality."
+        "provenance": "DEMONSTRATION_PREVIEW",
+        "summary": "Downstream estuarine receiving environment where the Ogun River discharges into the northwest Lagos Lagoon. Evaluated specifically for open-water spectral turbidity (NDTI).",
+        "management": "Combine satellite NDTI plume monitoring with in-situ gravimetric TSS sampling and coastal wetland conservation."
       },
       "geometry": {
         "type": "Polygon",
