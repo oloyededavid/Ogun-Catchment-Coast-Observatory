@@ -1,0 +1,116 @@
+{
+  "provenance": {
+    "status": "DEMONSTRATION_PREVIEW",
+    "is_demonstration_data": true,
+    "warning": "Dataset currently loaded in docs/data/ is a schema demonstration preview awaiting overwrite by your authenticated Google Earth Engine export (gee/01_extract_real_ogun_data.js). Statistical values are suppressed from empirical claim reporting until VERIFIED_GEE_EXPORT data are loaded."
+  },
+  "coverage": {
+    "n_total_months": 72,
+    "period_start": "2019-01",
+    "period_end": "2024-12",
+    "valid_rain_months": 72,
+    "valid_sm_months": 72,
+    "valid_sar_months": 72,
+    "valid_ndti_months": 54,
+    "missing_ndti_months": 18
+  },
+  "extremes": {
+    "peak_sar_inundation_km2": null,
+    "peak_sar_inundation_month": "2022-10"
+  },
+  "rain_to_sar_inundation_lags_seasonal": {
+    "lag_0_month": {
+      "n_pairs": 72,
+      "n_effective": 31.4,
+      "recommended_estimator": "spearman_rho",
+      "pearson_r": null,
+      "pearson_ci95": [null, null],
+      "p_value_raw": null,
+      "p_value_autocorr_adj": null,
+      "p_value_bh_fdr": null,
+      "spearman_rho": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    },
+    "lag_1_month": {
+      "n_pairs": 71,
+      "n_effective": 30.8,
+      "recommended_estimator": "spearman_rho",
+      "pearson_r": null,
+      "pearson_ci95": [null, null],
+      "p_value_raw": null,
+      "p_value_autocorr_adj": null,
+      "p_value_bh_fdr": null,
+      "spearman_rho": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    },
+    "lag_2_month": {
+      "n_pairs": 70,
+      "n_effective": 30.2,
+      "recommended_estimator": "spearman_rho",
+      "pearson_r": null,
+      "pearson_ci95": [null, null],
+      "p_value_raw": null,
+      "p_value_autocorr_adj": null,
+      "p_value_bh_fdr": null,
+      "spearman_rho": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    }
+  },
+  "rain_to_sar_inundation_lags_deseasonalized": {
+    "lag_0_month": {
+      "n_pairs": 72,
+      "n_effective": 58.0,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": null,
+      "pearson_ci95": [null, null],
+      "p_value_bh_fdr": null,
+      "spearman_rho": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    },
+    "lag_1_month": {
+      "n_pairs": 71,
+      "n_effective": 57.2,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": null,
+      "pearson_ci95": [null, null],
+      "p_value_bh_fdr": null,
+      "spearman_rho": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    },
+    "lag_2_month": {
+      "n_pairs": 70,
+      "n_effective": 56.4,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": null,
+      "pearson_ci95": [null, null],
+      "p_value_bh_fdr": null,
+      "spearman_rho": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    }
+  },
+  "sar_inundation_to_estuary_ndti": {
+    "seasonal": {
+      "n_pairs": 54,
+      "n_effective": 26.5,
+      "recommended_estimator": "spearman_rho",
+      "pearson_r": null,
+      "spearman_rho": null,
+      "p_value_autocorr_adj": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    },
+    "deseasonalized": {
+      "n_pairs": 54,
+      "n_effective": 46.1,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": null,
+      "spearman_rho": null,
+      "p_value_autocorr_adj": null,
+      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+    }
+  },
+  "methodological_notes": [
+    "Missing observations (e.g., cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
+    "Monthly resolution (Delta t = 1 month) is coarser than typical upland kinematic wave travel times; lag-0 and lag-1 associations reflect seasonal soil-wetting and floodplain storage memory rather than direct flood-wave routing.",
+    "Sentinel-2 NDTI is an uncalibrated spectral turbidity indicator over open water (MNDWI > 0, JRC >= 50%), not gravimetric TSS (mg/L) or NTU."
+  ]
+}
