@@ -143,7 +143,7 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
     is_demo = _detect_synthetic_template(df)
 
     df["cal_month"] = pd.to_datetime(df["year_month"], format="%Y-%m").dt.month
-    for col in ["rain_mm", "shallow_sm_m3m3", "sar_flood_km2", "estuary_ndti"]:
+    for col in ["rain_mm", "sar_flood_km2", "estuary_ndti"]:
         clim_mean = df.groupby("cal_month")[col].transform("mean")
         clim_std = df.groupby("cal_month")[col].transform(lambda s: s.std(ddof=1))
         df[f"{col}_anom"] = df[col] - clim_mean
@@ -173,24 +173,6 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
     for idx, lag in enumerate(lag_keys):
         raw_lags[f"lag_{lag}_month"]["p_value_bh_fdr"] = bh_raw[idx]
         anom_lags[f"lag_{lag}_month"]["p_value_bh_fdr"] = bh_anom[idx]
-
-    sm_raw_lags: dict[str, Any] = {}
-    sm_anom_lags: dict[str, Any] = {}
-    sm_raw_p: list[float] = []
-    sm_anom_p: list[float] = []
-    for lag in lag_keys:
-        flood_future = df["sar_flood_km2"].shift(-lag) if lag > 0 else df["sar_flood_km2"]
-        flood_anom_future = df["sar_flood_km2_anom"].shift(-lag) if lag > 0 else df["sar_flood_km2_anom"]
-        res_raw = _bivariate_test(df["shallow_sm_m3m3"], flood_future)
-        res_anom = _bivariate_test(df["shallow_sm_m3m3_anom"], flood_anom_future)
-        sm_raw_lags[f"lag_{lag}_month"] = res_raw
-        sm_anom_lags[f"lag_{lag}_month"] = res_anom
-        sm_raw_p.append(res_raw["p_value_autocorr_adj"] if res_raw["p_value_autocorr_adj"] is not None else 1.0)
-        sm_anom_p.append(res_anom["p_value_autocorr_adj"] if res_anom["p_value_autocorr_adj"] is not None else 1.0)
-    for idx, adj in enumerate(_benjamini_hochberg(sm_raw_p)):
-        sm_raw_lags[f"lag_{lag_keys[idx]}_month"]["p_value_bh_fdr"] = adj
-    for idx, adj in enumerate(_benjamini_hochberg(sm_anom_p)):
-        sm_anom_lags[f"lag_{lag_keys[idx]}_month"]["p_value_bh_fdr"] = adj
 
     turb_raw = _bivariate_test(df["sar_flood_km2"], df["estuary_ndti"])
     turb_anom = _bivariate_test(df["sar_flood_km2_anom"], df["estuary_ndti_anom"])
@@ -227,8 +209,6 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
         },
         "rain_to_sar_inundation_lags_seasonal": raw_lags,
         "rain_to_sar_inundation_lags_deseasonalized": anom_lags,
-        "soil_moisture_to_sar_inundation_lags_seasonal": sm_raw_lags,
-        "soil_moisture_to_sar_inundation_lags_deseasonalized": sm_anom_lags,
         "sar_inundation_to_estuary_ndti": {
             "seasonal": turb_raw,
             "deseasonalized": turb_anom

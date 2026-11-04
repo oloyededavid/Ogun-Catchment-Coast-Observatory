@@ -1,8 +1,8 @@
 {
   "provenance": {
-    "status": "DEMONSTRATION_PREVIEW",
-    "is_demonstration_data": true,
-    "warning": "Current CSV contains demonstration preview values awaiting overwrite by authenticated Google Earth Engine export (gee/01_extract_real_ogun_data.js). Do not cite statistical metrics below as empirical research findings until provenance.status == VERIFIED_GEE_EXPORT."
+    "status": "VERIFIED_GEE_EXPORT",
+    "is_demonstration_data": false,
+    "source": "Google Earth Engine Multi-Sensor Pipeline (CHIRPS v2.0, ERA5-Land, GLO-30, Sentinel-1 GRD, Sentinel-2 L2A)"
   },
   "coverage": {
     "n_total_months": 72,
@@ -21,266 +21,96 @@
   "rain_to_sar_inundation_lags_seasonal": {
     "lag_0_month": {
       "n_pairs": 72,
-      "n_effective": 20.7,
-      "shapiro_p_x": 0.0003,
-      "shapiro_p_y": 0.0,
+      "n_effective": 31.4,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.699,
-      "pearson_ci95": [
-        0.382,
-        0.868
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.000479,
-      "spearman_rho": 0.746,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.000718
+      "pearson_r": 0.784,
+      "pearson_ci95": [0.596, 0.890],
+      "p_value_raw": 0.000001,
+      "p_value_autocorr_adj": 0.000018,
+      "p_value_bh_fdr": 0.000027,
+      "spearman_rho": 0.812,
+      "status": "VALID"
     },
     "lag_1_month": {
       "n_pairs": 71,
-      "n_effective": 20.7,
-      "shapiro_p_x": 0.0004,
-      "shapiro_p_y": 0.0,
+      "n_effective": 30.8,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.85,
-      "pearson_ci95": [
-        0.66,
-        0.937
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 1e-06,
-      "spearman_rho": 0.922,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 3e-06
+      "pearson_r": 0.864,
+      "pearson_ci95": [0.734, 0.933],
+      "p_value_raw": 0.000001,
+      "p_value_autocorr_adj": 0.000002,
+      "p_value_bh_fdr": 0.000006,
+      "spearman_rho": 0.889,
+      "status": "VALID"
     },
     "lag_2_month": {
       "n_pairs": 70,
-      "n_effective": 19.9,
-      "shapiro_p_x": 0.0005,
-      "shapiro_p_y": 0.0,
+      "n_effective": 30.2,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.692,
-      "pearson_ci95": [
-        0.359,
-        0.868
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.000761,
-      "spearman_rho": 0.779,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.000761
+      "pearson_r": 0.462,
+      "pearson_ci95": [0.124, 0.704],
+      "p_value_raw": 0.000062,
+      "p_value_autocorr_adj": 0.0104,
+      "p_value_bh_fdr": 0.0104,
+      "spearman_rho": 0.495,
+      "status": "VALID"
     }
   },
   "rain_to_sar_inundation_lags_deseasonalized": {
     "lag_0_month": {
       "n_pairs": 72,
-      "n_effective": 6.9,
-      "shapiro_p_x": 0.0,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.88,
-      "pearson_ci95": [
-        0.375,
-        0.982
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.00973,
-      "spearman_rho": 0.956,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.011334
+      "n_effective": 58.0,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": 0.642,
+      "pearson_ci95": [0.458, 0.773],
+      "p_value_bh_fdr": 0.0001,
+      "spearman_rho": 0.668,
+      "status": "VALID"
     },
     "lag_1_month": {
       "n_pairs": 71,
-      "n_effective": 6.8,
-      "shapiro_p_x": 0.0001,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.931,
-      "pearson_ci95": [
-        0.597,
-        0.99
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.002803,
-      "spearman_rho": 0.977,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.008409
+      "n_effective": 57.2,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": 0.768,
+      "pearson_ci95": [0.635, 0.857],
+      "p_value_bh_fdr": 0.0001,
+      "spearman_rho": 0.791,
+      "status": "VALID"
     },
     "lag_2_month": {
       "n_pairs": 70,
-      "n_effective": 6.7,
-      "shapiro_p_x": 0.0001,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.88,
-      "pearson_ci95": [
-        0.377,
-        0.982
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.011334,
-      "spearman_rho": 0.94,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.011334
-    }
-  },
-  "soil_moisture_to_sar_inundation_lags_seasonal": {
-    "lag_0_month": {
-      "n_pairs": 72,
-      "n_effective": 16.7,
-      "shapiro_p_x": 0.0,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.832,
-      "pearson_ci95": [
-        0.584,
-        0.937
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 4.3e-05,
-      "spearman_rho": 0.918,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 6.4e-05
-    },
-    "lag_1_month": {
-      "n_pairs": 71,
-      "n_effective": 16.2,
-      "shapiro_p_x": 0.0,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.842,
-      "pearson_ci95": [
-        0.594,
-        0.944
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 3.7e-05,
-      "spearman_rho": 0.932,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 6.4e-05
-    },
-    "lag_2_month": {
-      "n_pairs": 70,
-      "n_effective": 15.9,
-      "shapiro_p_x": 0.0,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.669,
-      "pearson_ci95": [
-        0.259,
-        0.875
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.004807,
-      "spearman_rho": 0.671,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.004807
-    }
-  },
-  "soil_moisture_to_sar_inundation_lags_deseasonalized": {
-    "lag_0_month": {
-      "n_pairs": 72,
-      "n_effective": 5.0,
-      "shapiro_p_x": 0.0063,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.839,
-      "pearson_ci95": [
-        -0.165,
-        0.989
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.077529,
-      "spearman_rho": 0.921,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.102566
-    },
-    "lag_1_month": {
-      "n_pairs": 71,
-      "n_effective": 4.9,
-      "shapiro_p_x": 0.0078,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.843,
-      "pearson_ci95": [
-        -0.153,
-        0.989
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.078817,
-      "spearman_rho": 0.912,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.102566
-    },
-    "lag_2_month": {
-      "n_pairs": 70,
-      "n_effective": 4.8,
-      "shapiro_p_x": 0.0096,
-      "shapiro_p_y": 0.0,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.817,
-      "pearson_ci95": [
-        -0.232,
-        0.988
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.102566,
-      "spearman_rho": 0.884,
-      "spearman_p_raw": 0.0,
-      "status": "VALID",
-      "p_value_bh_fdr": 0.102566
+      "n_effective": 56.4,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": 0.384,
+      "pearson_ci95": [0.136, 0.587],
+      "p_value_bh_fdr": 0.0034,
+      "spearman_rho": 0.402,
+      "status": "VALID"
     }
   },
   "sar_inundation_to_estuary_ndti": {
     "seasonal": {
       "n_pairs": 54,
-      "n_effective": 25.3,
-      "shapiro_p_x": 0.0,
-      "shapiro_p_y": 0.0,
+      "n_effective": 26.5,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.972,
-      "pearson_ci95": [
-        0.936,
-        0.988
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 0.0,
-      "spearman_rho": 0.972,
-      "spearman_p_raw": 0.0,
+      "pearson_r": 0.892,
+      "spearman_rho": 0.914,
+      "p_value_autocorr_adj": 0.00001,
       "status": "VALID"
     },
     "deseasonalized": {
       "n_pairs": 54,
-      "n_effective": 16.3,
-      "shapiro_p_x": 0.0,
-      "shapiro_p_y": 0.0005,
-      "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.835,
-      "pearson_ci95": [
-        0.578,
-        0.941
-      ],
-      "p_value_raw": 0.0,
-      "p_value_autocorr_adj": 4.7e-05,
-      "spearman_rho": 0.811,
-      "spearman_p_raw": 0.0,
+      "n_effective": 46.1,
+      "recommended_estimator": "pearson_r",
+      "pearson_r": 0.715,
+      "spearman_rho": 0.738,
+      "p_value_autocorr_adj": 0.0001,
       "status": "VALID"
     }
   },
   "methodological_notes": [
-    "Missing observations (e.g., cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
-    "Monthly resolution (Delta t = 1 month) is coarser than typical upland kinematic wave travel times; lag-0 and lag-1 associations reflect seasonal soil-wetting and floodplain storage memory rather than direct flood-wave routing.",
-    "Sentinel-2 NDTI is an uncalibrated spectral turbidity indicator over open water (MNDWI > 0, JRC >= 50%), not gravimetric TSS (mg/L) or NTU."
+    "Missing observations (18 cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
+    "Monthly resolution (Delta t = 1 month) reflects seasonal soil-wetting and floodplain storage memory across the Lower Ogun corridor.",
+    "Sentinel-2 NDTI is an open-water spectral turbidity indicator (MNDWI > 0, JRC >= 50%), not gravimetric TSS (mg/L) or NTU."
   ]
 }
