@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Ogun River Catchment-to-Coast Environmental Intelligence Observatory: CHIRPS, ERA5-Land, Copernicus GLO-30, Sentinel-1 SAR & Sentinel-2 MSI.">
-    <title>Ogun Catchment-to-Coast Observatory | Copernicus Multi-Sensor Intelligence</title>
+    <meta name="description" content="Ogun River Catchment-to-Coast Environmental Observatory: CHIRPS, ERA5-Land, Copernicus GLO-30, Sentinel-1 SAR & Sentinel-2 MSI.">
+    <title>Ogun Catchment-to-Coast Observatory | Multi-Sensor Research Interface</title>
 
     <!-- Fontshare: Satoshi (400, 500, 700, 900) -->
     <link rel="preconnect" href="https://api.fontshare.com">
@@ -29,6 +29,14 @@
 
             --accent-blue: #0284C7;
             --accent-blue-soft: #E0F2FE;
+            --warn-bg: #FEF3C7;
+            --warn-border: #F59E0B;
+            --warn-ink: #78350F;
+            --err-bg: #FEE2E2;
+            --err-border: #EF4444;
+            --err-ink: #7F1D1D;
+            --ok-bg: #DCFCE7;
+            --ok-ink: #14532D;
 
             --chevron-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2309090B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
         }
@@ -86,8 +94,8 @@
         }
 
         .brand-mark {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             background: var(--ink-black);
             color: var(--bg-white);
@@ -209,11 +217,6 @@
             gap: 6px;
         }
 
-        .btn-pill.btn-guide:hover {
-            background: var(--ink-black);
-            color: var(--bg-white);
-        }
-
         .guide-dot-pulse {
             width: 7px;
             height: 7px;
@@ -222,7 +225,35 @@
             display: inline-block;
         }
 
-        /* 2. Key Finding Strip */
+        /* 2. Provenance & Research Question Strip */
+        .provenance-banner {
+            padding: 8px 24px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .provenance-banner.is-demo {
+            background: var(--warn-bg);
+            color: var(--warn-ink);
+            border-bottom-color: var(--warn-border);
+        }
+
+        .provenance-banner.is-verified {
+            background: var(--ok-bg);
+            color: var(--ok-ink);
+        }
+
+        .provenance-banner.is-error {
+            background: var(--err-bg);
+            color: var(--err-ink);
+            border-bottom-color: var(--err-border);
+        }
+
         .summary-strip {
             background: var(--bg-subtle);
             border-bottom: 1px solid var(--border-light);
@@ -232,7 +263,7 @@
             align-items: center;
             gap: 16px;
             flex-wrap: wrap;
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--ink-body);
         }
 
@@ -246,7 +277,7 @@
             background: none;
             border: none;
             font-family: 'Satoshi', sans-serif;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--ink-black);
             cursor: pointer;
@@ -279,20 +310,33 @@
             flex: 1;
             width: 100%;
             overflow: hidden;
-            perspective: 1200px;
         }
 
         .map-canvas {
             width: 100%;
             height: 100%;
-            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .map-stage.is-3d .map-canvas {
-            transform: rotateX(26deg) scale(1.06);
+        .map-error-overlay {
+            position: absolute;
+            inset: 24px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 2px solid var(--err-border);
+            border-radius: 12px;
+            padding: 24px;
+            z-index: 1200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 10px;
+            max-width: 520px;
+            margin: auto;
+            height: fit-content;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
         }
 
-        /* External Legend Dock (Below Map — Zero Interference) */
+        /* External Legend Dock */
         .legend-dock {
             background: var(--bg-white);
             border-top: 1px solid var(--border-light);
@@ -422,9 +466,9 @@
             color: #D4D4D8;
         }
 
-        /* 4. Expanded 560px Right Sidebar */
+        /* 4. Right Analytical Sidebar */
         .sidebar {
-            width: 560px;
+            width: 580px;
             flex-shrink: 0;
             background: var(--bg-subtle);
             border-left: 1px solid var(--border-light);
@@ -463,7 +507,7 @@
         }
 
         .card-title-lg {
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 900;
             color: var(--ink-black);
             letter-spacing: -0.025em;
@@ -471,20 +515,26 @@
         }
 
         .card-title-md {
-            font-size: 16px;
+            font-size: 15.5px;
             font-weight: 900;
             color: var(--ink-black);
             letter-spacing: -0.015em;
         }
 
         .status-tag {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
-            padding: 5px 11px;
+            padding: 4px 10px;
             border-radius: 6px;
             background: var(--ink-black);
             color: var(--bg-white);
             white-space: nowrap;
+        }
+
+        .status-tag.warn {
+            background: var(--warn-bg);
+            color: var(--warn-ink);
+            border: 1px solid var(--warn-border);
         }
 
         .unified-brief {
@@ -492,23 +542,23 @@
             border: 1px solid var(--border-light);
             border-left: 3.5px solid var(--ink-black);
             border-radius: 8px;
-            padding: 13px 15px;
-            margin-bottom: 16px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 7px;
         }
 
         .brief-summary {
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--ink-black);
         }
 
         .brief-management {
-            padding-top: 8px;
+            padding-top: 7px;
             border-top: 1px solid var(--border-light);
-            font-size: 12.5px;
+            font-size: 12px;
             color: var(--ink-body);
         }
 
@@ -522,7 +572,7 @@
             background: var(--bg-white);
             border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 11px 12px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
             gap: 3px;
@@ -532,7 +582,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 700;
             color: var(--ink-muted);
         }
@@ -550,13 +600,8 @@
             cursor: pointer;
         }
 
-        .tip-btn:hover {
-            background: var(--ink-black);
-            color: var(--bg-white);
-        }
-
         .m-val {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 900;
             color: var(--ink-black);
             letter-spacing: -0.02em;
@@ -564,35 +609,56 @@
         }
 
         .m-sub {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 500;
             color: var(--ink-muted);
         }
 
-        /* Chart & Scenario Controls */
+        /* Chart & Explicitly Labelled Sensitivity Explorer */
         .chart-wrap {
             position: relative;
-            height: 230px;
+            height: 225px;
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
+        }
+
+        .obs-coverage-bar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--ink-muted);
+            background: var(--bg-subtle);
+            padding: 7px 11px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-light);
         }
 
         .slider-box {
             background: var(--bg-subtle);
-            border: 1px solid var(--border-light);
+            border: 1px dashed var(--border-mid);
             border-radius: 8px;
             padding: 12px 14px;
             display: flex;
             flex-direction: column;
             gap: 7px;
+            margin-top: 12px;
         }
 
         .slider-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
+        }
+
+        .sensitivity-disclaimer {
+            font-size: 11px;
+            color: var(--ink-muted);
+            line-height: 1.4;
         }
 
         .slider-box input[type="range"] {
@@ -601,7 +667,7 @@
             cursor: pointer;
         }
 
-        /* Benchmark & Cascade Table */
+        /* Tables */
         .benchmark-controls {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -629,29 +695,30 @@
             border: 1px solid var(--border-light);
             border-radius: 8px;
             overflow: hidden;
+            margin-bottom: 12px;
         }
 
         .clean-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12.5px;
+            font-size: 12px;
             font-variant-numeric: tabular-nums;
         }
 
         .clean-table th {
             background: var(--bg-subtle);
             color: var(--ink-muted);
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             text-align: left;
-            padding: 9px 10px;
+            padding: 8px 9px;
             border-bottom: 1px solid var(--border-light);
         }
 
         .clean-table td {
-            padding: 8px 10px;
+            padding: 8px 9px;
             border-bottom: 1px solid var(--border-light);
             color: var(--ink-body);
             font-weight: 500;
@@ -668,7 +735,7 @@
             background: var(--bg-subtle);
             color: var(--ink-black);
             font-weight: 700;
-            font-size: 11.5px;
+            font-size: 11px;
         }
 
         #cascade-table tbody tr {
@@ -686,7 +753,7 @@
             font-weight: 700;
         }
 
-        /* Clean Light-Mode Interactive Onboarding Guide (LHC Style) */
+        /* Clean Light-Mode Interactive Walkthrough Guide */
         .tour-layer {
             position: fixed;
             inset: 0;
@@ -698,7 +765,7 @@
             border-radius: 12px;
             border: 2.5px solid var(--ink-black);
             box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.38), 0 0 0 6px rgba(255, 255, 255, 0.7);
-            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.25s ease;
             pointer-events: none;
             z-index: 2501;
         }
@@ -713,7 +780,7 @@
             padding: 20px 22px;
             box-shadow: 0 24px 48px rgba(9, 9, 11, 0.24);
             z-index: 2502;
-            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.25s ease;
         }
 
         .tour-progress-track {
@@ -728,7 +795,7 @@
         .tour-progress-fill {
             height: 100%;
             background: var(--ink-black);
-            transition: width 0.28s ease;
+            transition: width 0.25s ease;
         }
 
         .tour-top {
@@ -756,12 +823,8 @@
             cursor: pointer;
         }
 
-        .tour-skip:hover {
-            color: var(--ink-black);
-        }
-
         .tour-card h3 {
-            font-size: 17px;
+            font-size: 16.5px;
             font-weight: 900;
             letter-spacing: -0.02em;
             color: var(--ink-black);
@@ -769,7 +832,7 @@
         }
 
         .tour-card p {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--ink-body);
             line-height: 1.55;
         }
@@ -804,7 +867,6 @@
             height: 6px;
             border-radius: 50%;
             background: var(--border-mid);
-            transition: all 0.2s ease;
         }
 
         .tour-dot.active {
@@ -823,22 +885,12 @@
             background: var(--bg-white);
             color: var(--ink-black);
             cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .btn-tour-nav:hover {
-            border-color: var(--ink-black);
-            background: var(--bg-subtle);
         }
 
         .btn-tour-nav.primary {
             background: var(--ink-black);
             border-color: var(--ink-black);
             color: var(--bg-white);
-        }
-
-        .btn-tour-nav.primary:hover {
-            opacity: 0.9;
         }
 
         /* Scientific Methods Modal */
@@ -858,7 +910,7 @@
             background: var(--bg-white);
             border: 1.5px solid var(--ink-black);
             border-radius: 12px;
-            max-width: 700px;
+            max-width: 720px;
             width: 100%;
             max-height: 85vh;
             display: flex;
@@ -888,7 +940,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            font-size: 13.5px;
+            font-size: 13px;
             color: var(--ink-body);
         }
 
@@ -916,8 +968,11 @@
         }
 
         @media (max-width: 1080px) {
+            body { overflow: auto; height: auto; }
+            .app-shell { height: auto; }
             .workspace { flex-direction: column; }
-            .sidebar { width: 100%; height: 55%; }
+            .map-stage { min-height: 440px; }
+            .sidebar { width: 100%; height: auto; }
             .metrics-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
@@ -929,32 +984,32 @@
             <div class="brand">
                 <div class="brand-mark">OCC</div>
                 <div>
-                    <span class="brand-kicker">Copernicus Multi-Sensor Hydrological Observatory</span>
-                    <h1 class="brand-title">Ogun River Catchment-to-Coast Atlas</h1>
-                    <p class="brand-sub">CHIRPS Rainfall, Sentinel-1 SAR Flood Dynamics &amp; Sentinel-2 Estuarine Turbidity (22,370 km²)</p>
+                    <span class="brand-kicker">Catchment-to-Coast Environmental Observatory</span>
+                    <h1 class="brand-title">Ogun River Basin &amp; Lagos Lagoon Interface</h1>
+                    <p class="brand-sub">CHIRPS Rainfall, ERA5-Land Shallow Soil Moisture, Sentinel-1 SAR &amp; Sentinel-2 Spectral NDTI</p>
                 </div>
             </div>
 
             <div class="top-controls">
                 <div class="field-group">
-                    <label class="field-label" for="zone-select">Hydrological Unit</label>
+                    <label class="field-label" for="zone-select">Analytical Unit</label>
                     <select id="zone-select" class="clean-select">
-                        <option value="ALL" selected>Full Ogun Basin (5 Units)</option>
-                        <option value="Z1">01 · Upper Ogun Headwaters</option>
-                        <option value="Z2">02 · Oyan-Ofiki Dam Tributary</option>
-                        <option value="Z3">03 · Middle Ogun Floodplain</option>
-                        <option value="Z4">04 · Lower Ogun Alluvial Sink</option>
-                        <option value="Z5">05 · Lagos Lagoon Estuary</option>
+                        <option value="ALL" selected>All Study Units (Z1–Z4 Catchment + Z5 Estuary)</option>
+                        <option value="Z1">01 · Upper Ogun Headwaters (Sub-Basin)</option>
+                        <option value="Z2">02 · Oyan-Ofiki Tributary (Sub-Basin)</option>
+                        <option value="Z3">03 · Middle Ogun Mainstem (Sub-Basin)</option>
+                        <option value="Z4">04 · Lower Ogun Alluvial Corridor (Sub-Basin)</option>
+                        <option value="Z5">05 · NW Lagos Lagoon (Estuarine Zone)</option>
                     </select>
                 </div>
 
                 <div class="field-group">
-                    <label class="field-label" for="layer-select">Map Variable</label>
+                    <label class="field-label" for="layer-select">Map Indicator</label>
                     <select id="layer-select" class="clean-select">
-                        <option value="flood" selected>Peak SAR Inundation (km²)</option>
-                        <option value="rain">Mean Annual Rainfall (mm)</option>
-                        <option value="ndti">Estuarine &amp; Channel Turbidity (NDTI)</option>
-                        <option value="ndvi">Riparian Buffer Canopy (NDVI)</option>
+                        <option value="flood" selected>SAR Low-Backscatter Inundation Proxy (km²)</option>
+                        <option value="rain">Mean Annual Rainfall (mm/yr)</option>
+                        <option value="ndti">Open-Water Spectral Turbidity Indicator (NDTI)</option>
+                        <option value="ndvi">2 km Riparian Buffer Canopy (NDVI)</option>
                     </select>
                 </div>
 
@@ -969,40 +1024,53 @@
 
                 <div class="control-divider"></div>
 
-                <button type="button" id="btn-3d" class="btn-pill">3D Tilt</button>
                 <button type="button" id="btn-labels" class="btn-pill active">Labels</button>
-                <button type="button" id="btn-methods" class="btn-pill">Methods</button>
+                <button type="button" id="btn-methods" class="btn-pill">Methods &amp; Audit</button>
                 <button type="button" id="btn-tour" class="btn-pill btn-guide">
                     <span class="guide-dot-pulse"></span> Guide
                 </button>
             </div>
         </header>
 
-        <!-- 2. Empirical Finding Strip -->
+        <!-- 2. Explicit Data Provenance Banner -->
+        <div id="provenance-banner" class="provenance-banner is-demo" role="status">
+            <span id="provenance-text">
+                <strong>Data Provenance Status:</strong> Checking dataset provenance in <span class="mono">docs/data/</span>...
+            </span>
+            <span id="provenance-badge" class="mono">CHECKING</span>
+        </div>
+
+        <!-- 3. Research Question & Export Strip -->
         <div class="summary-strip">
-            <div id="executive-finding">
-                <strong>Key Empirical Finding:</strong> Loading multi-sensor telemetry across the Ogun River basin...
+            <div id="research-question-bar">
+                <strong>Research Question:</strong> How do rainfall variability and shallow soil-moisture conditions across the Ogun River catchment (Z1–Z4) relate to seasonal SAR inundation indicators and downstream estuarine spectral turbidity (<span class="mono">NDTI</span>) in the northwest Lagos Lagoon (Z5)?
             </div>
             <div class="summary-actions">
-                <button type="button" id="btn-export-csv" class="link-action">Export 72-Mo CSV ↓</button>
-                <button type="button" id="btn-export-geojson" class="link-action">Export Sub-Basins GeoJSON ↓</button>
+                <button type="button" id="btn-export-csv" class="link-action">Export Loaded CSV ↓</button>
+                <button type="button" id="btn-export-geojson" class="link-action">Export Loaded GeoJSON ↓</button>
                 <button type="button" id="btn-reset" class="link-action">Reset View</button>
             </div>
         </div>
 
-        <!-- 3. Split Workspace -->
+        <!-- 4. Split Workspace -->
         <main class="workspace">
-            <!-- Left: Unobstructed Map + External Legend Dock -->
+            <!-- Left: Map + External Legend Dock -->
             <div class="map-column">
                 <section class="map-stage" id="map-stage">
                     <div id="map" class="map-canvas"></div>
+                    <!-- Explicit Error State if GeoJSON or CSV Fails to Load -->
+                    <div id="map-error-box" class="map-error-overlay is-hidden" role="alert">
+                        <span class="section-kicker" style="color:var(--err-ink);">Data Load Failure · No Silent Synthetic Fallback</span>
+                        <h3 class="card-title-md" id="err-title">Required Dataset Unavailable</h3>
+                        <p id="err-desc">The application could not load the required spatial or temporal dataset from <span class="mono">docs/data/</span>. Per scientific integrity rules, synthetic fallback data are not substituted.</p>
+                    </div>
                 </section>
 
                 <div class="legend-dock" id="tour-legend">
                     <div class="legend-dock-top">
                         <div class="legend-title-wrap">
-                            <strong id="legend-title">Sentinel-1 Peak Seasonal Inundation (km²)</strong>
-                            <span id="legend-tag" class="legend-source-pill">Sentinel-1 IW VV (Slope &lt; 5°, JRC &lt; 80%)</span>
+                            <strong id="legend-title">SAR Seasonal Inundation Proxy (km²)</strong>
+                            <span id="legend-tag" class="legend-source-pill">Sentinel-1 IW VV DESCENDING (Slope &lt; 5°, JRC &lt; 80%)</span>
                         </div>
                         <div id="legend-classes" class="legend-classes"></div>
                     </div>
@@ -1017,29 +1085,29 @@
                 </div>
 
                 <div class="map-credit">
-                    <span>WWF HydroSHEDS L6/L7 · CHIRPS v2.0 · ERA5-Land · Copernicus GLO-30 DEM · Sentinel-1 GRD · Sentinel-2 L2A</span>
-                    <span>Click any sub-basin polygon to inspect its hydrograph</span>
+                    <span>CRS: EPSG:4326 (Geodesic Area km²) · WWF HydroBASINS L7 · CHIRPS v2.0 · ERA5-Land (0–7cm) · GLO-30 · Sentinel-1/2</span>
+                    <span>Click any unit polygon to inspect its properties</span>
                 </div>
             </div>
 
-            <!-- Right: 560px Analytical Sidebar -->
+            <!-- Right: Analytical Sidebar -->
             <aside class="sidebar" id="sidebar-scroll">
-                <!-- Card 01: Selected Sub-Basin & Hydrological Management Guide -->
+                <!-- Card 01: Selected Geographical Unit -->
                 <div class="card" id="card-unit">
                     <div class="card-head">
                         <div>
-                            <span class="section-kicker" id="sel-eyebrow">01 · Selected Hydrological Unit</span>
-                            <h2 class="card-title-lg" id="sel-title">Full Ogun River Basin (5 Units)</h2>
+                            <span class="section-kicker" id="sel-eyebrow">01 · Selected Geographical Unit</span>
+                            <h2 class="card-title-lg" id="sel-title">All Study Units (Z1–Z4 Catchment + Z5 Estuary)</h2>
                         </div>
-                        <span id="sel-badge" class="status-tag">Catchment-to-Coast</span>
+                        <span id="sel-badge" class="status-tag">Multi-Domain</span>
                     </div>
 
                     <div class="unified-brief">
                         <p class="brief-summary" id="sel-insight">
-                            Spanning 22,370 km² from the Oyo Basement Complex to the Lagos Lagoon, the Ogun River system exhibits a distinct hydrological cascade: rapid overland runoff in the northern headwaters converges with regulated Oyan Dam releases to inundate the low-gradient Isheri–Ikorodu alluvial wetlands.
+                            Distinguishes the four hydrological sub-basins of the Ogun River catchment (Z1–Z4, 21,400 km²) from the downstream estuarine receiving environment in the northwest Lagos Lagoon (Z5, 970 km²).
                         </p>
                         <p class="brief-management" id="sel-management">
-                            <strong>Watershed &amp; Adaptation Priority:</strong> Protecting riparian forest buffers in the Upper Ogun/Oyan sub-basins and coordinating Oyan Dam wet-season spilling schedules are critical to reducing backwater flood peaks in Akute, Isheri, and Ikorodu.
+                            <strong>Methodological Note:</strong> Uplands (Z1–Z4) govern rainfall-runoff partitioning and floodplain inundation, whereas spectral turbidity (NDTI) is evaluated over permanent open water (JRC &ge; 50%, MNDWI &gt; 0) in the estuarine receiving zone (Z5).
                         </p>
                     </div>
 
@@ -1047,52 +1115,52 @@
                         <div class="metric-box">
                             <span class="m-label">
                                 Annual Rainfall
-                                <button type="button" class="tip-btn" data-tip="Mean annual precipitation (mm/yr) derived from CHIRPS v2.0 (2019–2024).">?</button>
+                                <button type="button" class="tip-btn" data-tip="Mean annual precipitation (mm/yr) from CHIRPS v2.0 pentadal totals (2019–2024).">?</button>
                             </span>
                             <strong class="m-val" id="val-rain">—</strong>
-                            <span class="m-sub" id="sub-rain">CHIRPS v2.0 mean</span>
+                            <span class="m-sub" id="sub-rain">CHIRPS v2.0 (5.5 km)</span>
                         </div>
 
                         <div class="metric-box">
                             <span class="m-label">
-                                Peak SAR Flood
-                                <button type="button" class="tip-btn" data-tip="Maximum seasonal inundated floodplain area (km²) detected by Sentinel-1 VV (< -16.5 dB), excluding permanent water (JRC >= 80%) and slopes >= 5°.">?</button>
+                                SAR Flood Proxy
+                                <button type="button" class="tip-btn" data-tip="Seasonal low-backscatter area (km²) from Sentinel-1 IW VV (< -16.5 dB, GLO-30 slope < 5°), excluding permanent water (JRC >= 80%). Uncalibrated remote-sensing indicator.">?</button>
                             </span>
                             <strong class="m-val" id="val-flood">—</strong>
-                            <span class="m-sub" id="sub-flood">Peak wet-season extent</span>
+                            <span class="m-sub" id="sub-flood">Perm. water: —</span>
                         </div>
 
                         <div class="metric-box">
                             <span class="m-label">
-                                Turbidity (NDTI)
-                                <button type="button" class="tip-btn" data-tip="Sentinel-2 Normalized Difference Turbidity Index (B4-B3)/(B4+B3) over open water (MNDWI > 0). Higher values indicate elevated suspended sediment plumes.">?</button>
+                                Spectral NDTI
+                                <button type="button" class="tip-btn" data-tip="Sentinel-2 Normalized Difference Turbidity Index (B4-B3)/(B4+B3) over cloud-free open water (SCL=6, MNDWI>0). Relative spectral indicator, not NTU or mg/L TSS.">?</button>
                             </span>
                             <strong class="m-val" id="val-ndti">—</strong>
-                            <span class="m-sub" id="sub-ndti">Wet-season plume</span>
+                            <span class="m-sub" id="sub-ndti">Open-water mask only</span>
                         </div>
 
                         <div class="metric-box">
                             <span class="m-label">
-                                Soil Moisture
-                                <button type="button" class="tip-btn" data-tip="ERA5-Land root-zone volumetric soil water content (m³/m³). Saturation (>0.40) triggers rapid infiltration-excess runoff.">?</button>
+                                Shallow Soil Water
+                                <button type="button" class="tip-btn" data-tip="ERA5-Land volumetric_soil_water_layer_1 (0–7 cm surface skin layer, m³/m³). Not full root-zone soil moisture.">?</button>
                             </span>
                             <strong class="m-val" id="val-sm">—</strong>
-                            <span class="m-sub" id="sub-sm">ERA5-Land layer 1</span>
+                            <span class="m-sub" id="sub-sm">ERA5-Land (0–7 cm)</span>
                         </div>
 
                         <div class="metric-box">
                             <span class="m-label">
                                 Riparian NDVI
-                                <button type="button" class="tip-btn" data-tip="Sentinel-2 mean vegetation index within the riparian corridor buffering the main river stem and estuary.">?</button>
+                                <button type="button" class="tip-btn" data-tip="Sentinel-2 L2A mean NDVI within the 2 km buffer of Strahler order >= 3 rivers (cloud- and water-masked).">?</button>
                             </span>
                             <strong class="m-val" id="val-ndvi">—</strong>
-                            <span class="m-sub" id="sub-ndvi">Riparian canopy</span>
+                            <span class="m-sub" id="sub-ndvi">2 km fluvial buffer</span>
                         </div>
 
                         <div class="metric-box">
                             <span class="m-label">
-                                Mean Slope
-                                <button type="button" class="tip-btn" data-tip="Copernicus GLO-30 DEM mean terrain slope (degrees) across the hydrological unit.">?</button>
+                                Mean Terrain Slope
+                                <button type="button" class="tip-btn" data-tip="Copernicus GLO-30 DEM mean slope (degrees).">?</button>
                             </span>
                             <strong class="m-val" id="val-slope">—</strong>
                             <span class="m-sub" id="sub-area">Area: —</span>
@@ -1100,14 +1168,21 @@
                     </div>
                 </div>
 
-                <!-- Card 02: 72-Month Multi-Sensor Hydrograph & Upstream Forcing Simulator -->
+                <!-- Card 02: 72-Month Time Series, Observation Coverage & Sensitivity Explorer -->
                 <div class="card" id="card-hydrograph">
                     <div class="card-head">
                         <div>
-                            <span class="section-kicker">02 · Multi-Sensor Time Series &amp; Forcing Explorer (2019–2024)</span>
-                            <h3 class="card-title-md">Rainfall Forcing vs. SAR Inundation &amp; Estuarine Turbidity</h3>
+                            <span class="section-kicker">02 · Monthly Time Series &amp; Statistical Coupling (2019–2024)</span>
+                            <h3 class="card-title-md">Catchment Rainfall &amp; SAR Inundation vs. Estuarine NDTI</h3>
                         </div>
-                        <span class="status-tag" id="lag-badge">Computing Lag r...</span>
+                        <span class="status-tag warn" id="lag-badge">Checking Diagnostics...</span>
+                    </div>
+
+                    <div class="obs-coverage-bar" id="obs-coverage-bar">
+                        <span>Total Months: <strong id="cov-total">—</strong></span>
+                        <span>CHIRPS Valid: <strong id="cov-rain">—</strong></span>
+                        <span>S1 SAR Valid: <strong id="cov-sar">—</strong></span>
+                        <span>S2 Estuary NDTI Valid: <strong id="cov-ndti">—</strong> (<span id="cov-ndti-miss">—</span> cloudy/masked)</span>
                     </div>
 
                     <div class="chart-wrap">
@@ -1116,29 +1191,32 @@
 
                     <div class="slider-box">
                         <div class="slider-top">
-                            <label for="rain-shock-slider">Simulate Upstream Rainfall / Dam Spill Anomaly</label>
-                            <span id="shock-val" class="mono">0% (Observed Baseline)</span>
+                            <label for="rain-shock-slider">Illustrative Sensitivity Explorer (Parametric Scaling Only)</label>
+                            <span id="shock-val" class="mono">0% (Loaded Baseline)</span>
                         </div>
                         <input type="range" id="rain-shock-slider" min="-20" max="30" step="5" value="0" />
+                        <p class="sensitivity-disclaimer">
+                            <strong>Scientific Disclaimer:</strong> Adjusting this slider applies an uncalibrated parametric scaling (<span class="mono">Rain &times; (1+&Delta;)</span>, <span class="mono">SAR Proxy &times; (1+&Delta;)<sup>1.25</sup></span>) to illustrate directional sensitivity. It is <strong>not</strong> a calibrated physical runoff or hydrodynamic flood forecast.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Card 03: Upstream-to-Downstream Benchmark -->
+                <!-- Card 03: Statistical Diagnostics & Unit Comparison Table -->
                 <div class="card" id="card-benchmark">
                     <div class="card-head">
                         <div>
-                            <span class="section-kicker">03 · Upstream vs. Downstream Benchmark</span>
-                            <h3 class="card-title-md">Compare Any Two Cascade Units</h3>
+                            <span class="section-kicker">03 · Statistical Lag &amp; Unit Comparison</span>
+                            <h3 class="card-title-md">Compare Any Two Study Units</h3>
                         </div>
                     </div>
                     <div class="benchmark-controls">
                         <div class="field-group">
-                            <label class="field-label" for="comp-a">First Unit (Updates on Click)</label>
+                            <label class="field-label" for="comp-a">Unit A (Updates on Click)</label>
                             <select id="comp-a" class="clean-select"></select>
                         </div>
                         <span class="vs-pill">VS</span>
                         <div class="field-group">
-                            <label class="field-label" for="comp-b">Second Unit (Downstream Reference)</label>
+                            <label class="field-label" for="comp-b">Unit B (Reference)</label>
                             <select id="comp-b" class="clean-select"></select>
                         </div>
                     </div>
@@ -1146,35 +1224,56 @@
                         <table class="clean-table">
                             <thead>
                                 <tr>
-                                    <th>Hydrological Metric</th>
+                                    <th>Indicator</th>
                                     <th id="th-comp-a">Unit A</th>
                                     <th id="th-comp-b">Unit B</th>
-                                    <th>Gradient (A − B)</th>
+                                    <th>Difference (A &minus; B)</th>
                                 </tr>
                             </thead>
                             <tbody id="comp-tbody"></tbody>
                         </table>
                     </div>
+
+                    <div style="margin-top: 14px;">
+                        <span class="section-kicker">Statistical Lag &amp; Autocorrelation Audit Table</span>
+                        <div class="table-wrap" style="margin-top: 6px;">
+                            <table class="clean-table">
+                                <thead>
+                                    <tr>
+                                        <th>Lag Metric (&tau;)</th>
+                                        <th>Pairs ($n$)</th>
+                                        <th>Eff. $n$</th>
+                                        <th>Spearman $\rho$</th>
+                                        <th>Deseas. $r$ (95% CI)</th>
+                                        <th>FDR $p$-val</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="diag-tbody">
+                                    <tr><td colspan="6" style="text-align:center; color:var(--ink-muted);">Loading cascade_diagnostics.json...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Card 04: Complete 5-Unit Cascade Table -->
+                <!-- Card 04: Complete 5-Unit Table -->
                 <div class="card" id="card-table">
                     <div class="card-head">
                         <div>
-                            <span class="section-kicker">04 · Complete Catchment-to-Coast Cascade (Click Row to Inspect)</span>
-                            <h3 class="card-title-md">Ogun Basin Sub-Units (Headwaters → Lagos Lagoon)</h3>
+                            <span class="section-kicker">04 · Study Units Summary (Z1–Z4 Sub-Basins + Z5 Estuary)</span>
+                            <h3 class="card-title-md">Click Any Row to Inspect Unit</h3>
                         </div>
                     </div>
                     <div class="table-wrap">
                         <table class="clean-table" id="cascade-table">
                             <thead>
                                 <tr>
-                                    <th>Sub-Basin Unit</th>
+                                    <th>Analytical Unit</th>
+                                    <th>Unit Type</th>
                                     <th>Area (km²)</th>
                                     <th>Rain (mm)</th>
-                                    <th>SAR Flood</th>
+                                    <th>SAR Proxy</th>
                                     <th>NDTI</th>
-                                    <th>Hydrological Role</th>
                                 </tr>
                             </thead>
                             <tbody id="cascade-tbody"></tbody>
@@ -1185,31 +1284,33 @@
         </main>
     </div>
 
-    <!-- Scientific Methods Modal -->
+    <!-- Scientific Methods & Audit Modal -->
     <div id="methods-modal" class="modal-backdrop is-hidden" role="dialog" aria-modal="true">
         <div class="modal-card">
             <div class="modal-head">
                 <div>
-                    <span class="section-kicker">Methodological Lineage &amp; Uncertainty Audit</span>
-                    <h2 class="card-title-lg">Sensor Physics, Equations &amp; Limitations</h2>
+                    <span class="section-kicker">Methodological Lineage, Statistical Audit &amp; Limitations</span>
+                    <h2 class="card-title-lg">Sensor Processing &amp; Scientific Boundaries</h2>
                 </div>
                 <button type="button" id="btn-close-methods" class="btn-close">&times;</button>
             </div>
             <div class="modal-body">
-                <h4>1. Topographically Conditioned Sentinel-1 SAR Inundation</h4>
-                <p>Optical sensors (Sentinel-2, Landsat) suffer &gt;75% cloud obscuration over southwestern Nigeria during the July–October wet season. We use Sentinel-1 C-band Ground Range Detected (<span class="mono">IW, VV polarization</span>) filtered with a <span class="mono">50m focal-median</span> kernel. To eliminate false positives from granitic inselberg radar shadow in Oyo/Abeokuta and permanent water in Oyan Reservoir, pixels are constrained by Copernicus GLO-30 <span class="mono">Slope &lt; 5.0°</span> and JRC Global Surface Water <span class="mono">Occurrence &lt; 80%</span>.</p>
-                <h4>2. Estuarine Turbidity &amp; Sediment Plume Proxy (Sentinel-2 L2A)</h4>
-                <p>Over open water pixels (<span class="mono">MNDWI &gt; 0</span>) in the Ogun–Lagos Lagoon mixing zone, suspended sediment dynamics are tracked via the Normalized Difference Turbidity Index: <span class="mono">NDTI = (B4 − B3) / (B4 + B3)</span>.</p>
-                <h4>3. Explicit Scientific Limitations</h4>
-                <ul>
-                    <li><strong>SAR Emergent Vegetation Attenuation:</strong> C-band radar (<span class="mono">5.6 cm</span> wavelength) experiences double-bounce or volume scattering in dense swamp forest canopies along the Lower Ogun corridor, making open-water SAR flood area a conservative lower-bound estimate.</li>
-                    <li><strong>Optical Proxy Calibration:</strong> <span class="mono">NDTI</span> quantifies relative seasonal sediment plume intensity and is not a substitute for gravimetric in-situ Total Suspended Solids (<span class="mono">TSS mg/L</span>) sampling.</li>
-                </ul>
+                <h4>1. Geographical Separation: Catchment Sub-Basins vs. Estuarine Zone</h4>
+                <p>Units Z1–Z4 represent topographic sub-basins delineated from <span class="mono">WWF/HydroSHEDS/v1/Basins/hybas_7</span> within the Ogun River drainage system. Unit Z5 (<span class="mono">Northwest Lagos Lagoon Estuary</span>) is an estuarine receiving water domain where open-water pixels (<span class="mono">JRC occurrence &ge; 50%</span>) are analysed for spectral turbidity (<span class="mono">NDTI</span>). Catchment and estuarine units are not interchangeable.</p>
+
+                <h4>2. Sentinel-1 SAR Inundation Proxy &amp; Permanent Water Exclusion</h4>
+                <p>Sentinel-1 C-band GRD (<span class="mono">IW, VV, DESCENDING pass</span>) scenes are filtered with a <span class="mono">50 m focal-median</span> kernel. Pixels with <span class="mono">VV &lt; -16.5 dB</span> on terrain with Copernicus GLO-30 <span class="mono">Slope &lt; 5.0°</span> and JRC water <span class="mono">Occurrence &lt; 80%</span> are summed as the seasonal inundation proxy. Because C-band radar cannot penetrate dense swamp canopy and no independent aerial/field flood polygons were available for confusion-matrix validation, this layer is reported as an uncalibrated SAR inundation proxy rather than an accuracy-validated flood map.</p>
+
+                <h4>3. Sentinel-2 Spectral Turbidity Indicator (NDTI) &amp; Missing Monsoon Months</h4>
+                <p>Sentinel-2 L2A scenes are masked using the Scene Classification Layer (<span class="mono">SCL</span>) to remove clouds, cirrus, and shadows, and restricted to open water (<span class="mono">MNDWI &gt; 0</span> and <span class="mono">SCL == 6</span>). <span class="mono">NDTI = (B4 &minus; B3)/(B4 + B3)</span> is a relative spectral proxy for water optical properties and is not calibrated to NTU or gravimetric Total Suspended Solids (<span class="mono">mg/L</span>). Months with fewer than 100 valid cloud-free water pixels in the estuary are preserved as <span class="mono">null</span> (<span class="mono">NaN</span>) and never replaced with zero or interpolated prior to statistical testing.</p>
+
+                <h4>4. Statistical Analysis &amp; Temporal Autocorrelation</h4>
+                <p>All correlations in <span class="mono">src/02_compile_observatory.py</span> are computed on pairwise complete observations, reporting both raw seasonal associations and deseasonalized anomaly associations, Bretherton autocorrelation-adjusted effective sample sizes (<span class="mono">n_eff</span>), and Benjamini–Hochberg FDR-adjusted <span class="mono">p</span>-values across lags <span class="mono">&tau; &isin; {0, 1, 2}</span> months.</p>
             </div>
         </div>
     </div>
 
-    <!-- Clean White Interactive Walkthrough Guide (LHC Style) -->
+    <!-- Clean White Interactive Walkthrough Guide -->
     <div id="tour-layer" class="tour-layer is-hidden" role="dialog" aria-modal="true">
         <div id="tour-spotlight" class="tour-spotlight"></div>
         <div id="tour-card" class="tour-card">
@@ -1220,16 +1321,16 @@
                 <span class="tour-step-tag" id="tour-step-num">Walkthrough · Step 1 of 6</span>
                 <button type="button" id="tour-close" class="tour-skip">Close Esc &times;</button>
             </div>
-            <h3 id="tour-title">Catchment-to-Coast Hydrological Atlas</h3>
-            <p id="tour-desc">This observatory tracks how rainfall in the Oyo headwaters cascades through the Oyan Dam tributary into the Lower Ogun floodplains and the Lagos Lagoon estuary.</p>
+            <h3 id="tour-title">1. Provenance &amp; Scientific Integrity Banner</h3>
+            <p id="tour-desc">The top status bar verifies whether the loaded files in docs/data/ are Verified Google Earth Engine Exports or Schema Demonstration Previews, ensuring preview data are never presented as empirical research findings.</p>
             <div class="tour-tip-pill" id="tour-action-hint">
-                Tip: Click any of the 5 sub-basin polygons on the map to filter the entire dashboard.
+                Tip: Run gee/01_extract_real_ogun_data.js and src/02_compile_observatory.py to switch to VERIFIED_GEE_EXPORT.
             </div>
             <div class="tour-footer">
                 <div id="tour-dots" class="tour-dots"></div>
                 <div style="display:flex; gap:8px;">
-                    <button type="button" id="tour-prev" class="btn-tour-nav">← Back</button>
-                    <button type="button" id="tour-next" class="btn-tour-nav primary">Next →</button>
+                    <button type="button" id="tour-prev" class="btn-tour-nav">&larr; Back</button>
+                    <button type="button" id="tour-next" class="btn-tour-nav primary">Next &rarr;</button>
                 </div>
             </div>
         </div>
@@ -1239,109 +1340,6 @@
 
     <script>
     (function () {
-        const FALLBACK_GEOJSON = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {
-                        "zone_id": "Z1", "order": 1, "zone_name": "Upper Ogun Headwaters",
-                        "regime": "Basement Runoff Core", "area_km2": 8420,
-                        "rain_mm": 1290, "flood_km2": 48.2, "ndti": 0.042, "soil_moisture": 0.285, "ndvi": 0.542, "slope_deg": 3.45,
-                        "lag_r": 0.74, "role_color": "#0284C7",
-                        "summary": "Northern Precambrian basement complex across Oyo State (Saki, Iseyin, Sepeteri, Oyo). Thin saprolite soils and steeper inselberg slopes generate rapid overland runoff pulses following convective monsoon storms.",
-                        "management": "Priority for agroforestry and contour soil-conservation strips along headwater tributaries to reduce sheet erosion and downstream sediment loading."
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[[3.18, 7.85], [3.34, 7.82], [3.52, 7.84], [3.70, 7.83], [3.88, 7.85], [3.98, 7.98], [4.05, 8.16], [4.08, 8.38], [4.01, 8.62], [3.89, 8.81], [3.68, 8.92], [3.46, 8.90], [3.28, 8.79], [3.14, 8.62], [3.06, 8.40], [3.05, 8.15], [3.11, 7.96], [3.18, 7.85]]]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {
-                        "zone_id": "Z2", "order": 2, "zone_name": "Oyan-Ofiki Dam Tributary",
-                        "regime": "Regulated Tributary", "area_km2": 5610,
-                        "rain_mm": 1365, "flood_km2": 64.5, "ndti": 0.058, "soil_moisture": 0.312, "ndvi": 0.518, "slope_deg": 2.60,
-                        "lag_r": 0.79, "role_color": "#0D9488",
-                        "summary": "Western crystalline tributary catchment draining the Ofiki and Oyan rivers into the 400-million m³ Oyan Dam reservoir northwest of Abeokuta.",
-                        "management": "Requires automated telemetric stage forecasting to synchronize Oyan Dam wet-season spillway releases with mainstem Ogun River flood peaks."
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[[2.78, 7.35], [2.96, 7.33], [3.18, 7.35], [3.21, 7.52], [3.19, 7.68], [3.18, 7.85], [3.11, 7.96], [3.05, 8.15], [2.92, 8.18], [2.78, 8.09], [2.69, 7.92], [2.66, 7.72], [2.70, 7.51], [2.78, 7.35]]]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {
-                        "zone_id": "Z3", "order": 3, "zone_name": "Middle Ogun Floodplain",
-                        "regime": "Active Fluvial Floodplain", "area_km2": 4890,
-                        "rain_mm": 1490, "flood_km2": 112.8, "ndti": 0.094, "soil_moisture": 0.354, "ndvi": 0.475, "slope_deg": 1.85,
-                        "lag_r": 0.84, "role_color": "#D97706",
-                        "summary": "Confluence zone below the Oyan Dam spillway spanning Abeokuta, Papalanto, Ewekoro, and Ifo across the basement-sedimentary transition belt.",
-                        "management": "Enforce 500m non-buildable fluvial setback corridors in Abeokuta and Ifo and halt alluvial sand mining along unstable braided channel banks."
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[[3.06, 6.85], [3.25, 6.84], [3.46, 6.84], [3.64, 6.85], [3.72, 7.04], [3.79, 7.28], [3.84, 7.56], [3.88, 7.85], [3.70, 7.83], [3.52, 7.84], [3.34, 7.82], [3.18, 7.85], [3.19, 7.68], [3.21, 7.52], [3.18, 7.35], [2.96, 7.33], [2.94, 7.12], [2.99, 6.96], [3.06, 6.85]]]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {
-                        "zone_id": "Z4", "order": 4, "zone_name": "Lower Ogun Alluvial Sink",
-                        "regime": "Backwater Wetland Sink", "area_km2": 2480,
-                        "rain_mm": 1685, "flood_km2": 146.4, "ndti": 0.128, "soil_moisture": 0.418, "ndvi": 0.422, "slope_deg": 0.72,
-                        "lag_r": 0.89, "role_color": "#DC2626",
-                        "summary": "Flat alluvial floodplain (below 12m elevation, mean slope 0.72°) spanning Mowe, Kara, Isheri, Akute, and Ikorodu West. Acts as the hydraulic bottleneck where upstream flood waves pond.",
-                        "management": "Halt unregulated wetland sand-filling in Isheri-North and preserve natural alluvial retention basins to absorb upstream flood volumes."
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[[3.24, 6.58], [3.39, 6.57], [3.55, 6.58], [3.61, 6.70], [3.64, 6.85], [3.46, 6.84], [3.25, 6.84], [3.06, 6.85], [3.12, 6.71], [3.24, 6.58]]]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {
-                        "zone_id": "Z5", "order": 5, "zone_name": "Lagos Lagoon Estuary",
-                        "regime": "Estuarine Mixing Zone", "area_km2": 970,
-                        "rain_mm": 1840, "flood_km2": 46.5, "ndti": 0.164, "soil_moisture": 0.445, "ndvi": 0.348, "slope_deg": 0.35,
-                        "lag_r": 0.86, "role_color": "#7C2D12",
-                        "summary": "Freshwater-brackish discharge delta into the northwest Lagos Lagoon (Kosofe, Oworo, Ikorodu bay). Receives concentrated suspended sediment plumes (NDTI +0.164) and urban nutrient loads.",
-                        "management": "Restore estuarine mangrove fringes and monitor seasonal turbidity spikes affecting lagoon artisanal fisheries and coastal water quality."
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[[3.30, 6.45], [3.42, 6.44], [3.53, 6.46], [3.55, 6.58], [3.39, 6.57], [3.24, 6.58], [3.26, 6.50], [3.30, 6.45]]]
-                    }
-                }
-            ]
-        };
-
-        function buildBaseline72MonthSeries() {
-            const months = [];
-            const seasonalRain = [18, 36, 78, 135, 195, 285, 245, 190, 295, 215, 68, 22];
-            const seasonalFlood = [14, 12, 15, 24, 48, 115, 185, 210, 310, 345, 140, 38];
-            const seasonalNdti = [0.045, 0.042, 0.048, 0.062, 0.085, 0.118, 0.132, 0.125, 0.155, 0.164, 0.095, 0.055];
-            const yearMultipliers = { 2019: 0.94, 2020: 0.88, 2021: 0.98, 2022: 1.22, 2023: 1.06, 2024: 1.03 };
-
-            for (let yr = 2019; yr <= 2024; yr++) {
-                const mult = yearMultipliers[yr];
-                for (let m = 0; m < 12; m++) {
-                    const ym = `${yr}-${String(m + 1).padStart(2, '0')}`;
-                    months.push({
-                        year_month: ym,
-                        rain_mm: +(seasonalRain[m] * mult).toFixed(1),
-                        sar_flood_km2: +(seasonalFlood[m] * Math.pow(mult, 1.15)).toFixed(1),
-                        estuary_ndti: +(seasonalNdti[m] * (0.9 + 0.1 * mult)).toFixed(3)
-                    });
-                }
-            }
-            return months;
-        }
-
         const PALETTES = {
             flood: ['#EFF6FF', '#BFDBFE', '#60A5FA', '#2563EB', '#1E3A8A'],
             rain: ['#F0FDFA', '#99F6E4', '#2DD4BF', '#0D9488', '#115E59'],
@@ -1350,17 +1348,17 @@
         };
 
         const STATE = {
-            geojson: FALLBACK_GEOJSON,
-            features: FALLBACK_GEOJSON.features,
-            series: buildBaseline72MonthSeries(),
+            geojson: null,
+            features: [],
+            series: [],
+            diagnostics: null,
+            isDemo: true,
             selectedZone: 'ALL',
             layer: 'flood',
             compA: 'Z1',
             compB: 'Z4',
             rainShockPct: 0,
-            basinLagR: '0.86',
-            showLabels: true,
-            is3D: false
+            showLabels: true
         };
 
         function setTxt(id, val, isHtml) {
@@ -1370,38 +1368,31 @@
             else el.innerText = val;
         }
 
-        function computePearsonR(x, y) {
-            const n = Math.min(x.length, y.length);
-            if (n < 3) return 0;
-            const mx = x.reduce((a, b) => a + b, 0) / n;
-            const my = y.reduce((a, b) => a + b, 0) / n;
-            let num = 0, dx = 0, dy = 0;
-            for (let i = 0; i < n; i++) {
-                num += (x[i] - mx) * (y[i] - my);
-                dx += Math.pow(x[i] - mx, 2);
-                dy += Math.pow(y[i] - my, 2);
-            }
-            return num / (Math.sqrt(dx * dy) || 1);
+        function fmtNum(v, digits = 1, suffix = '') {
+            if (v === null || v === undefined || Number.isNaN(Number(v))) return 'N/A (Masked)';
+            return `${Number(v).toFixed(digits)}${suffix}`;
         }
 
-        // GEE-safe CSV line splitter (ignores commas inside quoted .geo JSON objects)
         function splitCsvLine(line) {
             const result = [];
             let cur = '';
             let inQuotes = false;
             for (let i = 0; i < line.length; i++) {
                 const ch = line[i];
-                if (ch === '"') {
-                    inQuotes = !inQuotes;
-                } else if (ch === ',' && !inQuotes) {
-                    result.push(cur.trim());
-                    cur = '';
-                } else {
-                    cur += ch;
-                }
+                if (ch === '"') inQuotes = !inQuotes;
+                else if (ch === ',' && !inQuotes) { result.push(cur.trim()); cur = ''; }
+                else cur += ch;
             }
             result.push(cur.trim());
             return result;
+        }
+
+        function parseNullableFloat(raw) {
+            if (raw === undefined || raw === null) return null;
+            const cleaned = String(raw).replace(/"/g, '').trim();
+            if (cleaned === '' || cleaned.toLowerCase() === 'null' || cleaned.toLowerCase() === 'nan') return null;
+            const num = Number(cleaned);
+            return Number.isFinite(num) ? num : null;
         }
 
         function parseGeeCsv(csvText) {
@@ -1410,23 +1401,28 @@
             const headers = splitCsvLine(lines[0]);
             const idxYm = headers.indexOf('year_month');
             const idxRain = headers.indexOf('rain_mm');
+            const idxSm = headers.indexOf('shallow_sm_m3m3');
             const idxFlood = headers.indexOf('sar_flood_km2');
             const idxNdti = headers.indexOf('estuary_ndti');
+            const idxStatus = headers.indexOf('data_status');
             if (idxYm === -1 || idxRain === -1) return [];
 
             return lines.slice(1).map(line => {
                 const cols = splitCsvLine(line);
                 return {
                     year_month: String(cols[idxYm] || '').replace(/"/g, '').trim(),
-                    rain_mm: +(parseFloat(cols[idxRain]) || 0).toFixed(1),
-                    sar_flood_km2: +(parseFloat(cols[idxFlood]) || 0).toFixed(1),
-                    estuary_ndti: +(parseFloat(cols[idxNdti]) || 0.05).toFixed(3)
+                    rain_mm: parseNullableFloat(cols[idxRain]),
+                    shallow_sm_m3m3: idxSm !== -1 ? parseNullableFloat(cols[idxSm]) : null,
+                    sar_flood_km2: parseNullableFloat(cols[idxFlood]),
+                    estuary_ndti: parseNullableFloat(cols[idxNdti]),
+                    data_status: idxStatus !== -1 ? String(cols[idxStatus] || '').replace(/"/g, '').trim() : 'UNKNOWN'
                 };
             }).filter(r => r.year_month.length >= 7)
               .sort((a, b) => a.year_month.localeCompare(b.year_month));
         }
 
         function interpolateColor(val, min, max, ramp) {
+            if (val === null || val === undefined || Number.isNaN(Number(val))) return '#D4D4D8';
             const t = Math.max(0, Math.min(1, (val - min) / ((max - min) || 1)));
             const idx = Math.min(ramp.length - 1, Math.floor(t * ramp.length));
             return ramp[idx];
@@ -1472,7 +1468,7 @@
                 },
                 {
                     "type": "Feature",
-                    "properties": { "name": "Oyan-Ofiki Regulated Tributary" },
+                    "properties": { "name": "Oyan-Ofiki Tributary" },
                     "geometry": {
                         "type": "LineString",
                         "coordinates": [
@@ -1483,53 +1479,124 @@
             ]
         };
 
-        // Load real GeoJSON and CSV from docs/data/
+        function showExplicitLoadError(title, message) {
+            const errBox = document.getElementById('map-error-box');
+            errBox.classList.remove('is-hidden');
+            setTxt('err-title', title);
+            setTxt('err-desc', message);
+
+            const banner = document.getElementById('provenance-banner');
+            banner.className = 'provenance-banner is-error';
+            setTxt('provenance-text', `<strong>Data Unavailable Error:</strong> ${message}`, true);
+            setTxt('provenance-badge', 'LOAD_FAILED');
+        }
+
+        // Load GeoJSON, CSV, and Python Statistical Diagnostics from docs/data/
         Promise.all([
-            fetch('data/ogun_subbasins.geojson').then(r => r.ok ? r.json() : null).catch(() => null),
-            fetch('data/ogun_monthly_timeseries.csv').then(r => r.ok ? r.text() : null).catch(() => null)
-        ]).then(([geojson, csvText]) => {
-            if (geojson && Array.isArray(geojson.features) && geojson.features.length > 0) {
-                geojson.features.sort((a, b) => (Number(a.properties.order) || 0) - (Number(b.properties.order) || 0));
-                geojson.features.forEach((f, idx) => {
-                    const p = f.properties;
-                    const fb = FALLBACK_GEOJSON.features[idx] ? FALLBACK_GEOJSON.features[idx].properties : {};
-                    p.zone_id = p.zone_id || fb.zone_id || `Z${idx + 1}`;
-                    p.order = Number(p.order) || fb.order || (idx + 1);
-                    p.zone_name = p.zone_name || fb.zone_name || `Zone ${idx + 1}`;
-                    p.regime = p.regime || fb.regime || 'Hydrological Sub-Unit';
-                    p.role_color = p.role_color || fb.role_color || '#0284C7';
-                    p.summary = p.summary || fb.summary || '';
-                    p.management = p.management || fb.management || '';
-                    p.area_km2 = Math.round(Number(p.area_km2) || fb.area_km2 || 2000);
-                    p.rain_mm = Math.round(Number(p.rain_mm) || fb.rain_mm || 1450);
-                    p.flood_km2 = +(Number(p.flood_km2) || fb.flood_km2 || 50).toFixed(1);
-                    p.ndti = +(Number(p.ndti) || fb.ndti || 0.08).toFixed(3);
-                    p.ndvi = +(Number(p.ndvi) || fb.ndvi || 0.45).toFixed(3);
-                    p.soil_moisture = +(Number(p.soil_moisture) || fb.soil_moisture || 0.34).toFixed(3);
-                    p.slope_deg = +(Number(p.slope_deg) || fb.slope_deg || 1.8).toFixed(2);
-                });
-                STATE.geojson = geojson;
-                STATE.features = geojson.features;
+            fetch('data/ogun_subbasins.geojson').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
+            fetch('data/ogun_monthly_timeseries.csv').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }),
+            fetch('data/cascade_diagnostics.json').then(r => r.ok ? r.json() : null).catch(() => null)
+        ]).then(([geojson, csvText, diagnostics]) => {
+            if (!geojson || !Array.isArray(geojson.features) || geojson.features.length === 0) {
+                showExplicitLoadError('GeoJSON Boundary Dataset Empty or Invalid', 'docs/data/ogun_subbasins.geojson contained no valid features.');
+                return;
+            }
+            const parsedSeries = parseGeeCsv(csvText);
+            if (parsedSeries.length === 0) {
+                showExplicitLoadError('Monthly Time-Series CSV Empty or Invalid', 'docs/data/ogun_monthly_timeseries.csv could not be parsed or contained zero monthly records.');
+                return;
             }
 
-            if (csvText) {
-                const parsed = parseGeeCsv(csvText);
-                if (parsed.length > 12) STATE.series = parsed;
-            }
-
-            const r0 = computePearsonR(STATE.series.map(d => d.rain_mm), STATE.series.map(d => d.sar_flood_km2));
-            const r1 = computePearsonR(STATE.series.slice(0, -1).map(d => d.rain_mm), STATE.series.slice(1).map(d => d.sar_flood_km2));
-            STATE.basinLagR = Math.max(r0, r1).toFixed(2);
-            STATE.features.forEach(f => {
-                if (!f.properties.lag_r) f.properties.lag_r = STATE.basinLagR;
+            geojson.features.sort((a, b) => (Number(a.properties.order) || 0) - (Number(b.properties.order) || 0));
+            geojson.features.forEach((f, idx) => {
+                const p = f.properties;
+                p.zone_id = p.zone_id || `Z${idx + 1}`;
+                p.order = Number(p.order) || (idx + 1);
+                p.zone_name = p.zone_name || `Unit ${idx + 1}`;
+                p.unit_type = p.unit_type || (p.zone_id === 'Z5' ? 'Estuarine Receiving Zone' : 'Hydrological Sub-Basin');
+                p.regime = p.regime || 'Analytical Unit';
+                p.role_color = p.role_color || '#0284C7';
+                p.area_km2 = parseNullableFloat(p.area_km2);
+                p.rain_mm = parseNullableFloat(p.rain_mm);
+                p.sar_inundation_km2 = parseNullableFloat(p.sar_inundation_km2 !== undefined ? p.sar_inundation_km2 : p.flood_km2);
+                p.perm_water_km2 = parseNullableFloat(p.perm_water_km2);
+                p.ndti = parseNullableFloat(p.ndti);
+                p.ndvi = parseNullableFloat(p.ndvi);
+                p.shallow_sm_m3m3 = parseNullableFloat(p.shallow_sm_m3m3 !== undefined ? p.shallow_sm_m3m3 : p.soil_moisture);
+                p.slope_deg = parseNullableFloat(p.slope_deg);
             });
 
+            STATE.geojson = geojson;
+            STATE.features = geojson.features;
+            STATE.series = parsedSeries;
+            STATE.diagnostics = diagnostics;
+
+            const geoProv = (geojson.metadata && geojson.metadata.provenance) || (STATE.features[0] && STATE.features[0].properties.provenance) || 'DEMONSTRATION_PREVIEW';
+            const diagProv = diagnostics && diagnostics.provenance ? diagnostics.provenance.status : 'DEMONSTRATION_PREVIEW';
+            STATE.isDemo = (geoProv !== 'VERIFIED_GEE_EXPORT') || (diagProv !== 'VERIFIED_GEE_EXPORT');
+
+            renderProvenanceBanner();
             initDropdowns();
             buildMapLayers();
             initHydroChart();
             updateEverything();
+            renderDiagnosticsTable();
             initTourIfFirstVisit();
+        }).catch(err => {
+            showExplicitLoadError(
+                'Dataset Fetch Failed (No Synthetic Substitution)',
+                `Failed to load required files from docs/data/ (${err.message}). Ensure ogun_subbasins.geojson and ogun_monthly_timeseries.csv exist.`
+            );
         });
+
+        function renderProvenanceBanner() {
+            const banner = document.getElementById('provenance-banner');
+            if (STATE.isDemo) {
+                banner.className = 'provenance-banner is-demo';
+                setTxt(
+                    'provenance-text',
+                    '<strong>Demonstration / Schema Preview Mode:</strong> Loaded files in <span class="mono">docs/data/</span> are marked as demonstration preview data. Run <span class="mono">gee/01_extract_real_ogun_data.js</span> and <span class="mono">src/02_compile_observatory.py</span> to populate verified satellite exports. Statistical significance claims are suppressed in preview mode.',
+                    true
+                );
+                setTxt('provenance-badge', 'DEMONSTRATION_PREVIEW');
+            } else {
+                banner.className = 'provenance-banner is-verified';
+                setTxt(
+                    'provenance-text',
+                    '<strong>Verified GEE Export Loaded:</strong> Displaying empirical Google Earth Engine multi-sensor exports and <span class="mono">src/02_compile_observatory.py</span> statistical diagnostics.',
+                    true
+                );
+                setTxt('provenance-badge', 'VERIFIED_GEE_EXPORT');
+            }
+        }
+
+        function renderDiagnosticsTable() {
+            const tbody = document.getElementById('diag-tbody');
+            if (!STATE.diagnostics || !STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--ink-muted);">Diagnostics unavailable or awaiting GEE export.</td></tr>`;
+                return;
+            }
+            const lagsObj = STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized;
+            const rows = Object.keys(lagsObj).map(key => {
+                const item = lagsObj[key];
+                const lagLabel = key.replace('lag_', 'Lag ').replace('_month', ' mo');
+                const pValStr = item.p_value_bh_fdr !== null && item.p_value_bh_fdr !== undefined ? fmtNum(item.p_value_bh_fdr, 3) : 'N/A';
+                const rStr = item.pearson_r !== null ? fmtNum(item.pearson_r, 2) : 'N/A';
+                const rhoStr = item.spearman_rho !== null ? fmtNum(item.spearman_rho, 2) : 'N/A';
+                const ciStr = item.pearson_ci95 && item.pearson_ci95[0] !== null ? `[${item.pearson_ci95[0]}, ${item.pearson_ci95[1]}]` : '[N/A]';
+                return `
+                    <tr>
+                        <td><strong>${lagLabel}</strong></td>
+                        <td>${item.n_pairs}</td>
+                        <td>${item.n_effective ?? 'N/A'}</td>
+                        <td>${rhoStr}</td>
+                        <td>${rStr} <span style="font-size:10px; color:var(--ink-muted);">${ciStr}</span></td>
+                        <td><span class="mono">${pValStr}</span></td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = rows.join('');
+        }
 
         function initDropdowns() {
             const opts = STATE.features.map(f =>
@@ -1561,18 +1628,12 @@
                     layer.bindTooltip('', { sticky: true, className: 'clean-tip' });
 
                     layer.on('mouseover', () => {
-                        if (STATE.selectedZone !== p.zone_id) {
-                            layer.setStyle({ weight: 3, fillOpacity: 0.92 });
-                        }
+                        if (STATE.selectedZone !== p.zone_id) layer.setStyle({ weight: 3, fillOpacity: 0.92 });
                     });
                     layer.on('mouseout', () => {
-                        if (STATE.selectedZone !== p.zone_id) {
-                            layer.setStyle({ weight: 1.8, fillOpacity: 0.78 });
-                        }
+                        if (STATE.selectedZone !== p.zone_id) layer.setStyle({ weight: 1.8, fillOpacity: 0.78 });
                     });
-                    layer.on('click', () => {
-                        selectZone(p.zone_id);
-                    });
+                    layer.on('click', () => selectZone(p.zone_id));
                 }
             }).addTo(map);
 
@@ -1590,18 +1651,20 @@
 
             STATE.features.forEach(f => {
                 const p = f.properties;
-                p.sim_rain = +(p.rain_mm * shockFactor).toFixed(0);
-                p.sim_flood = +(p.flood_km2 * floodFactor).toFixed(1);
-                p.sim_ndti = +(p.ndti * ndtiFactor).toFixed(3);
+                p.sim_rain = p.rain_mm !== null ? +(p.rain_mm * shockFactor).toFixed(0) : null;
+                p.sim_flood = p.sar_inundation_km2 !== null ? +(p.sar_inundation_km2 * floodFactor).toFixed(1) : null;
+                p.sim_ndti = p.ndti !== null ? +(p.ndti * ndtiFactor).toFixed(3) : null;
             });
 
-            const totFlood = STATE.features.reduce((s, f) => s + f.properties.sim_flood, 0).toFixed(1);
-            const estNdti = STATE.features[STATE.features.length - 1].properties.sim_ndti;
-            setTxt(
-                'executive-finding',
-                `<strong>Key Empirical Finding:</strong> Wet-season rainfall over the Upper Ogun &amp; Oyan tributary drives a lagged Sentinel-1 flood pulse across the basin (<strong>Peak: ${totFlood} km², r = ${STATE.basinLagR}, p &lt; 0.001</strong>) and elevates Lagos Lagoon sediment turbidity (<strong>Estuarine NDTI +${estNdti}</strong>).`,
-                true
-            );
+            const nTotal = STATE.series.length;
+            const nRain = STATE.series.filter(d => d.rain_mm !== null).length;
+            const nSar = STATE.series.filter(d => d.sar_flood_km2 !== null).length;
+            const nNdti = STATE.series.filter(d => d.estuary_ndti !== null).length;
+            setTxt('cov-total', `${nTotal}`);
+            setTxt('cov-rain', `${nRain}/${nTotal}`);
+            setTxt('cov-sar', `${nSar}/${nTotal}`);
+            setTxt('cov-ndti', `${nNdti}/${nTotal}`);
+            setTxt('cov-ndti-miss', `${nTotal - nNdti}`);
 
             styleMapAndLegend();
             renderUnitCard();
@@ -1618,8 +1681,10 @@
                 if (STATE.layer === 'rain') return p.sim_rain;
                 if (STATE.layer === 'ndti') return p.sim_ndti;
                 return p.ndvi;
-            });
-            const vMin = Math.min(...vals), vMax = Math.max(...vals);
+            }).filter(v => v !== null && !Number.isNaN(v));
+
+            const vMin = vals.length ? Math.min(...vals) : 0;
+            const vMax = vals.length ? Math.max(...vals) : 1;
             const ramp = PALETTES[STATE.layer];
 
             geojsonLayer.eachLayer(layer => {
@@ -1640,23 +1705,24 @@
 
                 layer.setTooltipContent(`
                     <strong>0${p.order} · ${p.zone_name}</strong><br/>
-                    Peak SAR Flood: <b>${p.sim_flood} km²</b> · Rain: <b>${p.sim_rain} mm/yr</b><br/>
-                    Turbidity (NDTI): <b>+${p.sim_ndti}</b> · Riparian NDVI: <b>${p.ndvi}</b>
+                    <span style="color:#71717A">${p.unit_type}</span><br/>
+                    SAR Flood Proxy: <b>${fmtNum(p.sim_flood, 1, ' km²')}</b> (Perm. Water: ${fmtNum(p.perm_water_km2, 1, ' km²')})<br/>
+                    Rain: <b>${fmtNum(p.sim_rain, 0, ' mm/yr')}</b> · Spectral NDTI: <b>${fmtNum(p.sim_ndti, 3)}</b>
                 `);
             });
 
             const meta = {
-                flood: ['Sentinel-1 Peak Seasonal Inundation (km²)', 'Sentinel-1 IW VV (Slope < 5°, JRC < 80%)', v => `${v.toFixed(0)} km²`, [
+                flood: ['SAR Low-Backscatter Inundation Proxy (km²)', 'Sentinel-1 IW VV DESCENDING (Slope < 5°, JRC < 80%)', v => `${v.toFixed(0)} km²`, [
                     ['#EFF6FF', 'Headwater (<60 km²)'], ['#60A5FA', 'Midstream (60–120 km²)'], ['#1E3A8A', 'Alluvial Sink (>120 km²)']
                 ]],
-                rain: ['Mean Annual Precipitation (mm/yr)', 'CHIRPS v2.0 (5.5km)', v => `${v.toFixed(0)} mm`, [
+                rain: ['Mean Annual Precipitation (mm/yr)', 'CHIRPS v2.0 Pentadal (5.5 km)', v => `${v.toFixed(0)} mm`, [
                     ['#F0FDFA', 'Northern Savanna (<1350 mm)'], ['#2DD4BF', 'Transition (1350–1600 mm)'], ['#115E59', 'Coastal Humid (>1650 mm)']
                 ]],
-                ndti: ['Surface Water & Estuarine Turbidity (NDTI)', 'Sentinel-2 L2A (MNDWI > 0)', v => `+${v.toFixed(3)}`, [
-                    ['#FEFCE8', 'Clear Upstream (<0.06)'], ['#F59E0B', 'Sediment Transport'], ['#78350F', 'Estuarine Plume (>0.14)']
+                ndti: ['Open-Water Spectral Turbidity Indicator (NDTI)', 'Sentinel-2 L2A (SCL=6, MNDWI > 0, JRC >= 50%)', v => v.toFixed(3), [
+                    ['#D4D4D8', 'Upland / Masked'], ['#F59E0B', 'Channel Water'], ['#78350F', 'Estuarine Plume (>0.14)']
                 ]],
-                ndvi: ['Riparian Buffer Vegetation Health (NDVI)', 'Sentinel-2 Corridor', v => v.toFixed(2), [
-                    ['#FEF2F2', 'Urbanized Estuary (<0.38)'], ['#4ADE80', 'Mixed Riparian'], ['#14532D', 'Intact Gallery Forest (>0.50)']
+                ndvi: ['2 km Riparian Buffer Canopy (NDVI)', 'Sentinel-2 L2A Cloud-Free Land Pixels', v => v.toFixed(2), [
+                    ['#FEF2F2', 'Urbanized Estuary (<0.38)'], ['#4ADE80', 'Mixed Riparian'], ['#14532D', 'Upland Gallery (>0.50)']
                 ]]
             };
 
@@ -1677,10 +1743,10 @@
             STATE.features.forEach(f => {
                 const p = f.properties;
                 const isSel = STATE.selectedZone === p.zone_id;
-                const subTxt = STATE.layer === 'flood' ? `${p.sim_flood} km² flood`
-                             : STATE.layer === 'rain' ? `${p.sim_rain} mm/yr`
-                             : STATE.layer === 'ndti' ? `NDTI +${p.sim_ndti}`
-                             : `NDVI ${p.ndvi}`;
+                const subTxt = STATE.layer === 'flood' ? fmtNum(p.sim_flood, 1, ' km² proxy')
+                             : STATE.layer === 'rain' ? fmtNum(p.sim_rain, 0, ' mm/yr')
+                             : STATE.layer === 'ndti' ? `NDTI: ${fmtNum(p.sim_ndti, 3)}`
+                             : `NDVI: ${fmtNum(p.ndvi, 2)}`;
                 const marker = L.marker([p._center[1], p._center[0]], {
                     interactive: false,
                     icon: L.divIcon({
@@ -1704,30 +1770,42 @@
         }
 
         function renderUnitCard() {
-            const n = STATE.features.length;
+            const lagBadge = document.getElementById('lag-badge');
+            if (STATE.isDemo) {
+                lagBadge.className = 'status-tag warn';
+                setTxt('lag-badge', 'Demo Preview (Run GEE Export for r / p)');
+            } else if (STATE.diagnostics && STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized) {
+                const l1 = STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized.lag_1_month;
+                lagBadge.className = 'status-tag';
+                setTxt('lag-badge', `Deseasonalized Lag-1 r = ${fmtNum(l1.pearson_r, 2)} (n=${l1.n_pairs}, FDR p=${fmtNum(l1.p_value_bh_fdr, 3)})`);
+            }
+
             if (STATE.selectedZone === 'ALL') {
-                const totArea = STATE.features.reduce((s, f) => s + f.properties.area_km2, 0);
-                const totFlood = STATE.features.reduce((s, f) => s + f.properties.sim_flood, 0);
-                const meanRain = STATE.features.reduce((s, f) => s + f.properties.sim_rain, 0) / n;
-                const meanSm = STATE.features.reduce((s, f) => s + f.properties.soil_moisture, 0) / n;
-                const meanNdvi = STATE.features.reduce((s, f) => s + f.properties.ndvi, 0) / n;
-                const meanSlope = STATE.features.reduce((s, f) => s + f.properties.slope_deg, 0) / n;
-                const estuaryNdti = STATE.features[n - 1].properties.sim_ndti;
+                const catchmentUnits = STATE.features.filter(f => f.properties.zone_id !== 'Z5');
+                const estuaryUnit = STATE.features.find(f => f.properties.zone_id === 'Z5') || STATE.features[STATE.features.length - 1];
+                const totCatchmentArea = catchmentUnits.reduce((s, f) => s + (f.properties.area_km2 || 0), 0);
+                const totFlood = catchmentUnits.reduce((s, f) => s + (f.properties.sim_flood || 0), 0);
+                const totPerm = catchmentUnits.reduce((s, f) => s + (f.properties.perm_water_km2 || 0), 0);
+                const meanRain = catchmentUnits.reduce((s, f) => s + (f.properties.sim_rain || 0), 0) / (catchmentUnits.length || 1);
+                const meanSm = catchmentUnits.reduce((s, f) => s + (f.properties.shallow_sm_m3m3 || 0), 0) / (catchmentUnits.length || 1);
+                const meanNdvi = catchmentUnits.reduce((s, f) => s + (f.properties.ndvi || 0), 0) / (catchmentUnits.length || 1);
+                const meanSlope = catchmentUnits.reduce((s, f) => s + (f.properties.slope_deg || 0), 0) / (catchmentUnits.length || 1);
 
-                setTxt('sel-eyebrow', '01 · Basin-Wide Synthesis (All 5 Units)');
-                setTxt('sel-title', 'Full Ogun River Basin');
-                setTxt('sel-badge', 'Catchment-to-Coast');
-                setTxt('sel-insight', 'Spanning the Oyo Basement Complex down to the Lagos Lagoon, upstream rainfall and Oyan Dam releases propagate downstream to inundate the low-gradient Lower Ogun wetlands and deliver suspended sediment plumes into the estuary.');
-                setTxt('sel-management', '<strong>Watershed & Adaptation Priority:</strong> Protecting riparian buffers in the Upper Ogun/Oyan sub-basins and coordinating Oyan Dam wet-season spilling schedules are critical to reducing backwater flood peaks in Akute, Isheri, and Ikorodu.', true);
+                setTxt('sel-eyebrow', '01 · Multi-Domain Overview (Z1–Z4 Catchment + Z5 Estuary)');
+                setTxt('sel-title', 'Ogun Catchment (Z1–Z4) & Estuary (Z5)');
+                setTxt('sel-badge', STATE.rainShockPct === 0 ? 'Baseline View' : `Sensitivity (${STATE.rainShockPct > 0 ? '+' : ''}${STATE.rainShockPct}%)`);
+                setTxt('sel-insight', 'Separates the four upland hydrological sub-basins (Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Z5).');
+                setTxt('sel-management', '<strong>Scientific Distinction:</strong> Catchment rainfall, shallow soil moisture (0–7 cm), and SAR floodplain inundation are aggregated across Z1–Z4, whereas estuarine spectral NDTI is evaluated strictly over open water in Z5.', true);
 
-                setTxt('val-rain', `${Math.round(meanRain).toLocaleString()} mm`);
-                setTxt('val-flood', `${totFlood.toFixed(1)} km²`);
-                setTxt('val-ndti', `+${estuaryNdti}`);
-                setTxt('val-sm', `${meanSm.toFixed(3)} m³/m³`);
-                setTxt('val-ndvi', meanNdvi.toFixed(3));
-                setTxt('val-slope', `${meanSlope.toFixed(2)}°`);
-                setTxt('sub-area', `Total: ${totArea.toLocaleString()} km²`);
-                setTxt('lag-badge', `Lag r = ${STATE.basinLagR} (p < 0.001)`);
+                setTxt('val-rain', fmtNum(meanRain, 0, ' mm'));
+                setTxt('val-flood', fmtNum(totFlood, 1, ' km²'));
+                setTxt('sub-flood', `Catchment Perm. Water: ${fmtNum(totPerm, 1, ' km²')}`);
+                setTxt('val-ndti', fmtNum(estuaryUnit ? estuaryUnit.properties.sim_ndti : null, 3));
+                setTxt('sub-ndti', 'Z5 Estuary open water');
+                setTxt('val-sm', fmtNum(meanSm, 3, ' m³/m³'));
+                setTxt('val-ndvi', fmtNum(meanNdvi, 3));
+                setTxt('val-slope', fmtNum(meanSlope, 2, '°'));
+                setTxt('sub-area', `Catchment: ${totCatchmentArea.toLocaleString()} km² (+970 km² Z5)`);
                 return;
             }
 
@@ -1735,20 +1813,21 @@
             if (!feat) return;
             const p = feat.properties;
 
-            setTxt('sel-eyebrow', `01 · Hydrological Cascade Unit 0${p.order} of 05`);
+            setTxt('sel-eyebrow', `01 · ${p.unit_type} (Unit 0${p.order})`);
             setTxt('sel-title', p.zone_name);
             setTxt('sel-badge', p.regime);
             setTxt('sel-insight', p.summary);
-            setTxt('sel-management', `<strong>Management Priority (${p.zone_name}):</strong> ${p.management}`, true);
+            setTxt('sel-management', `<strong>Monitoring & Management Focus:</strong> ${p.management}`, true);
 
-            setTxt('val-rain', `${p.sim_rain.toLocaleString()} mm`);
-            setTxt('val-flood', `${p.sim_flood} km²`);
-            setTxt('val-ndti', `+${p.sim_ndti}`);
-            setTxt('val-sm', `${p.soil_moisture} m³/m³`);
-            setTxt('val-ndvi', p.ndvi.toFixed(3));
-            setTxt('val-slope', `${p.slope_deg}°`);
-            setTxt('sub-area', `Area: ${p.area_km2.toLocaleString()} km²`);
-            setTxt('lag-badge', `Lag r = ${p.lag_r || STATE.basinLagR} (p < 0.001)`);
+            setTxt('val-rain', fmtNum(p.sim_rain, 0, ' mm'));
+            setTxt('val-flood', fmtNum(p.sim_flood, 1, ' km²'));
+            setTxt('sub-flood', `Perm. water: ${fmtNum(p.perm_water_km2, 1, ' km²')}`);
+            setTxt('val-ndti', fmtNum(p.sim_ndti, 3));
+            setTxt('sub-ndti', p.zone_id === 'Z5' ? 'Verified estuarine water' : 'Channel water pixels only');
+            setTxt('val-sm', fmtNum(p.shallow_sm_m3m3, 3, ' m³/m³'));
+            setTxt('val-ndvi', fmtNum(p.ndvi, 3));
+            setTxt('val-slope', fmtNum(p.slope_deg, 2, '°'));
+            setTxt('sub-area', `Area: ${(p.area_km2 || 0).toLocaleString()} km²`);
         }
 
         function initHydroChart() {
@@ -1759,7 +1838,7 @@
                     labels: STATE.series.map(d => d.year_month),
                     datasets: [
                         {
-                            label: 'CHIRPS Rainfall (mm)',
+                            label: 'CHIRPS Rainfall (mm/mo)',
                             data: [],
                             type: 'bar',
                             backgroundColor: 'rgba(13, 148, 136, 0.22)',
@@ -1768,25 +1847,27 @@
                             yAxisID: 'y'
                         },
                         {
-                            label: 'Sentinel-1 Flood Extent (km²)',
+                            label: 'SAR Inundation Proxy (km²)',
                             data: [],
                             type: 'line',
                             borderColor: '#09090B',
                             backgroundColor: '#09090B',
                             borderWidth: 2.2,
-                            pointRadius: 0,
-                            tension: 0.35,
+                            pointRadius: 1.5,
+                            spanGaps: false,
+                            tension: 0.25,
                             yAxisID: 'y1'
                         },
                         {
-                            label: 'Estuarine Turbidity (NDTI × 1000)',
+                            label: 'Estuarine NDTI (×1000, gaps = cloudy)',
                             data: [],
                             type: 'line',
                             borderColor: '#0284C7',
                             borderDash: [4, 3],
                             borderWidth: 1.8,
-                            pointRadius: 0,
-                            tension: 0.35,
+                            pointRadius: 2,
+                            spanGaps: false,
+                            tension: 0.25,
                             yAxisID: 'y1'
                         }
                     ]
@@ -1813,7 +1894,7 @@
                         y1: {
                             position: 'right',
                             grid: { drawOnChartArea: false },
-                            title: { display: true, text: 'SAR Flood (km²) / NDTI×10³', font: { family: 'Satoshi', size: 10, weight: '700' } }
+                            title: { display: true, text: 'SAR Proxy (km²) / NDTI×10³', font: { family: 'Satoshi', size: 10, weight: '700' } }
                         }
                     }
                 }
@@ -1822,31 +1903,39 @@
 
         function updateHydroChart(shockFactor, floodFactor, ndtiFactor) {
             if (!chartInstance) return;
-            const totalBaseFlood = STATE.features.reduce((s, f) => s + f.properties.flood_km2, 0) || 418.4;
+            const totalBaseFlood = STATE.features.reduce((s, f) => s + (f.properties.sar_inundation_km2 || 0), 0) || 418.4;
             const zoneScale = STATE.selectedZone === 'ALL' ? 1.0
-                : (STATE.features.find(f => f.properties.zone_id === STATE.selectedZone)?.properties.flood_km2 || 80) / totalBaseFlood;
+                : ((STATE.features.find(f => f.properties.zone_id === STATE.selectedZone)?.properties.sar_inundation_km2 || 60) / totalBaseFlood);
 
             chartInstance.data.labels = STATE.series.map(d => d.year_month);
-            chartInstance.data.datasets[0].data = STATE.series.map(d => +(d.rain_mm * shockFactor).toFixed(1));
-            chartInstance.data.datasets[1].data = STATE.series.map(d => +(d.sar_flood_km2 * floodFactor * zoneScale).toFixed(1));
-            chartInstance.data.datasets[2].data = STATE.series.map(d => +(d.estuary_ndti * ndtiFactor * 1000).toFixed(1));
+            chartInstance.data.datasets[0].data = STATE.series.map(d => d.rain_mm !== null ? +(d.rain_mm * shockFactor).toFixed(1) : null);
+            chartInstance.data.datasets[1].data = STATE.series.map(d => d.sar_flood_km2 !== null ? +(d.sar_flood_km2 * floodFactor * zoneScale).toFixed(1) : null);
+            chartInstance.data.datasets[2].data = STATE.series.map(d => d.estuary_ndti !== null ? +(d.estuary_ndti * ndtiFactor * 1000).toFixed(1) : null);
             chartInstance.update('none');
         }
 
         function renderBenchmark() {
             const fA = STATE.features.find(f => f.properties.zone_id === STATE.compA) || STATE.features[0];
             const fB = STATE.features.find(f => f.properties.zone_id === STATE.compB) || STATE.features[3];
+            if (!fA || !fB) return;
             const a = fA.properties, b = fB.properties;
 
             setTxt('th-comp-a', a.zone_name);
             setTxt('th-comp-b', b.zone_name);
 
+            function diffStr(va, vb, dec, unit) {
+                if (va === null || vb === null || Number.isNaN(va) || Number.isNaN(vb)) return 'N/A';
+                const d = va - vb;
+                return `${d >= 0 ? '+' : ''}${d.toFixed(dec)}${unit}`;
+            }
+
             const rows = [
-                ['Peak SAR Flood (km²)', `${a.sim_flood} km²`, `${b.sim_flood} km²`, `${(a.sim_flood - b.sim_flood >= 0 ? '+' : '')}${(a.sim_flood - b.sim_flood).toFixed(1)} km²`],
-                ['Annual Rainfall (mm)', `${a.sim_rain} mm`, `${b.sim_rain} mm`, `${(a.sim_rain - b.sim_rain >= 0 ? '+' : '')}${a.sim_rain - b.sim_rain} mm`],
-                ['Water Turbidity (NDTI)', `+${a.sim_ndti}`, `+${b.sim_ndti}`, `${(a.sim_ndti - b.sim_ndti >= 0 ? '+' : '')}${(a.sim_ndti - b.sim_ndti).toFixed(3)}`],
-                ['Mean Slope (GLO-30)', `${a.slope_deg}°`, `${b.slope_deg}°`, `${(a.slope_deg - b.slope_deg >= 0 ? '+' : '')}${(a.slope_deg - b.slope_deg).toFixed(2)}°`],
-                ['Riparian Canopy (NDVI)', a.ndvi.toFixed(3), b.ndvi.toFixed(3), `${(a.ndvi - b.ndvi >= 0 ? '+' : '')}${(a.ndvi - b.ndvi).toFixed(3)}`]
+                ['SAR Inundation Proxy', fmtNum(a.sim_flood, 1, ' km²'), fmtNum(b.sim_flood, 1, ' km²'), diffStr(a.sim_flood, b.sim_flood, 1, ' km²')],
+                ['Permanent Water (JRC)', fmtNum(a.perm_water_km2, 1, ' km²'), fmtNum(b.perm_water_km2, 1, ' km²'), diffStr(a.perm_water_km2, b.perm_water_km2, 1, ' km²')],
+                ['Annual Rainfall', fmtNum(a.sim_rain, 0, ' mm'), fmtNum(b.sim_rain, 0, ' mm'), diffStr(a.sim_rain, b.sim_rain, 0, ' mm')],
+                ['Spectral NDTI', fmtNum(a.sim_ndti, 3), fmtNum(b.sim_ndti, 3), diffStr(a.sim_ndti, b.sim_ndti, 3, '')],
+                ['Shallow Soil Water (0–7cm)', fmtNum(a.shallow_sm_m3m3, 3), fmtNum(b.shallow_sm_m3m3, 3), diffStr(a.shallow_sm_m3m3, b.shallow_sm_m3m3, 3, '')],
+                ['Mean Slope (GLO-30)', fmtNum(a.slope_deg, 2, '°'), fmtNum(b.slope_deg, 2, '°'), diffStr(a.slope_deg, b.slope_deg, 2, '°')]
             ];
 
             setTxt('comp-tbody', rows.map(([m, va, vb, d]) =>
@@ -1862,11 +1951,11 @@
                 return `
                     <tr class="${active}" data-zone="${p.zone_id}">
                         <td><span class="swatch-dot" style="background:${p._color};display:inline-block;margin-right:6px;vertical-align:middle;"></span><strong>0${p.order} · ${p.zone_name}</strong></td>
-                        <td>${p.area_km2.toLocaleString()}</td>
-                        <td>${p.sim_rain}</td>
-                        <td><strong>${p.sim_flood} km²</strong></td>
-                        <td>+${p.sim_ndti}</td>
-                        <td style="color:${p.role_color};font-weight:700;">${p.regime}</td>
+                        <td><span class="mono" style="font-size:11px;">${p.unit_type}</span></td>
+                        <td>${(p.area_km2 || 0).toLocaleString()}</td>
+                        <td>${fmtNum(p.sim_rain, 0)}</td>
+                        <td><strong>${fmtNum(p.sim_flood, 1, ' km²')}</strong></td>
+                        <td>${fmtNum(p.sim_ndti, 3)}</td>
                     </tr>
                 `;
             }).join('');
@@ -1876,7 +1965,7 @@
             });
         }
 
-        // Event Listeners
+        // Controls & Listeners
         document.getElementById('zone-select').addEventListener('change', e => selectZone(e.target.value));
         document.getElementById('layer-select').addEventListener('change', e => {
             STATE.layer = e.target.value;
@@ -1894,17 +1983,12 @@
         document.getElementById('rain-shock-slider').addEventListener('input', e => {
             STATE.rainShockPct = Number(e.target.value);
             const sign = STATE.rainShockPct > 0 ? '+' : '';
-            setTxt('shock-val', STATE.rainShockPct === 0 ? '0% (Observed Baseline)' : `${sign}${STATE.rainShockPct}% Forcing Anomaly`);
+            setTxt('shock-val', STATE.rainShockPct === 0 ? '0% (Loaded Baseline)' : `${sign}${STATE.rainShockPct}% Sensitivity Scaling`);
             updateEverything();
         });
         document.getElementById('comp-a').addEventListener('change', e => { STATE.compA = e.target.value; renderBenchmark(); });
         document.getElementById('comp-b').addEventListener('change', e => { STATE.compB = e.target.value; renderBenchmark(); });
 
-        document.getElementById('btn-3d').addEventListener('click', e => {
-            STATE.is3D = !STATE.is3D;
-            document.getElementById('map-stage').classList.toggle('is-3d', STATE.is3D);
-            e.currentTarget.classList.toggle('active', STATE.is3D);
-        });
         document.getElementById('btn-labels').addEventListener('click', e => {
             STATE.showLabels = !STATE.showLabels;
             e.currentTarget.classList.toggle('active', STATE.showLabels);
@@ -1915,7 +1999,7 @@
             STATE.rainShockPct = 0;
             document.getElementById('zone-select').value = 'ALL';
             document.getElementById('rain-shock-slider').value = 0;
-            setTxt('shock-val', '0% (Observed Baseline)');
+            setTxt('shock-val', '0% (Loaded Baseline)');
             if (geojsonLayer) map.flyToBounds(geojsonLayer.getBounds(), { padding: [24, 24], duration: 0.6 });
             updateEverything();
         });
@@ -1930,13 +2014,16 @@
         }
 
         document.getElementById('btn-export-csv').addEventListener('click', () => {
-            const headers = ['year_month', 'rain_mm', 'sar_flood_km2', 'estuary_ndti'];
-            const rows = STATE.series.map(r => `${r.year_month},${r.rain_mm},${r.sar_flood_km2},${r.estuary_ndti}`);
-            downloadBlob([headers.join(','), ...rows].join('\n'), 'ogun_catchment_72mo_timeseries.csv', 'text/csv');
+            const headers = ['year_month', 'rain_mm', 'shallow_sm_m3m3', 'sar_flood_km2', 'estuary_ndti', 'data_status'];
+            const rows = STATE.series.map(r =>
+                `${r.year_month},${r.rain_mm ?? ''},${r.shallow_sm_m3m3 ?? ''},${r.sar_flood_km2 ?? ''},${r.estuary_ndti ?? ''},${r.data_status}`
+            );
+            downloadBlob([headers.join(','), ...rows].join('\n'), 'ogun_catchment_timeseries_export.csv', 'text/csv');
         });
 
         document.getElementById('btn-export-geojson').addEventListener('click', () => {
-            downloadBlob(JSON.stringify(STATE.geojson, null, 2), 'ogun_catchment_5_units.geojson', 'application/geo+json');
+            if (!STATE.geojson) return;
+            downloadBlob(JSON.stringify(STATE.geojson, null, 2), 'ogun_analytical_units_export.geojson', 'application/geo+json');
         });
 
         const methodsModal = document.getElementById('methods-modal');
@@ -1957,43 +2044,43 @@
             btn.addEventListener('mouseleave', hide);
         });
 
-        // 6-Step Clean White Walkthrough Guide (LHC Architecture)
+        // 6-Step Clean Walkthrough Guide
         const TOUR_STEPS = [
             {
-                target: '#map-stage',
-                title: '1. Catchment-to-Coast Hydrological Map',
-                desc: 'All 5 hydrologically connected sub-basins—from the Upper Ogun Headwaters in Oyo down to the Lagos Lagoon Estuary—are mapped alongside the main river stem.',
-                hint: 'Click any polygon on the map to isolate its sub-basin metrics without camera jump.'
+                target: '#provenance-banner',
+                title: '1. Data Provenance & Integrity Banner',
+                desc: 'Verifies whether the files in docs/data/ are Verified Google Earth Engine Exports or Schema Demonstration Previews, ensuring preview data are never presented as empirical research findings.',
+                hint: 'Run gee/01_extract_real_ogun_data.js and src/02_compile_observatory.py to switch to VERIFIED_GEE_EXPORT.'
             },
             {
-                target: '#tour-topbar',
-                title: '2. Multi-Sensor Layer & Unit Controls',
-                desc: 'Switch the active map layer between Sentinel-1 SAR Flood Inundation, CHIRPS Annual Rainfall, Sentinel-2 Water Turbidity (NDTI), and Riparian Canopy (NDVI).',
-                hint: 'Use the 3D Tilt button or Methods modal to inspect the physical processing equations.'
+                target: '#map-stage',
+                title: '2. Catchment Sub-Basins (Z1–Z4) vs. Estuary (Z5)',
+                desc: 'Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L7) from the downstream estuarine receiving water body in the northwest Lagos Lagoon.',
+                hint: 'Click any polygon to inspect its specific unit type, permanent water area, and seasonal metrics.'
             },
             {
                 target: '#tour-legend',
-                title: '3. External Legend Dock',
-                desc: 'Positioned below the map canvas so floating cards never obscure the river corridor or estuarine delta.',
-                hint: 'Updates quantile ticks and physical sensor thresholds automatically when you switch layers.'
+                title: '3. External Sensor Legend Dock',
+                desc: 'Reports exact preprocessing thresholds (e.g., Sentinel-1 DESCENDING pass, GLO-30 slope < 5°, JRC permanent water < 80%) and marks masked upland cells clearly.',
+                hint: 'Switch layers in the top bar to compare rainfall, SAR inundation proxy, NDTI, and riparian NDVI.'
             },
             {
                 target: '#card-unit',
-                title: '4. Sub-Basin Diagnostic & Adaptation Brief',
-                desc: 'Synthesizes 6 satellite indicators and provides a concrete watershed management priority for the selected cascade unit.',
-                hint: 'Hover over any (?) badge to read the exact sensor definition and spatial resolution.'
+                title: '4. Unit Diagnostics & Permanent Water Separation',
+                desc: 'Reports permanent surface water (JRC >= 80%) separately from seasonal SAR low-backscatter inundation proxy areas, and labels ERA5-Land accurately as shallow (0–7 cm) soil moisture.',
+                hint: 'Hover over any (?) badge to read the exact sensor resolution and physical limitations.'
             },
             {
                 target: '#card-hydrograph',
-                title: '5. 72-Month Hydrograph & Forcing Simulator',
-                desc: 'Plots 6 years (2019–2024) of monthly CHIRPS rainfall against Sentinel-1 flood extent and estuarine turbidity, computing the live lagged Pearson correlation r.',
-                hint: 'Drag the anomaly slider (-20% to +30%) to simulate upstream rainfall or Oyan Dam spill shocks.'
+                title: '5. Observation Counts, Missing Months & Sensitivity Mode',
+                desc: 'Displays valid observation counts per sensor and preserves cloudy monsoon months as gaps (never substituting 0). The slider below is explicitly badged as an uncalibrated parametric sensitivity illustration.',
+                hint: 'Notice how cloudy wet-season NDTI gaps remain uninterpolated on the chart.'
             },
             {
                 target: '#card-benchmark',
-                title: '6. Upstream-Downstream Gradient & Data Exports',
-                desc: 'Compare headwater runoff zones directly against downstream alluvial flood sinks, or export the full 72-month CSV and GeoJSON from the top bar.',
-                hint: 'You can reopen this guide anytime via the "Guide" button in the top navigation bar.'
+                title: '6. Cross-Unit Comparison & Reproducible Exports',
+                desc: 'Compare any two analytical units side by side or export the loaded CSV and GeoJSON datasets from the top bar.',
+                hint: 'Click "Methods & Audit" in the top bar anytime to review the full methodological limitations.'
             }
         ];
 
@@ -2026,46 +2113,34 @@
                 document.getElementById('tour-prev').style.visibility = tourIdx === 0 ? 'hidden' : 'visible';
                 setTxt('tour-next', tourIdx === TOUR_STEPS.length - 1 ? 'Finish ✓' : 'Next →');
 
-                const cardW = 375, cardH = tourCard.offsetHeight || 235;
+                const cardW = 375, cardH = tourCard.offsetHeight || 240;
                 let leftPos = r.left < 420 ? r.right - cardW - 20 : r.left - cardW - 18;
-                if (step.target === '#map-stage') leftPos = r.left + 28;
-                if (step.target === '#tour-topbar') leftPos = window.innerWidth - cardW - 28;
-
+                if (step.target === '#map-stage' || step.target === '#provenance-banner') leftPos = r.left + 28;
                 let topPos = Math.max(16, Math.min(window.innerHeight - cardH - 16, r.top + 18));
-                if (step.target === '#tour-topbar') topPos = r.bottom + 14;
+                if (step.target === '#provenance-banner') topPos = r.bottom + 14;
                 if (step.target === '#tour-legend') topPos = Math.max(16, r.top - cardH - 14);
 
-                leftPos = Math.max(16, Math.min(window.innerWidth - cardW - 16, leftPos));
+                leftPos = Math.max(16, Math.min(window.innerWidth - tipWFallback(cardW) - 16, leftPos));
                 tourCard.style.top = `${topPos}px`;
                 tourCard.style.left = `${leftPos}px`;
-            }, 220);
+            }, 200);
         }
 
+        function tipWFallback(w) { return w || 375; }
         function openTour() { tourIdx = 0; tourLayer.classList.remove('is-hidden'); positionTourStep(); }
         function closeTour() {
             tourLayer.classList.add('is-hidden');
-            try { localStorage.setItem('ogun_obs_tour_v3', '1'); } catch (e) {}
+            try { localStorage.setItem('ogun_obs_tour_v4', '1'); } catch (e) {}
         }
         function initTourIfFirstVisit() {
-            try { if (!localStorage.getItem('ogun_obs_tour_v3')) setTimeout(openTour, 350); } catch (e) {}
+            try { if (!localStorage.getItem('ogun_obs_tour_v4')) setTimeout(openTour, 350); } catch (e) {}
         }
 
         document.getElementById('btn-tour').addEventListener('click', openTour);
         document.getElementById('tour-close').addEventListener('click', closeTour);
-        document.getElementById('tour-prev').addEventListener('click', () => { if (tourIdx > 0) { tourIdx--; positionTourStep(); } });
+        document.getElementById('btn-tour-prev', '#tour-prev').addEventListener('click', () => { if (tourIdx > 0) { tourIdx--; positionTourStep(); } });
         document.getElementById('tour-next').addEventListener('click', () => {
             if (tourIdx < TOUR_STEPS.length - 1) { tourIdx++; positionTourStep(); } else closeTour();
-        });
-
-        window.addEventListener('keydown', e => {
-            if (tourLayer.classList.contains('is-hidden')) return;
-            if (e.key === 'Escape') closeTour();
-            if (e.key === 'ArrowRight') {
-                if (tourIdx < TOUR_STEPS.length - 1) { tourIdx++; positionTourStep(); } else closeTour();
-            }
-            if (e.key === 'ArrowLeft' && tourIdx > 0) {
-                tourIdx--; positionTourStep();
-            }
         });
     })();
     </script>
