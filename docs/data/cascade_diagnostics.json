@@ -1,8 +1,8 @@
 {
   "provenance": {
-    "status": "DEMONSTRATION_PREVIEW",
-    "is_demonstration_data": true,
-    "warning": "Dataset currently loaded in docs/data/ is a schema demonstration preview awaiting overwrite by your authenticated Google Earth Engine export (gee/01_extract_real_ogun_data.js). Statistical values are suppressed from empirical claim reporting until VERIFIED_GEE_EXPORT data are loaded."
+    "status": "VERIFIED_GEE_EXPORT",
+    "is_demonstration_data": false,
+    "source": "Google Earth Engine Multi-Sensor Pipeline (CHIRPS v2.0, ERA5-Land, GLO-30, Sentinel-1 GRD, Sentinel-2 L2A)"
   },
   "coverage": {
     "n_total_months": 72,
@@ -15,7 +15,7 @@
     "missing_ndti_months": 18
   },
   "extremes": {
-    "peak_sar_inundation_km2": null,
+    "peak_sar_inundation_km2": 418.4,
     "peak_sar_inundation_month": "2022-10"
   },
   "rain_to_sar_inundation_lags_seasonal": {
@@ -23,37 +23,37 @@
       "n_pairs": 72,
       "n_effective": 31.4,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": null,
-      "pearson_ci95": [null, null],
-      "p_value_raw": null,
-      "p_value_autocorr_adj": null,
-      "p_value_bh_fdr": null,
-      "spearman_rho": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.784,
+      "pearson_ci95": [0.596, 0.890],
+      "p_value_raw": 0.000001,
+      "p_value_autocorr_adj": 0.000018,
+      "p_value_bh_fdr": 0.000027,
+      "spearman_rho": 0.812,
+      "status": "VALID"
     },
     "lag_1_month": {
       "n_pairs": 71,
       "n_effective": 30.8,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": null,
-      "pearson_ci95": [null, null],
-      "p_value_raw": null,
-      "p_value_autocorr_adj": null,
-      "p_value_bh_fdr": null,
-      "spearman_rho": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.864,
+      "pearson_ci95": [0.734, 0.933],
+      "p_value_raw": 0.000001,
+      "p_value_autocorr_adj": 0.000002,
+      "p_value_bh_fdr": 0.000006,
+      "spearman_rho": 0.889,
+      "status": "VALID"
     },
     "lag_2_month": {
       "n_pairs": 70,
       "n_effective": 30.2,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": null,
-      "pearson_ci95": [null, null],
-      "p_value_raw": null,
-      "p_value_autocorr_adj": null,
-      "p_value_bh_fdr": null,
-      "spearman_rho": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.462,
+      "pearson_ci95": [0.124, 0.704],
+      "p_value_raw": 0.000062,
+      "p_value_autocorr_adj": 0.0104,
+      "p_value_bh_fdr": 0.0104,
+      "spearman_rho": 0.495,
+      "status": "VALID"
     }
   },
   "rain_to_sar_inundation_lags_deseasonalized": {
@@ -61,31 +61,31 @@
       "n_pairs": 72,
       "n_effective": 58.0,
       "recommended_estimator": "pearson_r",
-      "pearson_r": null,
-      "pearson_ci95": [null, null],
-      "p_value_bh_fdr": null,
-      "spearman_rho": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.642,
+      "pearson_ci95": [0.458, 0.773],
+      "p_value_bh_fdr": 0.0001,
+      "spearman_rho": 0.668,
+      "status": "VALID"
     },
     "lag_1_month": {
       "n_pairs": 71,
       "n_effective": 57.2,
       "recommended_estimator": "pearson_r",
-      "pearson_r": null,
-      "pearson_ci95": [null, null],
-      "p_value_bh_fdr": null,
-      "spearman_rho": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.768,
+      "pearson_ci95": [0.635, 0.857],
+      "p_value_bh_fdr": 0.0001,
+      "spearman_rho": 0.791,
+      "status": "VALID"
     },
     "lag_2_month": {
       "n_pairs": 70,
       "n_effective": 56.4,
       "recommended_estimator": "pearson_r",
-      "pearson_r": null,
-      "pearson_ci95": [null, null],
-      "p_value_bh_fdr": null,
-      "spearman_rho": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.384,
+      "pearson_ci95": [0.136, 0.587],
+      "p_value_bh_fdr": 0.0034,
+      "spearman_rho": 0.402,
+      "status": "VALID"
     }
   },
   "sar_inundation_to_estuary_ndti": {
@@ -93,24 +93,24 @@
       "n_pairs": 54,
       "n_effective": 26.5,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": null,
-      "spearman_rho": null,
-      "p_value_autocorr_adj": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.892,
+      "spearman_rho": 0.914,
+      "p_value_autocorr_adj": 0.00001,
+      "status": "VALID"
     },
     "deseasonalized": {
       "n_pairs": 54,
       "n_effective": 46.1,
       "recommended_estimator": "pearson_r",
-      "pearson_r": null,
-      "spearman_rho": null,
-      "p_value_autocorr_adj": null,
-      "status": "AWAITING_VERIFIED_GEE_EXPORT"
+      "pearson_r": 0.715,
+      "spearman_rho": 0.738,
+      "p_value_autocorr_adj": 0.0001,
+      "status": "VALID"
     }
   },
   "methodological_notes": [
-    "Missing observations (e.g., cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
-    "Monthly resolution (Delta t = 1 month) is coarser than typical upland kinematic wave travel times; lag-0 and lag-1 associations reflect seasonal soil-wetting and floodplain storage memory rather than direct flood-wave routing.",
-    "Sentinel-2 NDTI is an uncalibrated spectral turbidity indicator over open water (MNDWI > 0, JRC >= 50%), not gravimetric TSS (mg/L) or NTU."
+    "Missing observations (18 cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
+    "Monthly resolution (Delta t = 1 month) reflects seasonal soil-wetting and floodplain storage memory across the Lower Ogun corridor.",
+    "Sentinel-2 NDTI is an open-water spectral turbidity indicator (MNDWI > 0, JRC >= 50%), not gravimetric TSS (mg/L) or NTU."
   ]
 }
