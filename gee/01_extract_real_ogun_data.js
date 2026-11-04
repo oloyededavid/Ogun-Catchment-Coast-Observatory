@@ -1,13 +1,11 @@
-
 var hybas7 = ee.FeatureCollection('WWF/HydroSHEDS/v1/Basins/hybas_7');
 var rivers = ee.FeatureCollection('WWF/HydroSHEDS/v1/FreeFlowingRivers');
 var jrc = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('occurrence').unmask(0);
 
-// Identify the Ogun River MAIN_BAS ID at Abeokuta mainstem ([3.35, 7.15])
+
 var ogunMainstemPt = ee.Geometry.Point([3.35, 7.15]);
 var mainBasId = hybas7.filterBounds(ogunMainstemPt).first().get('MAIN_BAS');
 
-// Annotate every intact Level-7 sub-basin in the Ogun network with its centroid lon/lat
 var ogunHybas7 = hybas7.filter(ee.Filter.eq('MAIN_BAS', mainBasId)).map(function(f) {
   var coords = f.geometry().centroid(30).coordinates();
   return f.set({
@@ -16,7 +14,7 @@ var ogunHybas7 = hybas7.filter(ee.Filter.eq('MAIN_BAS', mainBasId)).map(function
   });
 });
 
-// Mutually exclusive, collectively exhaustive grouping of intact hybas_7 sub-basins:
+
 var z1Geom = ogunHybas7.filter(ee.Filter.gte('c_lat', 7.75)).geometry().dissolve();
 var z2Geom = ogunHybas7.filter(
   ee.Filter.and(
@@ -98,9 +96,7 @@ Map.centerObject(fullStudyGeom, 8);
 Map.addLayer(analyticalUnits, {}, 'Audited Hydrological & Estuarine Units');
 Map.addLayer(ogunRivers, {color: '#0284C7'}, 'HydroSHEDS River Network (Order >= 3)');
 
-// ============================================================================
-// 2. TOPOGRAPHIC, PERMANENT WATER & SENSOR PREPROCESSING
-// ============================================================================
+
 var startDateStr = '2019-01-01';
 var endDateStr = '2024-12-31';
 var dem = ee.ImageCollection('COPERNICUS/DEM/GLO30').select('DEM').mosaic().clip(fullStudyGeom);
@@ -141,9 +137,7 @@ var s1Collection = ee.ImageCollection('COPERNICUS/S1_GRD')
   .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
   .select('VV');
 
-// ============================================================================
-// 3. MULTI-YEAR SPATIAL BASELINE PER ANALYTICAL UNIT (2019–2024)
-// ============================================================================
+
 var meanAnnualRain = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')
   .filterDate(startDateStr, endDateStr)
   .select('precipitation')
@@ -221,9 +215,7 @@ Export.table.toDrive({
   fileFormat: 'GeoJSON'
 });
 
-// ============================================================================
-// 4. CRASH-SAFE 72-MONTH TIME-SERIES EXPORT WITH OBSERVATION COUNTS & NULLS
-// ============================================================================
+
 var chirpsCol = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD').select('precipitation');
 var era5Col = ee.ImageCollection('ECMWF/ERA5_LAND/MONTHLY_AGGR').select('volumetric_soil_water_layer_1');
 
