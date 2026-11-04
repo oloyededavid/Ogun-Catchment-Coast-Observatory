@@ -3,40 +3,74 @@ var rivers = ee.FeatureCollection('WWF/HydroSHEDS/v1/FreeFlowingRivers');
 var jrc = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('occurrence').unmask(0);
 
 
-var ogunMainstemPt = ee.Geometry.Point([3.35, 7.15]);
-var mainBasId = hybas7.filterBounds(ogunMainstemPt).first().get('MAIN_BAS');
+// ---------------------------------------------------------------------------
+// Sub-basin delineation by HydroBASINS topology (NEXT_DOWN upstream tracing).
+// Each zone is defined by a POUR POINT (outlet). A zone is the hybas_7 unit that
+// contains its pour point plus every unit draining into it, minus any upstream
+// zone already assigned. No latitude/longitude slicing is used.
+//
+// VERIFY BEFORE EXPORT: check each pour point on the map (layers are added
+// below) and move it if it does not sit on the intended outlet reach.
+// ---------------------------------------------------------------------------
+var POUR_POINTS = {
+  // Oyan Dam outlet: everything upstream = Oyan-Ofiki regulated tributary (Z2)
+  oyanDam: ee.Geometry.Point([3.26, 7.25]),
+  // Upper Ogun mainstem outlet (above the Oyan confluence): upstream = Z1
+  upperOgunOutlet: ee.Geometry.Point([3.45, 7.75]),
+  // Ogun mainstem at Abeokuta: upstream minus Z1, Z2 = Middle Ogun (Z3)
+  abeokuta: ee.Geometry.Point([3.35, 7.15])
+};
 
-var ogunHybas7 = hybas7.filter(ee.Filter.eq('MAIN_BAS', mainBasId)).map(function(f) {
-  var coords = f.geometry().centroid(30).coordinates();
-  return f.set({
-    'c_lon': coords.get(0),
-    'c_lat': coords.get(1)
-  });
-});
+var mainBasId = hybas7.filterBounds(POUR_POINTS.abeokuta).first().get('MAIN_BAS');
+var ogunHybas7 = hybas7.filter(ee.Filter.eq('MAIN_BAS', mainBasId));
 
+// Returns the HYBAS_IDs of the unit containing `pt` and all units upstream of it.
+function upstreamIds(pt) {
+  var outletId = ogunHybas7.filterBounds(pt).first().get('HYBAS_ID');
+  var seed = ee.List([outletId]);
+  // 80 iterations exceeds the longest hybas_7 flow path in the Ogun basin.
+  return ee.List(ee.List.sequence(1, 80).iterate(function(_, acc) {
+    acc = ee.List(acc);
+    var newIds = ogunHybas7.filter(ee.Filter.inList('NEXT_DOWN', acc))
+      .aggregate_array('HYBAS_ID');
+    return acc.cat(newIds).distinct();
+  }, seed));
+}
 
-var z1Geom = ogunHybas7.filter(ee.Filter.gte('c_lat', 7.75)).geometry().dissolve();
-var z2Geom = ogunHybas7.filter(
-  ee.Filter.and(
-    ee.Filter.gte('c_lat', 6.95),
-    ee.Filter.lt('c_lat', 7.75),
-    ee.Filter.lt('c_lon', 3.28)
-  )
-).geometry().dissolve();
-var z3Geom = ogunHybas7.filter(
-  ee.Filter.and(
-    ee.Filter.gte('c_lat', 6.95),
-    ee.Filter.lt('c_lat', 7.75),
-    ee.Filter.gte('c_lon', 3.28)
-  )
-).geometry().dissolve();
-var z4Geom = ogunHybas7.filter(ee.Filter.lt('c_lat', 6.95)).geometry().dissolve();
+var idsZ2 = upstreamIds(POUR_POINTS.oyanDam);
+var idsZ1 = upstreamIds(POUR_POINTS.upperOgunOutlet).removeAll(idsZ2);
+var idsZ3 = upstreamIds(POUR_POINTS.abeokuta).removeAll(idsZ1).removeAll(idsZ2);
+var idsAssigned = idsZ1.cat(idsZ2).cat(idsZ3);
+var idsZ4 = ogunHybas7.filter(ee.Filter.inList('HYBAS_ID', idsAssigned).not())
+  .aggregate_array('HYBAS_ID');
+
+function zoneGeom(ids) {
+  return ogunHybas7.filter(ee.Filter.inList('HYBAS_ID', ids)).geometry().dissolve();
+}
+
+var z1Geom = zoneGeom(idsZ1);
+var z2Geom = zoneGeom(idsZ2);
+var z3Geom = zoneGeom(idsZ3);
+var z4Geom = zoneGeom(idsZ4);
 var catchmentGeom = ogunHybas7.geometry().dissolve();
+
+// Sanity check: every basin unit assigned exactly once.
+print('hybas_7 units per zone (Z1, Z2, Z3, Z4):',
+  idsZ1.size(), idsZ2.size(), idsZ3.size(), idsZ4.size());
+print('Total Ogun hybas_7 units (must equal the sum above):', ogunHybas7.size());
+Map.addLayer(ee.FeatureCollection([
+  ee.Feature(POUR_POINTS.oyanDam, {name: 'Oyan Dam'}),
+  ee.Feature(POUR_POINTS.upperOgunOutlet, {name: 'Upper Ogun outlet'}),
+  ee.Feature(POUR_POINTS.abeokuta, {name: 'Abeokuta'})
+]), {color: 'red'}, 'Pour points (verify)');
 
 var estuaryRawBox = ee.Geometry.Polygon([
   [[3.32, 6.45], [3.51, 6.45], [3.51, 6.58], [3.32, 6.58], [3.32, 6.45]]
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
+
+var SCRIPT_VERSION = '2.0.0';
+var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
   var areaKm2 = geom.area(10).divide(1e6);
@@ -51,6 +85,8 @@ function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary
     'summary': summary,
     'management': management,
     'provenance': 'VERIFIED_GEE_EXPORT',
+    'export_utc': EXPORT_UTC,
+    'script_version': SCRIPT_VERSION,
     'crs': 'EPSG:4326'
   });
 }
@@ -98,12 +134,22 @@ Map.addLayer(ogunRivers, {color: '#0284C7'}, 'HydroSHEDS River Network (Order >=
 
 
 var startDateStr = '2019-01-01';
-var endDateStr = '2024-12-31';
+// filterDate end is exclusive: use the first day after the study period.
+var endDateStr = '2025-01-01';
 var dem = ee.ImageCollection('COPERNICUS/DEM/GLO30').select('DEM').mosaic().clip(fullStudyGeom);
 var slope = ee.Terrain.slope(dem).rename('slope_deg');
 var lowSlopeMask = slope.lt(5.0);
 var seasonalDomainMask = jrc.lt(80);
 var openEstuaryWaterMask = jrc.gte(50);
+
+// Oyan Reservoir domain: JRC maximum water extent inside a box around the
+// reservoir. Monthly Sentinel-1 open-water area inside it is a proxy for
+// reservoir storage/regulation (no public release records are available).
+// VERIFY the box covers the whole reservoir and nothing else.
+var jrcMaxExtent = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('max_extent');
+var oyanBox = ee.Geometry.Rectangle([3.10, 7.22, 3.40, 7.50]);
+var oyanReservoirMask = jrcMaxExtent.eq(1).clip(oyanBox);
+Map.addLayer(oyanReservoirMask.selfMask(), {palette: ['#7C3AED']}, 'Oyan Reservoir domain (verify)');
 
 function preprocessS2(img) {
   var scl = img.select('SCL');
@@ -227,81 +273,77 @@ var maskedS2Template = ee.Image.constant([0, 0]).rename(['ndti', 'ndvi']).update
 var months = ee.List.sequence(0, 71);
 var baseDate = ee.Date(startDateStr);
 
-var monthlyTimeSeries = ee.FeatureCollection(months.map(function(m) {
+// Builds the monthly images once; reduced over the catchment, each unit and
+// the Oyan Reservoir below.
+function monthImages(m) {
   var mStart = baseDate.advance(m, 'month');
   var mEnd = mStart.advance(1, 'month');
 
   var chirpsMonth = chirpsCol.filterDate(mStart, mEnd);
-  var pentadCount = chirpsMonth.size();
-  var chirpsSumImg = ee.ImageCollection([maskedChirpsTemplate]).merge(chirpsMonth).sum();
-  var rainDict = chirpsSumImg.reduceRegion({
-    reducer: ee.Reducer.mean(),
-    geometry: catchmentGeom,
-    scale: 5500,
-    maxPixels: 1e9
-  });
-  var rainMm = ee.Algorithms.If(pentadCount.gte(5), rainDict.get('precipitation'), null);
-
   var era5Month = era5Col.filterDate(mStart, mEnd);
-  var era5Count = era5Month.size();
-  var era5MeanImg = ee.ImageCollection([maskedEra5Template]).merge(era5Month).mean();
-  var smDict = era5MeanImg.reduceRegion({
-    reducer: ee.Reducer.mean(),
-    geometry: catchmentGeom,
-    scale: 9000,
-    maxPixels: 1e9
-  });
-  var shallowSm = ee.Algorithms.If(era5Count.gt(0), smDict.get('volumetric_soil_water_layer_1'), null);
-
   var s1Month = s1Collection.filterDate(mStart, mEnd)
     .map(function(img) { return img.focal_median(50, 'circle', 'meters'); });
-  var s1Count = s1Month.size();
-  var s1MedImg = ee.ImageCollection([maskedS1Template]).merge(s1Month).median();
-  var sarAreaImg = s1MedImg.lt(-16.5)
-    .and(lowSlopeMask)
-    .and(seasonalDomainMask)
-    .multiply(ee.Image.pixelArea())
-    .divide(1e6)
-    .rename('VV');
-  var sarDict = sarAreaImg.reduceRegion({
-    reducer: ee.Reducer.sum(),
-    geometry: catchmentGeom,
-    scale: 120,
-    maxPixels: 1e9
-  });
-  var sarFloodKm2 = ee.Algorithms.If(s1Count.gt(0), sarDict.get('VV'), null);
-
   var s2Month = s2Processed.filterDate(mStart, mEnd);
-  var s2SceneCount = s2Month.size();
+
+  var s1MedImg = ee.ImageCollection([maskedS1Template]).merge(s1Month).median();
   var s2MedImg = ee.ImageCollection([maskedS2Template]).merge(s2Month).median();
-  var estNdtiImg = s2MedImg.select('ndti').updateMask(openEstuaryWaterMask);
 
-  var pxCountDict = estNdtiImg.reduceRegion({
-    reducer: ee.Reducer.count(),
-    geometry: estuaryGeom,
-    scale: 30,
-    maxPixels: 1e9
-  });
-  var s2ValidWaterPx = ee.Number(pxCountDict.get('ndti', 0));
+  return {
+    yearMonth: mStart.format('YYYY-MM'),
+    pentadCount: chirpsMonth.size(),
+    era5Count: era5Month.size(),
+    s1Count: s1Month.size(),
+    s2SceneCount: s2Month.size(),
+    rainImg: ee.ImageCollection([maskedChirpsTemplate]).merge(chirpsMonth).sum(),
+    smImg: ee.ImageCollection([maskedEra5Template]).merge(era5Month).mean(),
+    sarAreaImg: s1MedImg.lt(-16.5)
+      .and(lowSlopeMask)
+      .and(seasonalDomainMask)
+      .multiply(ee.Image.pixelArea())
+      .divide(1e6)
+      .rename('VV'),
+    reservoirAreaImg: s1MedImg.lt(-16.5)
+      .and(oyanReservoirMask)
+      .multiply(ee.Image.pixelArea())
+      .divide(1e6)
+      .rename('VV'),
+    ndtiImg: s2MedImg.select('ndti').updateMask(openEstuaryWaterMask)
+  };
+}
 
-  var ndtiMeanDict = estNdtiImg.reduceRegion({
-    reducer: ee.Reducer.mean(),
-    geometry: estuaryGeom,
-    scale: 30,
-    maxPixels: 1e9
-  });
-  var estuaryNdti = ee.Algorithms.If(s2ValidWaterPx.gte(100), ndtiMeanDict.get('ndti'), null);
+function reduceMean(img, band, geom, scale) {
+  return img.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: scale, maxPixels: 1e9}).get(band);
+}
 
+function reduceSum(img, geom, scale) {
+  return img.reduceRegion({reducer: ee.Reducer.sum(), geometry: geom, scale: scale, maxPixels: 1e9}).get('VV');
+}
+
+function ndtiStats(mi, geom) {
+  var px = ee.Number(mi.ndtiImg.reduceRegion({
+    reducer: ee.Reducer.count(), geometry: geom, scale: 30, maxPixels: 1e9
+  }).get('ndti', 0));
+  var mean = reduceMean(mi.ndtiImg, 'ndti', geom, 30);
+  return {px: px, ndti: ee.Algorithms.If(px.gte(100), mean, null)};
+}
+
+// --- Catchment-wide monthly series (Z1-Z4 rain, soil water, SAR; Z5 NDTI) ---
+var monthlyTimeSeries = ee.FeatureCollection(months.map(function(m) {
+  var mi = monthImages(m);
+  var nd = ndtiStats(mi, estuaryGeom);
   return ee.Feature(null, {
-    'year_month': mStart.format('YYYY-MM'),
-    'rain_mm': rainMm,
-    'shallow_sm_m3m3': shallowSm,
-    'sar_flood_km2': sarFloodKm2,
-    'estuary_ndti': estuaryNdti,
-    'chirps_pentads': pentadCount,
-    's1_scenes': s1Count,
-    's2_clear_scenes': s2SceneCount,
-    's2_water_px': s2ValidWaterPx,
+    'year_month': mi.yearMonth,
+    'rain_mm': ee.Algorithms.If(mi.pentadCount.gte(5), reduceMean(mi.rainImg, 'precipitation', catchmentGeom, 5500), null),
+    'shallow_sm_m3m3': ee.Algorithms.If(mi.era5Count.gt(0), reduceMean(mi.smImg, 'volumetric_soil_water_layer_1', catchmentGeom, 9000), null),
+    'sar_flood_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarAreaImg, catchmentGeom, 120), null),
+    'oyan_reservoir_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.reservoirAreaImg, oyanBox, 30), null),
+    'estuary_ndti': nd.ndti,
+    'chirps_pentads': mi.pentadCount,
+    's1_scenes': mi.s1Count,
+    's2_clear_scenes': mi.s2SceneCount,
+    's2_water_px': nd.px,
+    'export_utc': EXPORT_UTC,
+    'script_version': SCRIPT_VERSION,
     'data_status': 'VERIFIED_GEE_EXPORT'
   });
 }));
@@ -309,5 +351,41 @@ var monthlyTimeSeries = ee.FeatureCollection(months.map(function(m) {
 Export.table.toDrive({
   collection: monthlyTimeSeries,
   description: 'ogun_monthly_timeseries',
+  fileFormat: 'CSV'
+});
+
+// --- Per-unit monthly series (5 units x 72 months) ---------------------------
+// NDTI is reported for Z5 (estuary open water) only; SAR for Z1-Z4 only.
+var unitGeoms = ee.List([
+  ['Z1', z1Geom], ['Z2', z2Geom], ['Z3', z3Geom], ['Z4', z4Geom], ['Z5', estuaryGeom]
+]);
+
+var unitMonthly = ee.FeatureCollection(months.map(function(m) {
+  var mi = monthImages(m);
+  return ee.FeatureCollection(unitGeoms.map(function(pair) {
+    pair = ee.List(pair);
+    var zoneId = ee.String(pair.get(0));
+    var geom = ee.Geometry(pair.get(1));
+    var isEstuary = zoneId.equals('Z5');
+    var nd = ndtiStats(mi, geom);
+    return ee.Feature(null, {
+      'zone_id': zoneId,
+      'year_month': mi.yearMonth,
+      'rain_mm': ee.Algorithms.If(mi.pentadCount.gte(5), reduceMean(mi.rainImg, 'precipitation', geom, 5500), null),
+      'shallow_sm_m3m3': ee.Algorithms.If(mi.era5Count.gt(0), reduceMean(mi.smImg, 'volumetric_soil_water_layer_1', geom, 9000), null),
+      'sar_flood_km2': ee.Algorithms.If(isEstuary, null, ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarAreaImg, geom, 120), null)),
+      'estuary_ndti': ee.Algorithms.If(isEstuary, nd.ndti, null),
+      's1_scenes': mi.s1Count,
+      's2_water_px': ee.Algorithms.If(isEstuary, nd.px, null),
+      'export_utc': EXPORT_UTC,
+      'script_version': SCRIPT_VERSION,
+      'data_status': 'VERIFIED_GEE_EXPORT'
+    });
+  }));
+})).flatten();
+
+Export.table.toDrive({
+  collection: unitMonthly,
+  description: 'ogun_unit_monthly_timeseries',
   fileFormat: 'CSV'
 });

@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this observatory or its code, please cite it as below."
+title: "Ogun River Catchment-to-Coast Environmental Observatory (2019–2024)"
+type: software
+authors:
+  - alias: oloyededavid
+repository-code: "https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory"
+url: "https://oloyededavid.github.io/Ogun-Catchment-Coast-Observatory/"
+keywords:
+  - Ogun River
+  - Lagos Lagoon
+  - Sentinel-1
+  - Sentinel-2
+  - CHIRPS
+  - ERA5-Land
+  - Google Earth Engine
+  - flood inundation
+  - turbidity

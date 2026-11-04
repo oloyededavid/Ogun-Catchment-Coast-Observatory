@@ -5,6 +5,11 @@
 
 An integrated Earth Observation and hydrological research observatory investigating how monthly rainfall variability and shallow surface soil-moisture conditions across the Ogun River catchment relate to seasonal SAR floodplain inundation indicators and downstream estuarine spectral turbidity dynamics (`NDTI`) in the northwest Lagos Lagoon.
 
+> **Data status: demonstration preview.** The files in `docs/data/` are placeholder values, not an authenticated Google Earth Engine export. `src/02_compile_observatory.py` flags the current time series as `DEMONSTRATION_PREVIEW`, and the website shows a warning banner while that is the case. To publish real results:
+> 1. Open `gee/01_extract_real_ogun_data.js` in the Earth Engine Code Editor. Check the red pour points and the purple Oyan Reservoir layer on the map, and the zone counts printed in the console, before running the three exports (`ogun_subbasins`, `ogun_monthly_timeseries`, `ogun_unit_monthly_timeseries`).
+> 2. Download the exports from Google Drive and install them with the ingest script, which validates them and regenerates the diagnostics (see section 5).
+> 3. Run the tests, then commit the files in `docs/data/` unedited.
+
 ---
 
 ## 1. Research Question & Scientific Scope
@@ -20,7 +25,7 @@ An integrated Earth Observation and hydrological research observatory investigat
 ---
 
 ## 2. Study Area & Analytical Units (`EPSG:4326`)
-* **Units Z1–Z4 (Hydrological Catchment Sub-Basins):** Intact `WWF/HydroSHEDS/v1/Basins/hybas_7` watershed polygons belonging to the Ogun River drainage network (`MAIN_BAS`), grouped without arbitrary latitude slicing into:
+* **Units Z1–Z4 (Hydrological Catchment Sub-Basins):** Intact `WWF/HydroSHEDS/v1/Basins/hybas_7` watershed polygons belonging to the Ogun River drainage network (`MAIN_BAS`), grouped by upstream tracing through the HydroBASINS `NEXT_DOWN` network from three pour points (Oyan Dam → `Z2`; upper Ogun outlet → `Z1`; Abeokuta → `Z3`, minus `Z1` and `Z2`; all remaining downstream units → `Z4`):
   - `Z1`: Upper Ogun Headwaters Sub-Basin (`Oyo Basement Complex`)
   - `Z2`: Oyan–Ofiki Tributary Sub-Basin (`Western Regulated Tributary`)
   - `Z3`: Middle Ogun Mainstem Sub-Basin (`Abeokuta–Papalanto–Ifo Corridor`)
@@ -48,14 +53,65 @@ An integrated Earth Observation and hydrological research observatory investigat
 ```text
 Ogun-Catchment-Coast-Observatory/
 ├── README.md                              # Scientific documentation & reproduction guide
-├── requirements.txt                       # Python dependencies for statistical audit
+├── CITATION.cff                           # How to cite this project
+├── requirements.txt                       # Python dependencies for the statistical pipeline
+├── requirements-dev.txt                   # + pytest
+├── .github/workflows/tests.yml            # Runs the test suite on every push to main
 ├── gee/
-│   └── 01_extract_real_ogun_data.js       # Google Earth Engine multi-sensor extraction script
+│   └── 01_extract_real_ogun_data.js       # Google Earth Engine multi-sensor extraction (3 exports)
 ├── src/
+│   ├── 01_ingest_gee_exports.py           # Validates Earth Engine exports and installs them in docs/data/
 │   └── 02_compile_observatory.py          # Pairwise complete-case statistical & lag audit
+├── tests/                                 # pytest suite (statistics, ingest validation, published-data check)
 └── docs/                                  # Static GitHub Pages WebGIS deployment
-    ├── index.html                         # Single-page Satoshi Light-Mode WebGIS interface
+    ├── index.html                         # Single-page WebGIS interface
+    ├── vendor/                            # Bundled Leaflet 1.9.4 and Chart.js 4.4.1 (no CDN dependency)
     └── data/
         ├── ogun_subbasins.geojson         # 5 analytical units (Z1–Z4 sub-basins + Z5 estuary)
-        ├── ogun_monthly_timeseries.csv    # 72-month time series with observation counts & nulls
-        └── cascade_diagnostics.json       # Statistical output consumed by docs/index.html
+        ├── ogun_monthly_timeseries.csv    # 72-month catchment-wide time series with observation counts & nulls
+        ├── ogun_unit_monthly_timeseries.csv  # (after export) 72-month series per unit, used by the chart
+        └── cascade_diagnostics.json       # Statistical output consumed by docs/index.html (never edit by hand)
+```
+
+---
+
+## 5. Reproducing the Results
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+After downloading the three Earth Engine exports from Google Drive:
+
+```bash
+python src/01_ingest_gee_exports.py \
+    --monthly ~/Downloads/ogun_monthly_timeseries.csv \
+    --units ~/Downloads/ogun_subbasins.geojson \
+    --unit-monthly ~/Downloads/ogun_unit_monthly_timeseries.csv
+```
+
+The ingest script rejects exports with missing months, missing columns, missing zones or physically implausible values, and installs nothing if validation fails. It then regenerates `docs/data/cascade_diagnostics.json`.
+
+To regenerate the diagnostics alone:
+
+```bash
+python src/02_compile_observatory.py
+```
+
+Run the tests before committing. `tests/test_published_data.py` fails if `cascade_diagnostics.json` does not match what the script produces from the published CSV:
+
+```bash
+python -m pytest -q tests
+```
+
+---
+
+## 6. Known Limitations
+
+* **Oyan Dam regulation:** release records are not public. The Sentinel-1 open-water area of the Oyan Reservoir (`oyan_reservoir_km2`) is used as a proxy and partialled out of the rain → inundation association.
+* **Non-random NDTI gaps:** cloud-masked months cluster in the wet season (April–October), so SAR → NDTI associations are weighted towards dry-season conditions. Coverage by season is reported in `cascade_diagnostics.json`.
+* **Short record:** six years give six values per calendar month for deseasonalising, and serial autocorrelation leaves a small effective sample size.
+* **Other turbidity drivers:** tides, dredging, sand mining and Lagos urban runoff are not modelled.
+* **No ground validation:** no independent flood extents or gravimetric TSS samples were available, so the SAR and NDTI layers are uncalibrated proxies.
+* **Monthly resolution:** coarser than catchment-to-coast travel times; lags reflect seasonal storage memory, not flood-wave routing.
+* **Pour points and reservoir box** in the Earth Engine script are approximate and must be checked on the map before exporting.
