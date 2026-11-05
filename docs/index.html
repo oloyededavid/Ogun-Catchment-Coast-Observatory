@@ -25,7 +25,7 @@
             --surface-raised: #ffffff;
             --ink: #0b0b0b;
             --ink-2: #52514e;
-            --ink-3: #6f6e69;
+            --ink-3: #6a6964;
             --grid: #e1e0d9;
             --baseline: #c3c2b7;
             --border: rgba(11, 11, 11, 0.10);
@@ -33,6 +33,7 @@
             --accent: #2a78d6;
             --accent-ink: #1c5cab;
             --accent-soft: #e3eefb;
+            --accent-strong: #256abf; /* filled controls: white text 5.4:1 */
             --series: #2a78d6;
             --good: #0ca30c;
             --good-ink: #006300;
@@ -240,6 +241,7 @@
         }
 
         .menu-list a:hover { background: var(--surface-2); }
+        .menu-sep { height: 1px; margin: 6px 4px; background: var(--border); }
         .menu-list a span { display: block; font-size: 11.5px; font-weight: 400; color: var(--ink-3); }
 
         .banner {
@@ -296,7 +298,7 @@
         }
 
         .seg:hover { background: var(--surface-2); color: var(--ink); }
-        .layer-switch .seg[aria-checked="true"] { background: var(--accent); color: #ffffff; }
+        .layer-switch .seg[aria-checked="true"] { background: var(--accent-strong); color: #ffffff; }
 
         .basemap-switch { top: 14px; right: 58px; padding: 4px; }
 
@@ -682,13 +684,12 @@
 
         .intro h2 { font-size: 17px; font-weight: 900; letter-spacing: -0.01em; }
         .intro ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .intro li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 13.5px; color: var(--ink-2); }
+        .intro li { font-size: 13.5px; color: var(--ink-2); padding-left: 12px; border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); }
         .intro li strong { color: var(--ink); }
-        .intro .ico { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; background: var(--surface-raised); color: var(--accent-ink); }
         .intro-short { padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); font-size: 13.5px; }
         .intro-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-        .btn-primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
-        .btn-primary:hover { background: var(--accent-ink); }
+        .btn-primary { background: var(--accent-strong); border-color: var(--accent-strong); color: #ffffff; }
+        .btn-primary:hover { background: #1c5cab; border-color: #1c5cab; }
 
         /* Guided tour */
         .tour-blocker { position: fixed; inset: 0; z-index: 2400; }
@@ -760,9 +761,6 @@
         .timeline-label { font-size: 13px; font-weight: 900; min-width: 70px; text-align: right; font-variant-numeric: tabular-nums; }
         .timeline-note { font-size: 11.5px; color: var(--ink-3); }
         .play { width: 32px; height: 32px; flex-shrink: 0; }
-
-        .map-tools { top: 62px; right: 58px; display: flex; padding: 4px; gap: 2px; }
-        .map-tools .seg { padding: 5px 9px; }
 
         .place-label {
             pointer-events: none !important;
@@ -842,6 +840,7 @@
         /* Narrow desktop: stack the timeline above the legend so they never overlap */
         @media (min-width: 1101px) and (max-width: 1360px) {
             .timeline { left: 14px; right: auto; bottom: 178px; width: min(340px, calc(100% - 28px)); min-width: 0; }
+            .basemap-switch { top: 66px; }
         }
 
         @media (max-width: 1100px) {
@@ -871,8 +870,7 @@
             .leaflet-top.leaflet-right { top: auto; bottom: 56px; }
             .legend { left: 10px; bottom: 10px; }
             .timeline { left: 10px; right: 10px; bottom: auto; top: 58px; width: auto; min-width: 0; }
-            .map-tools { top: auto; bottom: 10px; right: 10px; }
-            .legend { width: calc(100% - 120px); padding: 9px 11px; }
+            .legend { width: calc(100% - 64px); padding: 9px 11px; }
             .legend-source { display: none; }
             .legend-title { font-size: 12.5px; margin-bottom: 6px; }
             .legend-note { margin-top: 6px; font-size: 11px; }
@@ -889,7 +887,7 @@
             .layout { display: block; }
             .map-pane { height: 110mm; break-inside: avoid; border: 1px solid #ccc; }
             .panel { border: 0; }
-            .appbar-actions, .layer-switch, .basemap-switch, .map-tools, .timeline, .leaflet-control-container,
+            .appbar-actions, .layer-switch, .basemap-switch, .timeline, .leaflet-control-container,
             .unit-picker, .tabs, .toast, .snack, #tour, .intro-actions, .info, details.table-view, .site-footer nav .no-print { display: none !important; }
             .tab-panels { overflow: visible; }
             .tab-panel[hidden] { display: none !important; }
@@ -933,6 +931,8 @@
                     <a href="data/ogun_unit_monthly_timeseries.csv" download>Per-unit monthly series (CSV)<span>Z1–Z5 × 72 months</span></a>
                     <a href="data/ogun_subbasins.geojson" download>Analytical units (GeoJSON)<span>Boundaries and unit summaries</span></a>
                     <a href="data/cascade_diagnostics.json" download>Statistical diagnostics (JSON)<span>Generated by src/02_compile_observatory.py</span></a>
+                    <div class="menu-sep" role="separator"></div>
+                    <a href="#" id="btn-map-png">Map image (PNG)<span>The map exactly as shown, with legend and credit</span></a>
                 </div>
             </details>
             <details class="menu" id="share-menu">
@@ -980,13 +980,6 @@
                     <option value="terrain">Topographic</option>
                     <option value="satellite">Satellite</option>
                 </select>
-            </div>
-
-            <div class="map-float map-tools">
-                <button type="button" class="seg" id="btn-map-png" title="Download the map as an image">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
-                    Map image
-                </button>
             </div>
 
             <div class="map-float timeline" id="timeline">
@@ -1042,9 +1035,9 @@
                     <section class="intro" id="intro" aria-labelledby="intro-title">
                         <h2 id="intro-title">The study in plain terms</h2>
                         <ul>
-                            <li><span class="ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"/></svg></span><span><strong>The place.</strong> The Ogun River drains about 22,000 km² of southwest Nigeria, past Abeokuta, into the Lagos Lagoon.</span></li>
-                            <li><span class="ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"/><path d="M12 17h.01"/></svg></span><span><strong>The question.</strong> When it rains more than usual, does more of the river's floodplain go under water, and does that muddier water reach the lagoon?</span></li>
-                            <li><span class="ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4 15 4-4 4 4 4-4 4 4"/><path d="M4 20h16"/></svg></span><span><strong>How.</strong> Free satellite data, every month from 2019 to 2024: rainfall, soil wetness, radar images of flooded ground, and how cloudy the lagoon water looks.</span></li>
+                            <li><strong>The place.</strong> The Ogun River drains about 22,000 km² of southwest Nigeria, past Abeokuta, into the Lagos Lagoon.</li>
+                            <li><strong>The question.</strong> When it rains more than usual, does more of the river's floodplain go under water, and does that muddier water reach the lagoon?</li>
+                            <li><strong>How.</strong> Free satellite data, every month from 2019 to 2024: rainfall, soil wetness, radar images of flooded ground, and how cloudy the lagoon water looks.</li>
                         </ul>
                         <p class="intro-short" id="intro-short"><strong>Short answer:</strong> loading…</p>
                         <div class="intro-actions">
@@ -1207,7 +1200,7 @@
             <div class="eyebrow">Plain-language definitions</div>
             <h2 class="panel-title" id="glossary-title">Glossary</h2>
         </div>
-        <button type="button" class="btn btn-icon" data-close aria-label="Close">✕</button>
+        <button type="button" class="btn btn-icon" data-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="dialog-body">
         <dl class="glossary" id="glossary-list"></dl>
@@ -1220,7 +1213,7 @@
             <div class="eyebrow">Methods, audit &amp; limitations</div>
             <h2 class="panel-title" id="methods-title">How this was measured</h2>
         </div>
-        <button type="button" class="btn btn-icon" data-close aria-label="Close">✕</button>
+        <button type="button" class="btn btn-icon" data-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="dialog-body">
                 <h4>1. Geographical Separation: Catchment Sub-Basins vs. Estuarine Zone</h4>
@@ -1253,7 +1246,7 @@
             <div class="eyebrow">About this observatory</div>
             <h2 class="panel-title" id="about-title">How to use this site</h2>
         </div>
-        <button type="button" class="btn btn-icon" data-close aria-label="Close">✕</button>
+        <button type="button" class="btn btn-icon" data-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="dialog-body">
         <p>This observatory tests whether rainfall and shallow soil moisture across the roughly 22,200 km² Ogun River catchment relate to floodplain inundation, and whether that flooding reaches the northwest Lagos Lagoon as turbidity. All data come from one Google Earth Engine export (2019–2024) and are recomputed by the repository's own scripts.</p>
@@ -1264,7 +1257,7 @@
             <li><strong>Map</strong>: switch indicators at the top left; click a unit to open it. Units drawn hatched with a dashed outline have no reliable value for that indicator.</li>
             <li><strong>Unit</strong> shows one unit's measurements. <strong>Time series</strong> shows 72 months as four aligned charts; hover to read the same month across all of them.</li>
             <li><strong>Statistics</strong> is the full audit table. <strong>Compare</strong> puts two units side by side.</li>
-            <li><strong>Share</strong> copies a link to exactly the view you are looking at, or prints it. <strong>Map image</strong> and <strong>Download charts</strong> save figures as PNG.</li>
+            <li><strong>Share</strong> copies a link to exactly the view you are looking at, or prints it. <strong>Data → Map image</strong> and <strong>Download charts</strong> (Time series) save figures as PNG.</li>
             <li><strong>By month</strong> on the map steps through 2019–2024; <strong>Seasonal cycle</strong> in Time series shows the average year.</li>
         </ol>
         <h4>Data &amp; licence</h4>
@@ -1559,8 +1552,8 @@
         const pane = document.querySelector('.map-pane').getBoundingClientRect();
         const below = sel => { const el = document.querySelector(sel); if (!el || el.offsetParent === null) return 0; const r = el.getBoundingClientRect(); return r.top - pane.top < pane.height / 2 ? r.bottom - pane.top : 0; };
         const above = sel => { const el = document.querySelector(sel); if (!el || el.offsetParent === null) return 0; const r = el.getBoundingClientRect(); return r.top - pane.top >= pane.height / 2 ? pane.bottom - r.top : 0; };
-        const top = Math.max(below('.layer-switch'), below('#timeline'), below('.map-tools')) + 12;
-        const bottom = Math.max(above('#legend'), above('#timeline'), above('.map-tools'), 24) + 12;
+        const top = Math.max(below('.layer-switch'), below('#timeline')) + 12;
+        const bottom = Math.max(above('#legend'), above('#timeline'), 24) + 12;
         const side = window.innerWidth <= 640 ? 16 : 40;
         return { paddingTopLeft: [side, top], paddingBottomRight: [side, bottom] };
     }
@@ -1704,11 +1697,22 @@
             interactive: false,
             style: f => ({ color: css('--accent-ink'), weight: Math.max(1, Math.min(3.5, ((f.properties && f.properties.ORD_STRA) || 3) - 2)), opacity: 0.85 })
         }).addTo(extrasLayer);
+        placesLayer.clearLayers();
         PLACES.forEach(pl => L.marker([pl.lat, pl.lon], {
             interactive: false,
             icon: L.divIcon({ className: 'place-label', iconSize: [0, 0], iconAnchor: [5, 6], html: escHtml(pl.name) })
-        }).addTo(extrasLayer));
+        }).addTo(placesLayer));
+        togglePlaces();
     }
+
+    // Town labels only once zoomed in, so they never collide with the unit labels.
+    const placesLayer = L.layerGroup();
+    function togglePlaces() {
+        const show = map.getZoom() >= 9;
+        if (show && !map.hasLayer(placesLayer)) placesLayer.addTo(map);
+        if (!show && map.hasLayer(placesLayer)) map.removeLayer(placesLayer);
+    }
+    map.on('zoomend', togglePlaces);
 
     // ================= Unit selection =================
     function renderChips() {
@@ -1846,7 +1850,7 @@
         { target: '#intro', tab: 'overview', title: 'Start with the overview', text: 'The study in plain terms and the short answer. Below it are the headline numbers and each finding with a verdict: Significant, Not robust, or No link.' },
         { target: '#multiples', tab: 'series', title: 'Explore 72 months of data', text: 'Four aligned charts share one time axis: rainfall, the radar flood index, the optical flood check and lagoon turbidity. Hover over (or tap) any chart to read the same month in all four. "Seasonal cycle" shows the average year, and you can download the charts as an image.' },
         { target: '#panel-stats .controls', tab: 'stats', title: 'Check the statistics', text: 'Pick a relationship to see the full audit: sample sizes, correlations with confidence intervals and adjusted p-values, plus a robustness check. Underlined terms explain themselves when you hover or tap them.' },
-        { target: '.appbar-actions', tab: 'overview', title: 'Share, download and read the methods', text: 'Copy a link to exactly this view or print it, download every dataset, read how each value was measured and its limitations, or switch to dark mode.' }
+        { target: '.appbar-actions', tab: 'overview', title: 'Share, download and read the methods', text: 'Copy a link to exactly this view or print it, download every dataset or a map image, read how each value was measured and its limitations, or switch to dark mode.' }
     ];
     let tourIdx = 0;
     let tourReturnFocus = null;
@@ -2192,7 +2196,9 @@
         saveCanvas(c, `ogun-observatory-${STATE.seriesMode}-${STATE.zone.toLowerCase()}.png`);
     });
 
-    $('btn-map-png').addEventListener('click', () => {
+    $('btn-map-png').addEventListener('click', e => {
+        e.preventDefault();
+        $('download-menu').open = false;
         if (!LAST_MAP) return;
         const W = 1200, H = 1240, top = 100, bottom = 150, pad = 40;
         const { c, ctx } = figureFrame(W, H, 'Ogun Catchment-to-Coast Observatory', LAST_MAP.title);
