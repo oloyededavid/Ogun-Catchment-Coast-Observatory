@@ -2,6 +2,9 @@ cff-version: 1.2.0
 message: "If you use this observatory or its code, please cite it as below."
 title: "Ogun River Catchment-to-Coast Environmental Observatory (2019–2024)"
 type: software
+license:
+  - MIT
+  - CC-BY-4.0
 authors:
   - alias: oloyededavid
 repository-code: "https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory"

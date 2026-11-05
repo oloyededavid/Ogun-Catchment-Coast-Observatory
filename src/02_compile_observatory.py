@@ -126,7 +126,9 @@ def _detect_synthetic_template(df: pd.DataFrame) -> bool:
 
 LAG_KEYS = [0, 1, 2]
 WET_SEASON_MONTHS = {4, 5, 6, 7, 8, 9, 10}  # southwest Nigeria rainy season (Apr-Oct)
-SERIES_COLUMNS = ["rain_mm", "shallow_sm_m3m3", "sar_flood_km2", "oyan_reservoir_km2", "estuary_ndti"]
+SERIES_COLUMNS = ["rain_mm", "shallow_sm_m3m3", "sar_flood_km2", "sar_flood_max_km2", "dw_flood_km2",
+                  "oyan_reservoir_km2", "oyan_release_mcm", "estuary_ndti"]
+FDR_ALPHA = 0.05
 
 
 def _p_or_one(res: dict[str, Any]) -> float:
@@ -162,6 +164,41 @@ def _lag_suite(x: pd.Series, y: pd.Series, control: pd.Series | None = None) -> 
     for lag, adj in zip(LAG_KEYS, adjusted):
         results[f"lag_{lag}_month"]["p_value_bh_fdr"] = adj
     return results
+
+
+def _robustness(x: pd.Series, y: pd.Series, months: pd.Series) -> dict[str, Any]:
+    """Leave-one-out sensitivity of Pearson r for x(t) vs y(t), and the test without the most influential month."""
+    pair = pd.concat([x.rename("x"), y.rename("y"), months.rename("m")], axis=1).dropna()
+    if len(pair) < 10:
+        return {"status": "INSUFFICIENT_OBSERVATIONS", "n_pairs": int(len(pair))}
+    full_r = float(stats.pearsonr(pair["x"], pair["y"])[0])
+    loo = {idx: float(stats.pearsonr(pair["x"].drop(index=idx), pair["y"].drop(index=idx))[0]) for idx in pair.index}
+    rs = list(loo.values())
+    top_idx = max(loo, key=lambda i: abs(loo[i] - full_r))
+    without = _bivariate_test(pair["x"].drop(index=top_idx), pair["y"].drop(index=top_idx))
+    return {
+        "status": "VALID",
+        "n_pairs": int(len(pair)),
+        "pearson_r_full": round(full_r, 3),
+        "leave_one_out_pearson_r_min": round(min(rs), 3),
+        "leave_one_out_pearson_r_max": round(max(rs), 3),
+        "most_influential_month": str(pair.loc[top_idx, "m"]),
+        "without_most_influential_month": without,
+    }
+
+
+def _finding(label: str, res: dict[str, Any], p_key: str = "p_value_bh_fdr") -> dict[str, Any]:
+    p = res.get(p_key)
+    return {
+        "relationship": label,
+        "status": res.get("status"),
+        "n_pairs": res.get("n_pairs"),
+        "spearman_rho": res.get("spearman_rho"),
+        "pearson_r": res.get("pearson_r"),
+        "p_value": p,
+        "p_value_type": "BH FDR" if p_key == "p_value_bh_fdr" else "autocorrelation-adjusted",
+        "significant": bool(p is not None and p < FDR_ALPHA),
+    }
 
 
 def _sha256(path: Path) -> str:
@@ -216,6 +253,38 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
             "reason": "No oyan_reservoir_km2 column in the time series. Re-export with gee/01_extract_real_ogun_data.js v2.0.0 or later."
         }
 
+    has_releases = int(df["oyan_release_mcm"].notna().sum()) >= 8
+    if has_releases:
+        release_block: dict[str, Any] = {
+            "status": "VALID",
+            "control_variable": "oyan_release_mcm (Oyan Dam releases, million m3/month)",
+            "seasonal": _lag_suite(df["rain_mm"], df["sar_flood_km2"], control=df["oyan_release_mcm"]),
+            "deseasonalized": _lag_suite(df["rain_mm_anom"], df["sar_flood_km2_anom"], control=df["oyan_release_mcm_anom"]),
+        }
+    else:
+        release_block = {
+            "status": "NOT_AVAILABLE",
+            "reason": "No Oyan Dam release records supplied. Add them with src/01_ingest_gee_exports.py --dam-releases."
+        }
+
+    has_dw = int(df["dw_flood_km2"].notna().sum()) >= 8
+    validation_block: dict[str, Any] = (
+        {
+            "status": "VALID",
+            "reference": "Google Dynamic World V1 (Sentinel-2): water or flooded vegetation, same floodplain domain",
+            "months_with_dynamic_world": int(df["dw_flood_km2"].notna().sum()),
+            "seasonal": _bivariate_test(df["sar_flood_km2"], df["dw_flood_km2"]),
+            "deseasonalized": _bivariate_test(df["sar_flood_km2_anom"], df["dw_flood_km2_anom"]),
+        }
+        if has_dw else
+        {"status": "NOT_AVAILABLE", "reason": "No dw_flood_km2 column. Re-export with gee/01_extract_real_ogun_data.js v2.4.0 or later."}
+    )
+
+    robustness = {
+        "rain_to_sar_lag_0_deseasonalized": _robustness(df["rain_mm_anom"], df["sar_flood_km2_anom"], df["year_month"]),
+        "rain_to_sar_lag_0_seasonal": _robustness(df["rain_mm"], df["sar_flood_km2"], df["year_month"]),
+    }
+
     turb_raw = _bivariate_test(df["sar_flood_km2"], df["estuary_ndti"])
     turb_anom = _bivariate_test(df["sar_flood_km2_anom"], df["estuary_ndti_anom"])
 
@@ -257,6 +326,8 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
             "valid_sm_months": int(df["shallow_sm_m3m3"].notna().sum()),
             "valid_sar_months": int(df["sar_flood_km2"].notna().sum()),
             "valid_reservoir_months": int(df["oyan_reservoir_km2"].notna().sum()),
+            "valid_dynamic_world_months": int(df["dw_flood_km2"].notna().sum()),
+            "valid_dam_release_months": int(df["oyan_release_mcm"].notna().sum()),
             "valid_ndti_months": int(ndti_valid.sum()),
             "missing_ndti_months": int((~ndti_valid).sum()),
             "ndti_valid_wet_season_months": int((ndti_valid & wet).sum()),
@@ -272,10 +343,20 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
         "soil_moisture_to_sar_inundation_lags_seasonal": sm_raw_lags,
         "soil_moisture_to_sar_inundation_lags_deseasonalized": sm_anom_lags,
         "rain_to_sar_inundation_controlling_for_oyan_reservoir": reservoir_block,
+        "rain_to_sar_inundation_controlling_for_oyan_dam_releases": release_block,
         "sar_inundation_to_estuary_ndti": {
             "seasonal": turb_raw,
             "deseasonalized": turb_anom
         },
+        "sar_validation_against_dynamic_world": validation_block,
+        "robustness": robustness,
+        "key_findings": [
+            _finding("Rain -> floodplain SAR inundation (same month, deseasonalized)", anom_lags["lag_0_month"]),
+            _finding("Rain -> floodplain SAR inundation (1-month lag, deseasonalized)", anom_lags["lag_1_month"]),
+            _finding("Soil moisture -> floodplain SAR inundation (same month, deseasonalized)", sm_anom_lags["lag_0_month"]),
+            _finding("Floodplain SAR inundation -> estuary NDTI (deseasonalized)", turb_anom, p_key="p_value_autocorr_adj"),
+        ] + ([_finding("SAR inundation vs Dynamic World flooding (deseasonalized)",
+                       validation_block["deseasonalized"], p_key="p_value_autocorr_adj")] if has_dw else []),
         "methodological_notes": [
             "Missing observations (e.g., cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
             "NDTI gaps are concentrated in the cloudy wet season (see coverage.ndti_valid_wet_season_months), so SAR-NDTI associations are weighted towards dry-season conditions and are not missing at random.",

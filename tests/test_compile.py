@@ -53,3 +53,15 @@ def test_partial_correlation_removes_shared_driver(compiler):
     partial = compiler._lag_suite(x, y, control=driver)["lag_0_month"]["pearson_r"]
     assert plain > 0.9
     assert abs(partial) < 0.35
+
+
+def test_robustness_finds_single_outlier(compiler):
+    rng = np.random.default_rng(3)
+    x = pd.Series(rng.normal(size=60))
+    y = pd.Series(rng.normal(size=60))
+    x[17], y[17] = 12.0, 12.0  # one extreme month creates a spurious correlation
+    months = pd.Series([f"m{i}" for i in range(60)])
+    res = compiler._robustness(x, y, months)
+    assert res["most_influential_month"] == "m17"
+    assert res["pearson_r_full"] > 0.5
+    assert abs(res["without_most_influential_month"]["pearson_r"]) < 0.4

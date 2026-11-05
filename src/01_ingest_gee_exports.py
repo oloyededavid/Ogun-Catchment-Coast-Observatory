@@ -27,7 +27,8 @@ DATA_DIR = REPO_ROOT / "docs" / "data"
 
 MONTHLY_REQUIRED = ["year_month", "rain_mm", "shallow_sm_m3m3", "sar_flood_km2", "estuary_ndti",
                     "chirps_pentads", "s1_scenes", "s2_clear_scenes", "s2_water_px", "data_status"]
-MONTHLY_OPTIONAL = ["oyan_reservoir_km2", "export_utc", "script_version"]
+MONTHLY_OPTIONAL = ["sar_flood_max_km2", "dw_flood_km2", "dw_images", "oyan_reservoir_km2", "oyan_release_mcm",
+                    "export_utc", "script_version"]
 UNIT_MONTHLY_REQUIRED = ["zone_id", "year_month", "rain_mm", "shallow_sm_m3m3", "sar_flood_km2", "estuary_ndti"]
 UNIT_PROPS_REQUIRED = ["zone_id", "order", "zone_name", "area_km2"]
 EXPECTED_ZONES = ["Z1", "Z2", "Z3", "Z4", "Z5"]
@@ -37,7 +38,10 @@ RANGES = {
     "rain_mm": (0.0, 1500.0),
     "shallow_sm_m3m3": (0.0, 1.0),
     "sar_flood_km2": (0.0, 25000.0),
+    "sar_flood_max_km2": (0.0, 25000.0),
+    "dw_flood_km2": (0.0, 25000.0),
     "oyan_reservoir_km2": (0.0, 500.0),
+    "oyan_release_mcm": (0.0, 5000.0),
     "estuary_ndti": (-1.0, 1.0),
 }
 
@@ -87,9 +91,27 @@ def validate_monthly(df: pd.DataFrame) -> pd.DataFrame:
     errors += _check_ranges(df, "monthly")
     if errors:
         raise ValidationError("\n".join(errors))
-    cols = MONTHLY_REQUIRED[:4] + [c for c in MONTHLY_OPTIONAL[:1] if c in df.columns] + MONTHLY_REQUIRED[4:] \
-        + [c for c in MONTHLY_OPTIONAL[1:] if c in df.columns]
+    cols = MONTHLY_REQUIRED + [c for c in MONTHLY_OPTIONAL if c in df.columns]
     return df.sort_values("year_month")[cols].reset_index(drop=True)
+
+
+def merge_dam_releases(monthly: pd.DataFrame, releases: pd.DataFrame) -> pd.DataFrame:
+    """Add Oyan Dam release records (columns: year_month, oyan_release_mcm) to the monthly series."""
+    missing = [c for c in ["year_month", "oyan_release_mcm"] if c not in releases.columns]
+    if missing:
+        raise ValidationError(f"dam-releases: missing columns {missing}")
+    releases = releases[["year_month", "oyan_release_mcm"]].copy()
+    releases["year_month"] = releases["year_month"].astype(str).str.strip()
+    if releases["year_month"].duplicated().any():
+        raise ValidationError("dam-releases: duplicate months")
+    unknown = sorted(set(releases["year_month"]) - set(monthly["year_month"]))
+    if unknown:
+        raise ValidationError(f"dam-releases: months outside the study period {unknown[:5]}")
+    merged = monthly.drop(columns=["oyan_release_mcm"], errors="ignore").merge(releases, on="year_month", how="left")
+    errors = _check_ranges(merged, "dam-releases")
+    if errors:
+        raise ValidationError("\n".join(errors))
+    return merged
 
 
 def validate_unit_monthly(df: pd.DataFrame) -> pd.DataFrame:
@@ -137,8 +159,11 @@ def _load_compiler():
     return module
 
 
-def ingest(monthly: Path, units: Path, unit_monthly: Path | None, out_dir: Path = DATA_DIR) -> dict:
+def ingest(monthly: Path, units: Path, unit_monthly: Path | None, out_dir: Path = DATA_DIR,
+           dam_releases: Path | None = None) -> dict:
     monthly_df = validate_monthly(pd.read_csv(monthly))
+    if dam_releases:
+        monthly_df = merge_dam_releases(monthly_df, pd.read_csv(dam_releases))
     units_gj = validate_units(json.loads(Path(units).read_text(encoding="utf-8")))
     unit_df = validate_unit_monthly(pd.read_csv(unit_monthly)) if unit_monthly else None
 
@@ -157,10 +182,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--monthly", type=Path, required=True, help="ogun_monthly_timeseries.csv from Earth Engine")
     parser.add_argument("--units", type=Path, required=True, help="ogun_subbasins.geojson from Earth Engine")
     parser.add_argument("--unit-monthly", type=Path, help="ogun_unit_monthly_timeseries.csv from Earth Engine")
+    parser.add_argument("--dam-releases", type=Path,
+                        help="optional CSV of Oyan Dam releases with columns year_month, oyan_release_mcm")
     parser.add_argument("--out", type=Path, default=DATA_DIR, help="output directory (default: docs/data)")
     args = parser.parse_args(argv)
     try:
-        summary = ingest(args.monthly, args.units, args.unit_monthly, args.out)
+        summary = ingest(args.monthly, args.units, args.unit_monthly, args.out, args.dam_releases)
     except ValidationError as exc:
         print(f"Validation failed; nothing was installed.\n{exc}", file=sys.stderr)
         return 1

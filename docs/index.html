@@ -964,6 +964,31 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.18);
         }
 
+        .findings-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .findings-list li {
+            font-size: 12.5px;
+            color: var(--ink-body);
+            padding: 8px 10px;
+            border: 1px solid var(--border-light);
+            border-left: 3px solid var(--border-mid);
+            border-radius: 6px;
+        }
+
+        .findings-list li.is-significant {
+            border-left-color: var(--accent-blue);
+        }
+
+        .findings-list li strong {
+            color: var(--ink-black);
+        }
+
         .chart-note {
             font-size: 11px;
             color: var(--ink-muted);
@@ -1093,7 +1118,6 @@
             <div class="map-column">
                 <section class="map-stage" id="map-stage">
                     <div id="map" class="map-canvas"></div>
-                    <div id="sim-flag" class="sim-flag is-hidden" role="status">Sensitivity scaling active — values are not observed</div>
                     <!-- Explicit Error State if GeoJSON or CSV Fails to Load -->
                     <div id="map-error-box" class="map-error-overlay is-hidden" role="alert">
                         <span class="section-kicker" style="color:var(--err-ink);">Data Load Failure</span>
@@ -1204,7 +1228,19 @@
                     </div>
                 </div>
 
-                <!-- Card 02: 72-Month Time Series, Observation Coverage & Sensitivity Explorer -->
+                <!-- Card: Key Findings (generated from cascade_diagnostics.json) -->
+                <div class="card" id="card-findings">
+                    <div class="card-head">
+                        <div>
+                            <span class="section-kicker">Key Findings · generated from the diagnostics</span>
+                            <h3 class="card-title-md">What the 2019–2024 data shows</h3>
+                        </div>
+                    </div>
+                    <ul class="findings-list" id="findings-list"><li>Diagnostics unavailable.</li></ul>
+                    <p class="sensitivity-disclaimer" id="findings-note"></p>
+                </div>
+
+                <!-- Card 02: 72-Month Time Series & Observation Coverage -->
                 <div class="card" id="card-hydrograph">
                     <div class="card-head">
                         <div>
@@ -1227,16 +1263,6 @@
                         <canvas id="cascadeChart"></canvas>
                     </div>
 
-                    <div class="slider-box">
-                        <div class="slider-top">
-                            <label for="rain-shock-slider">Illustrative Sensitivity Explorer (Parametric Scaling Only)</label>
-                            <span id="shock-val" class="mono">0% (Observed Baseline)</span>
-                        </div>
-                        <input type="range" id="rain-shock-slider" min="-20" max="30" step="5" value="0" />
-                        <p class="sensitivity-disclaimer">
-                            <strong>Scientific Disclaimer:</strong> Adjusting this slider applies an uncalibrated parametric scaling (<span class="mono">Rain &times; (1+&Delta;)</span>, <span class="mono">SAR Proxy &times; (1+&Delta;)<sup>1.25</sup></span>) to illustrate directional sensitivity. It is <strong>not</strong> a calibrated physical runoff or hydrodynamic flood forecast.
-                        </p>
-                    </div>
                 </div>
 
                 <!-- Card 03: Statistical Diagnostics & Unit Comparison Table -->
@@ -1281,7 +1307,9 @@
                                     <option value="rain" selected>CHIRPS Rain &rarr; SAR Proxy</option>
                                     <option value="sm">ERA5-Land Soil Water &rarr; SAR Proxy</option>
                                     <option value="reservoir">CHIRPS Rain &rarr; SAR Proxy, controlling for Oyan Reservoir</option>
+                                    <option value="dam">CHIRPS Rain &rarr; SAR Proxy, controlling for Oyan Dam releases</option>
                                     <option value="ndti">SAR Proxy &rarr; Estuary NDTI (lag 0)</option>
+                                    <option value="dw">Validation: SAR Proxy vs Dynamic World flooding</option>
                                 </select>
                             </div>
                             <div class="field-group">
@@ -1358,13 +1386,16 @@
                 <h4>3. Sentinel-2 Spectral Turbidity Indicator (NDTI) &amp; Missing Monsoon Months</h4>
                 <p>Sentinel-2 L2A scenes are masked using the Scene Classification Layer (<span class="mono">SCL</span>) to remove clouds, cirrus, and shadows, and restricted to open water (<span class="mono">MNDWI &gt; 0</span> and <span class="mono">SCL == 6</span>). <span class="mono">NDTI = (B4 &minus; B3)/(B4 + B3)</span> is a relative spectral proxy for water optical properties and is not calibrated to NTU or gravimetric Total Suspended Solids (<span class="mono">mg/L</span>). Months with fewer than 100 valid cloud-free water pixels in the estuary are preserved as <span class="mono">null</span> (<span class="mono">NaN</span>) and never replaced with zero or interpolated prior to statistical testing.</p>
 
-                <h4>4. Oyan Dam Regulation</h4>
-                <p>The Oyan–Ofiki tributary (Z2) is regulated by the Oyan Dam, whose releases can drive lower-Ogun flooding independently of rainfall. Release records are not publicly available, so the monthly Sentinel-1 open-water area of the Oyan Reservoir is exported as a regulation proxy and partialled out of the rain&ndash;inundation association where available.</p>
+                <h4>4. Per-Pass Detection, Optical Cross-Check &amp; Robustness</h4>
+                <p>Flooding is detected on every Sentinel-1 pass; the monthly value is the mean flooded area (each pixel's fraction of flooded passes &times; its area), and the maximum extent is also exported. As an independent check, Google Dynamic World (Sentinel-2) pixels labelled water or flooded vegetation are measured over the same floodplain. The two do not agree (see Validation in the audit table): Dynamic World has 40&ndash;60 clear images a month in the dry season but only 1&ndash;3 in the wet season, so its signal is dominated by cloud availability, while the radar index retains some dry-season false alarms. The rain&ndash;inundation association is also tested with each month left out in turn; it depends strongly on the October 2024 flood. Treat the SAR series as an unvalidated index.</p>
 
-                <h4>5. Statistical Analysis &amp; Temporal Autocorrelation</h4>
+                <h4>5. Oyan Dam Regulation</h4>
+                <p>The Oyan–Ofiki tributary (Z2) is regulated by the Oyan Dam, whose releases can drive lower-Ogun flooding independently of rainfall. Release records are not publicly available, so the monthly Sentinel-1 open-water area of the Oyan Reservoir is exported as a regulation proxy and partialled out of the rain&ndash;inundation association. If release records are added (<span class="mono">--dam-releases</span>), they are partialled out as well.</p>
+
+                <h4>6. Statistical Analysis &amp; Temporal Autocorrelation</h4>
                 <p>All correlations in <span class="mono">src/02_compile_observatory.py</span> are computed on pairwise complete observations, reporting both raw seasonal associations and deseasonalized anomaly associations, Bretherton autocorrelation-adjusted effective sample sizes (<span class="mono">n_eff</span>), and Benjamini–Hochberg FDR-adjusted <span class="mono">p</span>-values across lags <span class="mono">&tau; &isin; {0, 1, 2}</span> months.</p>
 
-                <h4>6. Known Limitations</h4>
+                <h4>7. Known Limitations</h4>
                 <p>Cloud-masked NDTI months cluster in the wet season, so SAR&ndash;NDTI associations are weighted towards dry-season conditions. Six years give only six values per calendar month for deseasonalising. Tides, dredging, sand mining and urban runoff also affect lagoon turbidity and are not modelled. No in-situ flood extents or gravimetric TSS samples were available for validation.</p>
             </div>
         </div>
@@ -1406,6 +1437,13 @@
             ndti: ['#FEFCE8', '#FDE047', '#F59E0B', '#D97706', '#78350F'],
             ndvi: ['#FEF2F2', '#D9F99D', '#4ADE80', '#16A34A', '#14532D']
         };
+
+        // SAR flood values in these units are dominated by dry-season artefacts
+        // (burnt savanna and dry ground); see Methods.
+        const SAR_UNRELIABLE = new Set(['Z1', 'Z2']);
+        const sarVal = p => SAR_UNRELIABLE.has(p.zone_id) ? null : p.sim_flood;
+        const sarTxt = (p, suffix = ' km²') => SAR_UNRELIABLE.has(p.zone_id)
+            ? `${fmtNum(p.sim_flood, 1, suffix)} (unreliable)` : fmtNum(p.sim_flood, 1, suffix);
 
         const STATE = {
             geojson: null,
@@ -1493,6 +1531,7 @@
             const idxSm = headers.indexOf('shallow_sm_m3m3');
             const idxFlood = headers.indexOf('sar_flood_km2');
             const idxNdti = headers.indexOf('estuary_ndti');
+            const idxDw = headers.indexOf('dw_flood_km2');
             const idxStatus = headers.indexOf('data_status');
             const idxZone = headers.indexOf('zone_id');
             if (idxYm === -1 || idxRain === -1) return [];
@@ -1506,6 +1545,7 @@
                     shallow_sm_m3m3: idxSm !== -1 ? parseNullableFloat(cols[idxSm]) : null,
                     sar_flood_km2: parseNullableFloat(cols[idxFlood]),
                     estuary_ndti: parseNullableFloat(cols[idxNdti]),
+                    dw_flood_km2: idxDw !== -1 ? parseNullableFloat(cols[idxDw]) : null,
                     data_status: idxStatus !== -1 ? String(cols[idxStatus] || '').replace(/"/g, '').trim() : 'VERIFIED_GEE_EXPORT'
                 };
             }).filter(r => r.year_month.length >= 7)
@@ -1633,6 +1673,7 @@
             updateEverything();
             renderDiagnosticsTable();
             renderProvenance();
+            renderFindings();
             initTourIfFirstVisit();
         }).catch(err => {
             showExplicitLoadError(
@@ -1641,6 +1682,25 @@
             );
         });
 
+        function renderFindings() {
+            const d = STATE.diagnostics;
+            const list = document.getElementById('findings-list');
+            if (!d || !Array.isArray(d.key_findings)) return;
+            const est = f => `ρ = ${fmtNum(f.spearman_rho, 2)}, r = ${fmtNum(f.pearson_r, 2)}, ${escHtml(f.p_value_type)} p = ${fmtP(f.p_value)}`;
+            const items = d.key_findings.map(f => f.status !== 'VALID'
+                ? `<li><strong>${escHtml(f.relationship)}:</strong> not enough observations.</li>`
+                : `<li class="${f.significant ? 'is-significant' : ''}"><strong>${escHtml(f.relationship)}:</strong> ${f.significant ? 'significant association' : 'no significant association'} (${est(f)}, n = ${f.n_pairs}).</li>`);
+            const rb = d.robustness && d.robustness.rain_to_sar_lag_0_deseasonalized;
+            if (rb && rb.status === 'VALID') {
+                const w = rb.without_most_influential_month || {};
+                items.push(`<li><strong>Robustness:</strong> leaving out any single month gives r between ${fmtNum(rb.leave_one_out_pearson_r_min, 2)} and ${fmtNum(rb.leave_one_out_pearson_r_max, 2)}. Without ${escHtml(rb.most_influential_month)}, the most influential month, r = ${fmtNum(w.pearson_r, 2)} (ρ = ${fmtNum(w.spearman_rho, 2)}, p = ${fmtP(w.p_value_autocorr_adj)}).</li>`);
+            }
+            list.innerHTML = items.join('');
+            setTxt('findings-note', 'All values are recomputed by src/02_compile_observatory.py from the published data. The SAR flood proxy is an uncalibrated index (see Methods & Audit).');
+            const f0 = d.key_findings[0];
+            if (f0 && f0.status === 'VALID') setTxt('lag-badge', `Rain → flood (same month): ρ = ${fmtNum(f0.spearman_rho, 2)}, r = ${fmtNum(f0.pearson_r, 2)}`);
+        }
+
         function renderDiagnosticsTable() {
             const tbody = document.getElementById('diag-tbody');
             const d = STATE.diagnostics;
@@ -1648,14 +1708,17 @@
             if (!d) return empty('Diagnostics unavailable.');
 
             let entries;
-            if (STATE.diagPair === 'reservoir') {
-                const block = d.rain_to_sar_inundation_controlling_for_oyan_reservoir;
+            if (STATE.diagPair === 'reservoir' || STATE.diagPair === 'dam') {
+                const block = STATE.diagPair === 'dam'
+                    ? d.rain_to_sar_inundation_controlling_for_oyan_dam_releases
+                    : d.rain_to_sar_inundation_controlling_for_oyan_reservoir;
                 if (!block) return empty('Not in cascade_diagnostics.json. Re-run src/02_compile_observatory.py.');
                 if (block.status !== 'VALID') return empty(escHtml(block.reason || block.status));
                 const lagsObj = block[STATE.diagMode];
                 entries = lagsObj ? Object.keys(lagsObj).map(k => [k.replace('lag_', 'Lag ').replace('_month', ' mo'), lagsObj[k]]) : [];
-            } else if (STATE.diagPair === 'ndti') {
-                const block = d.sar_inundation_to_estuary_ndti;
+            } else if (STATE.diagPair === 'ndti' || STATE.diagPair === 'dw') {
+                const block = STATE.diagPair === 'dw' ? d.sar_validation_against_dynamic_world : d.sar_inundation_to_estuary_ndti;
+                if (block && block.status === 'NOT_AVAILABLE') return empty(escHtml(block.reason));
                 const item = block && block[STATE.diagMode];
                 entries = item ? [['Lag 0 mo', item]] : [];
             } else {
@@ -1663,14 +1726,15 @@
                 const lagsObj = d[prefix + STATE.diagMode];
                 entries = lagsObj ? Object.keys(lagsObj).map(k => [k.replace('lag_', 'Lag ').replace('_month', ' mo'), lagsObj[k]]) : [];
             }
-            setTxt('diag-p-head', STATE.diagPair === 'ndti' ? 'Autocorr.-adj. p' : 'FDR p-val');
+            const singleTest = STATE.diagPair === 'ndti' || STATE.diagPair === 'dw';
+            setTxt('diag-p-head', singleTest ? 'Autocorr.-adj. p' : 'FDR p-val');
             if (!entries.length) return empty('This relationship is not in cascade_diagnostics.json. Re-run src/02_compile_observatory.py.');
 
             tbody.innerHTML = entries.map(([label, item]) => {
                 if (item.status && item.status !== 'VALID') {
                     return `<tr><td><strong>${label}</strong></td><td>${item.n_pairs ?? 'N/A'}</td><td colspan="4" style="color:var(--ink-muted);">${escHtml(item.status)}</td></tr>`;
                 }
-                const pVal = STATE.diagPair === 'ndti' ? item.p_value_autocorr_adj : item.p_value_bh_fdr;
+                const pVal = singleTest ? item.p_value_autocorr_adj : item.p_value_bh_fdr;
                 const ci = item.pearson_ci95 && item.pearson_ci95[0] !== null && item.pearson_ci95[0] !== undefined
                     ? `[${item.pearson_ci95[0]}, ${item.pearson_ci95[1]}]` : '';
                 return `
@@ -1757,10 +1821,6 @@
             setTxt('cov-ndti-wet', `${STATE.series.filter(d => d.estuary_ndti !== null && isWet(d.year_month)).length}/${STATE.series.filter(d => isWet(d.year_month)).length}`);
             setTxt('cov-ndti-dry', `${STATE.series.filter(d => d.estuary_ndti !== null && !isWet(d.year_month)).length}/${STATE.series.filter(d => !isWet(d.year_month)).length}`);
 
-            const simFlag = document.getElementById('sim-flag');
-            simFlag.classList.toggle('is-hidden', STATE.rainShockPct === 0);
-            setTxt('sim-flag', `Sensitivity scaling ${STATE.rainShockPct > 0 ? '+' : ''}${STATE.rainShockPct}% active — values shown are not observed`);
-
             styleMapAndLegend();
             renderUnitCard();
             updateHydroChart(shockFactor, floodFactor, ndtiFactor);
@@ -1772,7 +1832,7 @@
             labelGroup.clearLayers();
             const vals = STATE.features.map(f => {
                 const p = f.properties;
-                if (STATE.layer === 'flood') return p.sim_flood;
+                if (STATE.layer === 'flood') return sarVal(p);
                 if (STATE.layer === 'rain') return p.sim_rain;
                 if (STATE.layer === 'ndti') return p.sim_ndti;
                 return p.ndvi;
@@ -1784,7 +1844,7 @@
 
             geojsonLayer.eachLayer(layer => {
                 const p = layer.feature.properties;
-                const val = STATE.layer === 'flood' ? p.sim_flood
+                const val = STATE.layer === 'flood' ? sarVal(p)
                           : STATE.layer === 'rain' ? p.sim_rain
                           : STATE.layer === 'ndti' ? p.sim_ndti
                           : p.ndvi;
@@ -1801,8 +1861,8 @@
                 layer.setTooltipContent(`
                     <strong>0${p.order} · ${escHtml(p.zone_name)}</strong><br/>
                     <span style="color:#71717A">${escHtml(p.unit_type)}</span><br/>
-                    ${STATE.rainShockPct !== 0 ? `<span style="color:#B45309;font-weight:700">Scaled ${STATE.rainShockPct > 0 ? '+' : ''}${STATE.rainShockPct}% — not observed</span><br/>` : ''}
-                    SAR Flood Proxy: <b>${fmtNum(p.sim_flood, 1, ' km²')}</b> (Perm. Water: ${fmtNum(p.perm_water_km2, 1, ' km²')})<br/>
+
+                    SAR Flood Proxy: <b>${sarTxt(p)}</b> (Perm. Water: ${fmtNum(p.perm_water_km2, 1, ' km²')})<br/>
                     Rain: <b>${fmtNum(p.sim_rain, 0, ' mm/yr')}</b> · Spectral NDTI: <b>${fmtNum(p.sim_ndti, 3)}</b>
                 `);
             });
@@ -1815,8 +1875,7 @@
             };
 
             const [title, baseTag, fmt] = meta[STATE.layer];
-            const simulated = STATE.rainShockPct !== 0 && STATE.layer !== 'ndvi';
-            const tag = simulated ? `${baseTag} · SCALED ${STATE.rainShockPct > 0 ? '+' : ''}${STATE.rainShockPct}% (not observed)` : baseTag;
+            const tag = baseTag;
             // Equal-interval classes matching exactly how interpolateColor() bins values
             const step = (vMax - vMin) / ramp.length;
             const classes = ramp.map((c, i) => [c, `${fmt(vMin + step * i)} – ${fmt(vMin + step * (i + 1))}`]);
@@ -1836,7 +1895,7 @@
             STATE.features.forEach(f => {
                 const p = f.properties;
                 const isSel = STATE.selectedZone === p.zone_id;
-                const subTxt = STATE.layer === 'flood' ? fmtNum(p.sim_flood, 1, ' km² proxy')
+                const subTxt = STATE.layer === 'flood' ? (SAR_UNRELIABLE.has(p.zone_id) ? 'SAR unreliable' : fmtNum(p.sim_flood, 1, ' km² proxy'))
                              : STATE.layer === 'rain' ? fmtNum(p.sim_rain, 0, ' mm/yr')
                              : STATE.layer === 'ndti' ? `NDTI: ${fmtNum(p.sim_ndti, 3)}`
                              : `NDVI: ${fmtNum(p.ndvi, 2)}`;
@@ -1888,19 +1947,12 @@
         }
 
         function renderUnitCard() {
-            if (STATE.diagnostics && STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized) {
-                const l1 = STATE.diagnostics.rain_to_sar_inundation_lags_deseasonalized.lag_1_month;
-                if (l1 && l1.pearson_r !== null) {
-                    const demo = !STATE.diagnostics.provenance || STATE.diagnostics.provenance.is_demonstration_data !== false;
-                    setTxt('lag-badge', `${demo ? 'DEMO · ' : ''}Deseas. Lag-1 r = ${fmtNum(l1.pearson_r, 2)} (n=${l1.n_pairs}, FDR p=${fmtP(l1.p_value_bh_fdr)})`);
-                }
-            }
-
             if (STATE.selectedZone === 'ALL') {
                 const catchmentUnits = STATE.features.filter(f => f.properties.zone_id !== 'Z5');
                 const estuaryUnit = STATE.features.find(f => f.properties.zone_id === 'Z5') || STATE.features[STATE.features.length - 1];
                 const totCatchmentArea = catchmentUnits.reduce((s, f) => s + (f.properties.area_km2 || 0), 0);
-                const totFlood = catchmentUnits.reduce((s, f) => s + (f.properties.sim_flood || 0), 0);
+                const totFlood = catchmentUnits.filter(f => !SAR_UNRELIABLE.has(f.properties.zone_id))
+                    .reduce((s, f) => s + (f.properties.sim_flood || 0), 0);
                 const totPerm = catchmentUnits.reduce((s, f) => s + (f.properties.perm_water_km2 || 0), 0);
                 const meanRain = catchmentUnits.reduce((s, f) => s + (f.properties.sim_rain || 0), 0) / (catchmentUnits.length || 1);
                 const meanSm = catchmentUnits.reduce((s, f) => s + (f.properties.shallow_sm_m3m3 || 0), 0) / (catchmentUnits.length || 1);
@@ -1909,13 +1961,13 @@
 
                 setTxt('sel-eyebrow', '01 · Multi-Domain Overview (Z1–Z4 Catchment + Z5 Estuary)');
                 setTxt('sel-title', 'Ogun Catchment (Z1–Z4) & Estuary (Z5)');
-                setTxt('sel-badge', STATE.rainShockPct === 0 ? 'Baseline View' : `Sensitivity (${STATE.rainShockPct > 0 ? '+' : ''}${STATE.rainShockPct}%)`);
+                setTxt('sel-badge', 'Observed 2019–2024');
                 setTxt('sel-insight', 'Separates the four upland hydrological sub-basins (Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Z5).');
                 setTxt('sel-management', '<strong>Scientific Distinction:</strong> Catchment rainfall and shallow soil moisture (0–7 cm) are aggregated across Z1–Z4, the SAR inundation series is measured over the Z3–Z4 floodplain, and estuarine spectral NDTI is evaluated strictly over open water in Z5.', true);
 
                 setTxt('val-rain', fmtNum(meanRain, 0, ' mm'));
                 setTxt('val-flood', fmtNum(totFlood, 1, ' km²'));
-                setTxt('sub-flood', `Catchment Perm. Water: ${fmtNum(totPerm, 1, ' km²')}`);
+                setTxt('sub-flood', `Z3–Z4 floodplain, Sep–Oct 2022 · Perm. water: ${fmtNum(totPerm, 1, ' km²')}`);
                 setTxt('val-ndti', fmtNum(estuaryUnit ? estuaryUnit.properties.sim_ndti : null, 3));
                 setTxt('sub-ndti', 'Z5 Estuary open water');
                 setTxt('val-sm', fmtNum(meanSm, 3, ' m³/m³'));
@@ -1938,7 +1990,9 @@
 
             setTxt('val-rain', fmtNum(p.sim_rain, 0, ' mm'));
             setTxt('val-flood', fmtNum(p.sim_flood, 1, ' km²'));
-            setTxt('sub-flood', `Perm. water: ${fmtNum(p.perm_water_km2, 1, ' km²')}`);
+            setTxt('sub-flood', SAR_UNRELIABLE.has(p.zone_id)
+                ? 'Unreliable here: dry-season artefacts'
+                : `Sep–Oct 2022 · Perm. water: ${fmtNum(p.perm_water_km2, 1, ' km²')}`);
             setTxt('val-ndti', fmtNum(p.sim_ndti, 3));
             setTxt('sub-ndti', p.zone_id === 'Z5' ? 'Verified estuarine water' : 'Channel water pixels only');
             setTxt('val-sm', fmtNum(p.shallow_sm_m3m3, 3, ' m³/m³'));
@@ -1986,6 +2040,18 @@
                             spanGaps: false,
                             tension: 0.25,
                             yAxisID: 'y2'
+                        },
+                        {
+                            label: 'Dynamic World flooding (km², optical check)',
+                            data: [],
+                            type: 'line',
+                            borderColor: '#16A34A',
+                            borderDash: [2, 3],
+                            borderWidth: 1.6,
+                            pointRadius: 1.5,
+                            spanGaps: false,
+                            tension: 0.25,
+                            yAxisID: 'y1'
                         }
                     ]
                 },
@@ -2042,7 +2108,8 @@
 
             chartInstance.data.labels = STATE.series.map(d => d.year_month);
             chartInstance.data.datasets[0].data = upland.map(d => d.rain_mm !== null ? +(d.rain_mm * shockFactor).toFixed(1) : null);
-            chartInstance.data.datasets[1].data = upland.map(d => d.sar_flood_km2 !== null ? +(d.sar_flood_km2 * floodFactor).toFixed(1) : null);
+            chartInstance.data.datasets[1].data = upland.map(d => d.sar_flood_km2 !== null ? +(d.sar_flood_km2 * floodFactor).toFixed(2) : null);
+            chartInstance.data.datasets[3].data = upland.map(d => d.dw_flood_km2 !== null && d.dw_flood_km2 !== undefined ? +d.dw_flood_km2.toFixed(2) : null);
             chartInstance.data.datasets[2].data = STATE.series.map(d => d.estuary_ndti !== null ? +(d.estuary_ndti * ndtiFactor).toFixed(4) : null);
             chartInstance.update('none');
         }
@@ -2063,7 +2130,7 @@
             }
 
             const rows = [
-                ['SAR Inundation Proxy', fmtNum(a.sim_flood, 1, ' km²'), fmtNum(b.sim_flood, 1, ' km²'), diffStr(a.sim_flood, b.sim_flood, 1, ' km²')],
+                ['SAR Inundation Proxy (Sep–Oct 2022)', sarTxt(a), sarTxt(b), diffStr(sarVal(a), sarVal(b), 1, ' km²')],
                 ['Permanent Water (JRC)', fmtNum(a.perm_water_km2, 1, ' km²'), fmtNum(b.perm_water_km2, 1, ' km²'), diffStr(a.perm_water_km2, b.perm_water_km2, 1, ' km²')],
                 ['Annual Rainfall', fmtNum(a.sim_rain, 0, ' mm'), fmtNum(b.sim_rain, 0, ' mm'), diffStr(a.sim_rain, b.sim_rain, 0, ' mm')],
                 ['Spectral NDTI', fmtNum(a.sim_ndti, 3), fmtNum(b.sim_ndti, 3), diffStr(a.sim_ndti, b.sim_ndti, 3, '')],
@@ -2087,7 +2154,7 @@
                         <td><span class="mono" style="font-size:11px;">${escHtml(p.unit_type)}</span></td>
                         <td>${Math.round(p.area_km2 || 0).toLocaleString()}</td>
                         <td>${fmtNum(p.sim_rain, 0)}</td>
-                        <td><strong>${fmtNum(p.sim_flood, 1, ' km²')}</strong></td>
+                        <td><strong>${sarTxt(p)}</strong></td>
                         <td>${fmtNum(p.sim_ndti, 3)}</td>
                     </tr>
                 `;
@@ -2114,12 +2181,6 @@
                 if (riverStemLayer) riverStemLayer.bringToFront();
             }
         });
-        document.getElementById('rain-shock-slider').addEventListener('input', e => {
-            STATE.rainShockPct = Number(e.target.value);
-            const sign = STATE.rainShockPct > 0 ? '+' : '';
-            setTxt('shock-val', STATE.rainShockPct === 0 ? '0% (Observed Baseline)' : `${sign}${STATE.rainShockPct}% Sensitivity Scaling`);
-            updateEverything();
-        });
         document.getElementById('comp-a').addEventListener('change', e => { STATE.compA = e.target.value; renderBenchmark(); });
         document.getElementById('comp-b').addEventListener('change', e => { STATE.compB = e.target.value; renderBenchmark(); });
         document.getElementById('diag-pair').addEventListener('change', e => { STATE.diagPair = e.target.value; renderDiagnosticsTable(); });
@@ -2132,10 +2193,7 @@
         });
         document.getElementById('btn-reset').addEventListener('click', () => {
             STATE.selectedZone = 'ALL';
-            STATE.rainShockPct = 0;
             document.getElementById('zone-select').value = 'ALL';
-            document.getElementById('rain-shock-slider').value = 0;
-            setTxt('shock-val', '0% (Observed Baseline)');
             if (geojsonLayer) map.flyToBounds(geojsonLayer.getBounds(), { padding: [24, 24], duration: 0.6 });
             updateEverything();
         });
@@ -2220,9 +2278,9 @@
             },
             {
                 target: '#card-hydrograph',
-                title: '5. 72-Month Hydrograph & Sensitivity Explorer',
-                desc: 'Displays valid observation counts per sensor and preserves cloudy monsoon months as gaps (never substituting 0). The slider below illustrates directional sensitivity.',
-                hint: 'Notice how cloudy wet-season NDTI gaps remain uninterpolated on the chart.'
+                title: '5. 72-Month Time Series',
+                desc: 'Displays valid observation counts per sensor and preserves cloudy months as gaps (never substituting 0). Select a unit to see its own rainfall and SAR series.',
+                hint: 'The dashed green line is the independent Dynamic World (Sentinel-2) flooding check.'
             },
             {
                 target: '#card-benchmark',

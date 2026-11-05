@@ -60,3 +60,17 @@ def test_failed_validation_installs_nothing(ingester, tmp_path):
     with pytest.raises(ingester.ValidationError):
         ingester.ingest(bad, DATA / "ogun_subbasins.geojson", None, out)
     assert not out.exists()
+
+
+def test_dam_releases_merged(ingester):
+    monthly = ingester.validate_monthly(_monthly())
+    rel = pd.DataFrame({"year_month": monthly["year_month"][:12], "oyan_release_mcm": range(12)})
+    merged = ingester.merge_dam_releases(monthly, rel)
+    assert merged["oyan_release_mcm"].notna().sum() == 12
+
+
+def test_dam_releases_outside_period_rejected(ingester):
+    monthly = ingester.validate_monthly(_monthly())
+    rel = pd.DataFrame({"year_month": ["1999-01"], "oyan_release_mcm": [5.0]})
+    with pytest.raises(ingester.ValidationError, match="outside the study period"):
+        ingester.merge_dam_releases(monthly, rel)

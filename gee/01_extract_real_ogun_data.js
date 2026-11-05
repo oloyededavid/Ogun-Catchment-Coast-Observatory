@@ -63,7 +63,7 @@ var estuaryRawBox = ee.Geometry.Polygon([
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.3.0';
+var SCRIPT_VERSION = '2.4.0';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
@@ -132,7 +132,7 @@ Map.addLayer(ogunRivers, {color: '#0284C7'}, 'HydroSHEDS River Network (Order >=
 var startDateStr = '2019-01-01';
 // filterDate end is exclusive: use the first day after the study period.
 var endDateStr = '2025-01-01';
-var glo30 = ee.ImageCollection('COPERNICUS/DEM/GLO30').select('DEM');
+var glo30 = ee.ImageCollection('COPERNICUS/DEM/GLO30_2024_1').select('DEM');
 // mosaic() drops the native 30 m projection (it defaults to a 1-degree grid), which
 // made ee.Terrain.slope return no data and silently zeroed the slope mask and the
 // SAR inundation proxy. Restore the native projection before computing slope.
@@ -202,10 +202,9 @@ var meanShallowSm = ee.ImageCollection('ECMWF/ERA5_LAND/MONTHLY_AGGR')
   .mean()
   .rename('shallow_sm_m3m3');
 
-var s1Peak2022 = s1Collection
-  .filterDate('2022-09-01', '2022-10-31')
-  .map(function(img) { return img.focal_median(50, 'circle', 'meters'); })
-  .median();
+var s1Peak2022Passes = s1Collection
+  .filterDate('2022-09-01', '2022-11-01')
+  .map(function(img) { return img.focal_median(50, 'circle', 'meters'); });
 
 // --- SAR flood detection --------------------------------------------------
 // A fixed VV < -16.5 dB threshold alone is dominated by dry-season false alarms
@@ -225,11 +224,19 @@ function floodMask(vvImg) {
     .and(handMask);
 }
 
+// Independent optical cross-check: Google Dynamic World (Sentinel-2) pixels labelled
+// water (0) or flooded vegetation (3), outside permanent water and < 15 m above drainage.
+var dwLabels = ee.ImageCollection('GOOGLE/DYNAMICWORLD/V1').select('label')
+  .filterBounds(fullStudyGeom).filterDate(startDateStr, endDateStr);
+var maskedDwTemplate = ee.Image.constant(0).toFloat().rename('label').updateMask(0);
+
 // The catchment flood series is measured over the lower-Ogun floodplain
 // (Z3 + Z4) only; Z1/Z2 values remain affected by dry-season artefacts.
 var floodplainGeom = z3Geom.union(z4Geom, 30);
 
-var sarPeakProxyKm2 = floodMask(s1Peak2022)
+// Per-pass detection: the fraction of Sep-Oct 2022 passes in which each pixel was
+// flooded, times its area, is the mean flooded area over the period.
+var sarPeakProxyKm2 = s1Peak2022Passes.map(function(img) { return floodMask(img).toFloat(); }).mean()
   .multiply(ee.Image.pixelArea())
   .divide(1e6)
   .rename('sar_inundation_km2');
@@ -319,6 +326,15 @@ function monthImages(m) {
   var s1Month = s1Collection.filterDate(mStart, mEnd)
     .map(function(img) { return img.focal_median(50, 'circle', 'meters'); });
   var s2Month = s2Processed.filterDate(mStart, mEnd);
+  var dwMonth = dwLabels.filterDate(mStart, mEnd);
+
+  // Per-pass flood masks (1 flooded, 0 not, masked outside each pass's footprint).
+  var s1FloodPasses = s1Month.map(function(img) { return floodMask(img).toFloat().rename('VV'); });
+  var floodFraction = orTemplate(s1FloodPasses, maskedS1Template).mean();
+  var floodEver = orTemplate(s1FloodPasses, maskedS1Template).max();
+  var dwWetFraction = orTemplate(dwMonth.map(function(img) {
+    return img.eq(0).or(img.eq(3)).toFloat().rename('label');
+  }), maskedDwTemplate).mean().updateMask(seasonalDomainMask.and(handMask));
 
   var s1MedImg = orTemplate(s1Month, maskedS1Template).median();
   var s2MedImg = orTemplate(s2Month, maskedS2Template).median();
@@ -331,10 +347,12 @@ function monthImages(m) {
     s2SceneCount: s2Month.size(),
     rainImg: orTemplate(chirpsMonth, maskedChirpsTemplate).sum(),
     smImg: orTemplate(era5Month, maskedEra5Template).mean(),
-    sarAreaImg: floodMask(s1MedImg)
-      .multiply(ee.Image.pixelArea())
-      .divide(1e6)
-      .rename('VV'),
+    dwCount: dwMonth.size(),
+    // Mean flooded area: per-pixel fraction of passes flooded x pixel area.
+    sarAreaImg: floodFraction.multiply(ee.Image.pixelArea()).divide(1e6).rename('VV'),
+    // Maximum extent: area flooded in at least one pass of the month.
+    sarMaxImg: floodEver.multiply(ee.Image.pixelArea()).divide(1e6).rename('VV'),
+    dwAreaImg: dwWetFraction.multiply(ee.Image.pixelArea()).divide(1e6).rename('VV'),
     reservoirAreaImg: s1MedImg.lt(-16.5)
       .and(oyanReservoirMask)
       .multiply(ee.Image.pixelArea())
@@ -369,6 +387,9 @@ var monthlyTimeSeries = ee.FeatureCollection(months.map(function(m) {
     'rain_mm': ee.Algorithms.If(mi.pentadCount.gte(5), reduceMean(mi.rainImg, 'precipitation', catchmentGeom, 5500), null),
     'shallow_sm_m3m3': ee.Algorithms.If(mi.era5Count.gt(0), reduceMean(mi.smImg, 'volumetric_soil_water_layer_1', catchmentGeom, 9000), null),
     'sar_flood_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarAreaImg, floodplainGeom, 120), null),
+    'sar_flood_max_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarMaxImg, floodplainGeom, 120), null),
+    'dw_flood_km2': ee.Algorithms.If(mi.dwCount.gt(0), reduceSum(mi.dwAreaImg, floodplainGeom, 60), null),
+    'dw_images': mi.dwCount,
     'oyan_reservoir_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.reservoirAreaImg, oyanBox, 30), null),
     'estuary_ndti': nd.ndti,
     'chirps_pentads': mi.pentadCount,
@@ -407,6 +428,8 @@ var unitMonthly = ee.FeatureCollection(months.map(function(m) {
       'rain_mm': ee.Algorithms.If(mi.pentadCount.gte(5), reduceMean(mi.rainImg, 'precipitation', geom, 5500), null),
       'shallow_sm_m3m3': ee.Algorithms.If(mi.era5Count.gt(0), reduceMean(mi.smImg, 'volumetric_soil_water_layer_1', geom, 9000), null),
       'sar_flood_km2': ee.Algorithms.If(isEstuary, null, ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarAreaImg, geom, 120), null)),
+      'sar_flood_max_km2': ee.Algorithms.If(isEstuary, null, ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarMaxImg, geom, 120), null)),
+      'dw_flood_km2': ee.Algorithms.If(isEstuary, null, ee.Algorithms.If(mi.dwCount.gt(0), reduceSum(mi.dwAreaImg, geom, 60), null)),
       'estuary_ndti': ee.Algorithms.If(isEstuary, nd.ndti, null),
       's1_scenes': mi.s1Count,
       's2_water_px': ee.Algorithms.If(isEstuary, nd.px, null),
