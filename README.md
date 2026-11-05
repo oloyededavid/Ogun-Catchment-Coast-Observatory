@@ -44,7 +44,7 @@ An integrated Earth Observation and hydrological research observatory investigat
 | **Surface Water** | `JRC/GSW1_4/GlobalSurfaceWater` | `30 m` | `occurrence >= 80%` separated as permanent water; `occurrence >= 50%` masks estuarine water. |
 | **Rainfall** | `UCSB-CHG/CHIRPS/PENTAD` | `0.05° (~5.5 km)` | Monthly total (`mm/month`) when $\ge 5$ pentads exist; otherwise preserved as `null`. |
 | **Shallow Soil Water** | `ECMWF/ERA5_LAND/MONTHLY_AGGR` | `0.1° (~9 km)` | `volumetric_soil_water_layer_1` (`0–7 cm` surface skin layer, $\text{m}^3/\text{m}^3$). |
-| **SAR Inundation Proxy** | `COPERNICUS/S1_GRD` | `10 m` (`60–120 m` zonal) | `IW`, `VV`, `ASCENDING` pass (the descending track covers only ~5% of the catchment); `50 m` focal-median filter; `VV < -16.5 dB`, `slope < 5°`, `JRC < 80%`. Preserves `null` if `s1_scenes == 0`. |
+| **SAR Inundation Proxy** | `COPERNICUS/S1_GRD`, `MERIT/Hydro/v1_0_1` | `10 m` (`60–120 m` zonal) | `IW`, `VV`, `ASCENDING` pass (the descending track covers only ~5% of the catchment); `50 m` focal-median filter. Flooded where `VV < -16.5 dB` **and** ≥ 3 dB darker than the Jan–Mar dry-season reference, `slope < 5°`, `JRC < 80%`, height above nearest drainage `< 15 m`. Catchment series measured over the lower-Ogun floodplain (`Z3 + Z4`). Preserves `null` if `s1_scenes == 0`. |
 | **Spectral Turbidity** | `COPERNICUS/S2_SR_HARMONIZED` | `10–30 m` | `SCL` cloud/shadow masked; restricted to open water (`SCL == 6` & `MNDWI > 0`). $\text{NDTI} = (B4 - B3)/(B4 + B3)$. Preserves `null` if `< 100` valid water pixels exist. |
 
 ---
@@ -113,5 +113,6 @@ python -m pytest -q tests
 * **Short record:** six years give six values per calendar month for deseasonalising, and serial autocorrelation leaves a small effective sample size.
 * **Other turbidity drivers:** tides, dredging, sand mining and Lagos urban runoff are not modelled.
 * **No ground validation:** no independent flood extents or gravimetric TSS samples were available, so the SAR and NDTI layers are uncalibrated proxies.
+* **SAR flood proxy:** a fixed `VV < -16.5 dB` threshold is dominated in this catchment by dry-season false alarms (burnt savanna and dry ground darken in January–March, mostly in `Z1` and `Z2`). The proxy therefore uses change detection against a dry-season reference plus a height-above-drainage filter, and the catchment series covers the floodplain units `Z3 + Z4` only. Monthly median composites miss short-lived floods, and C-band radar cannot see water under vegetation, so absolute areas are small and should be read as an index.
 * **Monthly resolution:** coarser than catchment-to-coast travel times; lags reflect seasonal storage memory, not flood-wave routing.
 * **Pour points and reservoir box** in the Earth Engine script are approximate and must be checked on the map before exporting.

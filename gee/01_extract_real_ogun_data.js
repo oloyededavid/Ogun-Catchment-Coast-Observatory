@@ -63,7 +63,7 @@ var estuaryRawBox = ee.Geometry.Polygon([
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.2.0';
+var SCRIPT_VERSION = '2.3.0';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
@@ -207,9 +207,29 @@ var s1Peak2022 = s1Collection
   .map(function(img) { return img.focal_median(50, 'circle', 'meters'); })
   .median();
 
-var sarPeakProxyKm2 = s1Peak2022.lt(-16.5)
-  .and(lowSlopeMask)
-  .and(seasonalDomainMask)
+// --- SAR flood detection --------------------------------------------------
+// A fixed VV < -16.5 dB threshold alone is dominated by dry-season false alarms
+// (burnt savanna and dry ground in Z1/Z2 darken in Jan-Mar). A pixel is counted
+// as flooded only if it is dark, at least 3 dB darker than its dry-season
+// (Jan-Mar, 2019-2024) reference, on gentle slopes, outside permanent water and
+// less than 15 m above the nearest drainage (MERIT Hydro HAND).
+var s1DryReference = s1Collection.filter(ee.Filter.calendarRange(1, 3, 'month'))
+  .median().focal_median(50, 'circle', 'meters');
+var handMask = ee.Image('MERIT/Hydro/v1_0_1').select('hnd').lt(15);
+
+function floodMask(vvImg) {
+  return vvImg.lt(-16.5)
+    .and(vvImg.subtract(s1DryReference).lt(-3))
+    .and(lowSlopeMask)
+    .and(seasonalDomainMask)
+    .and(handMask);
+}
+
+// The catchment flood series is measured over the lower-Ogun floodplain
+// (Z3 + Z4) only; Z1/Z2 values remain affected by dry-season artefacts.
+var floodplainGeom = z3Geom.union(z4Geom, 30);
+
+var sarPeakProxyKm2 = floodMask(s1Peak2022)
   .multiply(ee.Image.pixelArea())
   .divide(1e6)
   .rename('sar_inundation_km2');
@@ -311,9 +331,7 @@ function monthImages(m) {
     s2SceneCount: s2Month.size(),
     rainImg: orTemplate(chirpsMonth, maskedChirpsTemplate).sum(),
     smImg: orTemplate(era5Month, maskedEra5Template).mean(),
-    sarAreaImg: s1MedImg.lt(-16.5)
-      .and(lowSlopeMask)
-      .and(seasonalDomainMask)
+    sarAreaImg: floodMask(s1MedImg)
       .multiply(ee.Image.pixelArea())
       .divide(1e6)
       .rename('VV'),
@@ -350,7 +368,7 @@ var monthlyTimeSeries = ee.FeatureCollection(months.map(function(m) {
     'year_month': mi.yearMonth,
     'rain_mm': ee.Algorithms.If(mi.pentadCount.gte(5), reduceMean(mi.rainImg, 'precipitation', catchmentGeom, 5500), null),
     'shallow_sm_m3m3': ee.Algorithms.If(mi.era5Count.gt(0), reduceMean(mi.smImg, 'volumetric_soil_water_layer_1', catchmentGeom, 9000), null),
-    'sar_flood_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarAreaImg, catchmentGeom, 120), null),
+    'sar_flood_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.sarAreaImg, floodplainGeom, 120), null),
     'oyan_reservoir_km2': ee.Algorithms.If(mi.s1Count.gt(0), reduceSum(mi.reservoirAreaImg, oyanBox, 30), null),
     'estuary_ndti': nd.ndti,
     'chirps_pentads': mi.pentadCount,
