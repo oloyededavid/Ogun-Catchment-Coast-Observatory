@@ -3,1380 +3,940 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Ogun River Catchment-to-Coast Environmental Observatory: CHIRPS, ERA5-Land, Copernicus GLO-30, Sentinel-1 SAR & Sentinel-2 MSI.">
-    <title>Ogun Catchment-to-Coast Observatory | Multi-Sensor Research Interface</title>
+    <meta name="description" content="Ogun River catchment-to-coast observatory: how rainfall and soil moisture across the Ogun catchment relate to floodplain inundation and turbidity in the northwest Lagos Lagoon, 2019–2024, from Google Earth Engine.">
+    <meta name="color-scheme" content="light dark">
+    <title>Ogun Catchment-to-Coast Observatory</title>
 
-    <!-- Fontshare: Satoshi (400, 500, 700, 900) -->
     <link rel="preconnect" href="https://api.fontshare.com">
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
 
-    <!-- Leaflet 1.9.4 & Chart.js 4.4.1 (bundled in docs/vendor/, no CDN dependency) -->
+    <!-- Leaflet 1.9.4 & Chart.js 4.4.1, bundled in docs/vendor/ (no CDN dependency) -->
     <link rel="stylesheet" href="vendor/leaflet-1.9.4/leaflet.css" />
     <script src="vendor/leaflet-1.9.4/leaflet.js"></script>
     <script src="vendor/chartjs-4.4.1/chart.umd.min.js"></script>
 
     <style>
+        /* ================= Design tokens ================= */
         :root {
-            --bg-white: #FFFFFF;
-            --bg-canvas: #F8FAFC;
-            --bg-subtle: #F4F4F5;
-            --border-light: #E4E4E7;
-            --border-mid: #D4D4D8;
-
-            --ink-black: #09090B;
-            --ink-body: #3F3F46;
-            --ink-muted: #71717A;
-
-            --accent-blue: #0284C7;
-            --accent-blue-soft: #E0F2FE;
-            --err-border: #EF4444;
-            --err-ink: #7F1D1D;
-
-            --chevron-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2309090B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            color-scheme: light;
+            --page: #f4f4f1;
+            --surface: #fcfcfb;
+            --surface-2: #f0efec;
+            --surface-raised: #ffffff;
+            --ink: #0b0b0b;
+            --ink-2: #52514e;
+            --ink-3: #6f6e69;
+            --grid: #e1e0d9;
+            --baseline: #c3c2b7;
+            --border: rgba(11, 11, 11, 0.10);
+            --border-strong: rgba(11, 11, 11, 0.18);
+            --accent: #2a78d6;
+            --accent-ink: #1c5cab;
+            --accent-soft: #e3eefb;
+            --series: #2a78d6;
+            --good: #0ca30c;
+            --good-ink: #006300;
+            --warning: #fab219;
+            --warning-ink: #7a5200;
+            --critical: #d03b3b;
+            --shadow-float: 0 2px 6px rgba(11, 11, 11, 0.08), 0 12px 32px rgba(11, 11, 11, 0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --font: 'Satoshi', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            /* Sequential blue ramp, low -> high (validated: ordinal, light surface) */
+            --seq-1: #86b6ef; --seq-2: #5598e7; --seq-3: #2a78d6; --seq-4: #1c5cab; --seq-5: #104281;
+            --unreliable: #c9c8c1;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        @media (prefers-color-scheme: dark) {
+            :root:where(:not([data-theme="light"])) {
+                color-scheme: dark;
+                --page: #0d0d0d;
+                --surface: #1a1a19;
+                --surface-2: #232322;
+                --surface-raised: #222221;
+                --ink: #f0efec;
+                --ink-2: #c3c2b7;
+                --ink-3: #9a998f;
+                --grid: #2c2c2a;
+                --baseline: #383835;
+                --border: rgba(255, 255, 255, 0.10);
+                --border-strong: rgba(255, 255, 255, 0.18);
+                --accent: #3987e5;
+                --accent-ink: #86b6ef;
+                --accent-soft: rgba(57, 135, 229, 0.16);
+                --series: #3987e5;
+                --good-ink: #0ca30c;
+                --warning-ink: #fab219;
+                --shadow-float: 0 2px 6px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.5);
+                --unreliable: #4a4a46;
+                --seq-1: #1c5cab; --seq-2: #2a78d6; --seq-3: #5598e7; --seq-4: #86b6ef; --seq-5: #b7d3f6;
+            }
         }
+
+        :root[data-theme="dark"] {
+            color-scheme: dark;
+            --page: #0d0d0d;
+            --surface: #1a1a19;
+            --surface-2: #232322;
+            --surface-raised: #222221;
+            --ink: #f0efec;
+            --ink-2: #c3c2b7;
+            --ink-3: #9a998f;
+            --grid: #2c2c2a;
+            --baseline: #383835;
+            --border: rgba(255, 255, 255, 0.10);
+            --border-strong: rgba(255, 255, 255, 0.18);
+            --accent: #3987e5;
+            --accent-ink: #86b6ef;
+            --accent-soft: rgba(57, 135, 229, 0.16);
+            --series: #3987e5;
+            --good-ink: #0ca30c;
+            --warning-ink: #fab219;
+            --shadow-float: 0 2px 6px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.5);
+            --unreliable: #4a4a46;
+            --seq-1: #1c5cab; --seq-2: #2a78d6; --seq-3: #5598e7; --seq-4: #86b6ef; --seq-5: #b7d3f6;
+        }
+
+        /* ================= Base ================= */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
 
         body {
-            font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 13.5px;
-            color: var(--ink-black);
-            background: var(--bg-white);
-            line-height: 1.5;
+            font-family: var(--font);
+            font-size: 14px;
+            line-height: 1.55;
+            color: var(--ink);
+            background: var(--page);
             -webkit-font-smoothing: antialiased;
+        }
+
+        button, select, input { font: inherit; color: inherit; }
+        a { color: var(--accent-ink); }
+        .mono { font-family: var(--mono); font-size: 0.88em; }
+        [hidden] { display: none !important; }
+
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; overflow: hidden;
+            clip: rect(0 0 0 0); white-space: nowrap;
+        }
+
+        /* ================= App shell ================= */
+        .app {
+            display: grid;
+            grid-template-rows: auto auto minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1fr);
             height: 100vh;
-            overflow: hidden;
+            height: 100dvh;
         }
 
-        .mono {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 0.9em;
-        }
-
-        .is-hidden {
-            display: none !important;
-        }
-
-        .app-shell {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* 1. Top Navigation Bar */
-        .topbar {
-            min-height: 68px;
-            padding: 10px 24px;
-            background: var(--bg-white);
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 18px;
-            flex-wrap: wrap;
-            z-index: 1000;
-        }
-
-        .brand {
+        .appbar {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
+            padding: 10px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            z-index: 1100;
         }
+
+        .brand { display: flex; align-items: center; gap: 12px; min-width: 0; margin-right: auto; }
 
         .brand-mark {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: var(--ink-black);
-            color: var(--bg-white);
-            display: grid;
-            place-items: center;
-            font-weight: 900;
-            font-size: 13px;
-            letter-spacing: -0.03em;
-            flex-shrink: 0;
+            width: 34px; height: 34px; flex-shrink: 0;
+            border-radius: 9px;
+            background: var(--accent);
+            display: grid; place-items: center;
         }
 
-        .brand-kicker {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent-blue);
-            display: block;
-        }
+        .brand-text { min-width: 0; }
 
         .brand-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 900;
-            letter-spacing: -0.025em;
-            color: var(--ink-black);
-            line-height: 1.15;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .brand-sub {
-            font-size: 11.5px;
-            font-weight: 500;
-            color: var(--ink-muted);
+            font-size: 12px;
+            color: var(--ink-3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .top-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        .field-label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--ink-muted);
-        }
-
-        .clean-select {
-            appearance: none;
-            -webkit-appearance: none;
-            font-family: 'Satoshi', sans-serif;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: var(--ink-black);
-            background-color: var(--bg-white);
-            background-image: var(--chevron-svg);
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 14px;
-            border: 1.5px solid var(--border-mid);
-            border-radius: 8px;
-            padding: 7px 32px 7px 11px;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.15s ease;
-        }
-
-        .clean-select:hover,
-        .clean-select:focus {
-            border-color: var(--ink-black);
-        }
-
-        .control-divider {
-            width: 1px;
-            height: 28px;
-            background: var(--border-light);
-            margin: 0 2px;
-        }
-
-        .btn-pill {
-            font-family: 'Satoshi', sans-serif;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: var(--ink-black);
-            background: var(--bg-white);
-            border: 1.5px solid var(--border-mid);
-            border-radius: 8px;
-            padding: 7px 12px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            align-self: flex-end;
-        }
-
-        .btn-pill:hover {
-            border-color: var(--ink-black);
-            background: var(--bg-subtle);
-        }
-
-        .btn-pill.active {
-            background: var(--ink-black);
-            color: var(--bg-white);
-            border-color: var(--ink-black);
-        }
-
-        .btn-pill.btn-guide {
-            background: var(--bg-subtle);
-            color: var(--ink-black);
-            border-color: var(--ink-black);
+        .status-chip {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .btn-pill.btn-guide:hover {
-            background: var(--ink-black);
-            color: var(--bg-white);
-        }
-
-        .guide-dot-pulse {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-            display: inline-block;
-        }
-
-        /* 2. Research Question & Export Strip */
-        .summary-strip {
-            background: var(--bg-subtle);
-            border-bottom: 1px solid var(--border-light);
-            padding: 8px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            font-size: 12.5px;
-            color: var(--ink-body);
-        }
-
-        .summary-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .link-action {
-            background: none;
-            border: none;
-            font-family: 'Satoshi', sans-serif;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
             font-size: 12px;
             font-weight: 700;
-            color: var(--ink-black);
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 3px;
+            color: var(--ink-2);
+            white-space: nowrap;
         }
 
-        .link-action:hover {
-            color: var(--accent-blue);
-        }
+        .status-chip svg { flex-shrink: 0; }
+        .status-chip.is-good svg { color: var(--good-ink); }
+        .status-chip.is-warning svg { color: var(--warning-ink); }
 
-        /* 3. Split Workspace */
-        .workspace {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        .appbar-actions { display: flex; align-items: center; gap: 6px; }
 
-        .map-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg-canvas);
-        }
-
-        .map-stage {
-            position: relative;
-            flex: 1;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .map-canvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        .map-error-overlay {
-            position: absolute;
-            inset: 24px;
-            background: rgba(255, 255, 255, 0.96);
-            border: 2px solid var(--err-border);
-            border-radius: 12px;
-            padding: 24px;
-            z-index: 1200;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 10px;
-            max-width: 520px;
-            margin: auto;
-            height: fit-content;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-        }
-
-        /* External Legend Dock */
-        .legend-dock {
-            background: var(--bg-white);
-            border-top: 1px solid var(--border-light);
-            padding: 10px 20px;
-            display: flex;
-            flex-direction: column;
+        .btn {
+            display: inline-flex;
+            align-items: center;
             gap: 6px;
-            z-index: 800;
-        }
-
-        .legend-dock-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .legend-title-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-title-wrap strong {
-            font-size: 12.5px;
-            font-weight: 900;
-            color: var(--ink-black);
-        }
-
-        .legend-source-pill {
-            font-size: 11px;
+            height: 34px;
+            padding: 0 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-strong);
+            background: var(--surface-raised);
+            font-size: 13px;
             font-weight: 700;
-            color: var(--ink-muted);
-            background: var(--bg-subtle);
-            padding: 2px 8px;
-            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--ink);
+            transition: background 0.15s;
         }
 
-        .legend-classes {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            font-size: 11.5px;
-            font-weight: 500;
-            color: var(--ink-body);
+        .btn:hover { background: var(--surface-2); }
+        .btn-icon { width: 34px; padding: 0; justify-content: center; }
+
+        .menu { position: relative; }
+        .menu > summary { list-style: none; }
+        .menu > summary::-webkit-details-marker { display: none; }
+
+        .menu-list {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            min-width: 270px;
+            padding: 6px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-float);
+            z-index: 1300;
         }
 
-        .legend-item {
+        .menu-list a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .menu-list a:hover { background: var(--surface-2); }
+        .menu-list a span { display: block; font-size: 11.5px; font-weight: 400; color: var(--ink-3); }
+
+        .banner {
             display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 10px 20px;
+            background: rgba(250, 178, 25, 0.14);
+            border-bottom: 1px solid rgba(250, 178, 25, 0.5);
+            font-size: 13px;
+        }
+
+        .banner svg { color: var(--warning-ink); flex-shrink: 0; margin-top: 2px; }
+
+        .layout {
+            grid-row: 3;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(460px, 560px);
+            min-height: 0;
+        }
+
+        .appbar { grid-row: 1; }
+        .banner { grid-row: 2; }
+
+        /* ================= Map pane ================= */
+        .map-pane { position: relative; min-height: 0; background: var(--surface-2); }
+        #map { position: absolute; inset: 0; }
+        .leaflet-container { background: var(--surface-2); font-family: var(--font); }
+
+        .map-float {
+            position: absolute;
+            z-index: 800;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-float);
+        }
+
+        .layer-switch { top: 14px; left: 14px; display: flex; gap: 2px; padding: 4px; max-width: calc(100% - 180px); overflow-x: auto; scrollbar-width: none; }
+
+        .seg {
+            display: inline-flex;
             align-items: center;
             gap: 6px;
+            padding: 6px 11px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--ink-2);
+            cursor: pointer;
+            white-space: nowrap;
         }
 
-        .swatch-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            border: 1px solid rgba(0,0,0,0.2);
-            flex-shrink: 0;
+        .seg:hover { background: var(--surface-2); color: var(--ink); }
+        .layer-switch .seg[aria-checked="true"] { background: var(--accent); color: #ffffff; }
+
+        .basemap-switch { top: 14px; right: 58px; padding: 4px; }
+
+        .basemap-switch select {
+            border: 0;
+            background: transparent;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 5px 6px;
+            cursor: pointer;
         }
 
-        .legend-bar {
-            height: 9px;
-            width: 100%;
-            border-radius: 999px;
-            border: 1px solid rgba(9, 9, 11, 0.14);
-        }
+        .legend { left: 14px; bottom: 14px; width: min(340px, calc(100% - 28px)); padding: 12px 14px; }
+        .legend-title { font-size: 13px; font-weight: 900; }
+        .legend-source { font-size: 11.5px; color: var(--ink-3); margin-bottom: 8px; }
+        .legend-bar { height: 10px; border-radius: 999px; border: 1px solid var(--border); }
 
         .legend-ticks {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ink-muted);
+            margin-top: 4px;
+            font-size: 11.5px;
+            color: var(--ink-2);
             font-variant-numeric: tabular-nums;
         }
 
-        .map-credit {
-            background: var(--bg-subtle);
-            border-top: 1px solid var(--border-light);
-            padding: 5px 20px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--ink-muted);
-            display: flex;
-            justify-content: space-between;
+        .legend-note { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11.5px; color: var(--ink-2); }
+
+        .swatch { width: 14px; height: 10px; flex-shrink: 0; border-radius: 3px; border: 1px dashed var(--ink-2); }
+        .swatch-unreliable { background: repeating-linear-gradient(45deg, var(--unreliable) 0 3px, transparent 3px 6px); }
+
+        .map-error {
+            position: absolute;
+            inset: 24px;
+            margin: auto;
+            height: fit-content;
+            max-width: 480px;
+            padding: 20px;
+            z-index: 1200;
+            background: var(--surface-raised);
+            border: 1px solid var(--critical);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-float);
         }
 
-        /* Permanent Sub-Basin Map Labels */
-        .zone-label-icon {
-            pointer-events: none !important;
-        }
+        .zone-label { pointer-events: none !important; }
 
         .zone-pin {
             display: inline-block;
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.95);
-            border: 1.5px solid rgba(9, 9, 11, 0.35);
-            border-radius: 6px;
             padding: 3px 8px;
-            font-family: 'Satoshi', sans-serif;
-            font-size: 11px;
+            border-radius: 6px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border-strong);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+            font-family: var(--font);
+            font-size: 11.5px;
             font-weight: 900;
-            color: var(--ink-black);
+            color: var(--ink);
             white-space: nowrap;
             text-align: center;
-            line-height: 1.2;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+            line-height: 1.25;
         }
 
-        .zone-pin.is-selected {
-            background: var(--ink-black);
-            color: var(--bg-white);
-            border-color: var(--ink-black);
+        .zone-pin span { display: block; font-size: 11px; font-weight: 500; color: var(--ink-2); }
+        .zone-pin.is-compact { padding: 2px 7px; font-size: 11px; }
+        .zone-pin.is-compact span { display: inline; margin-left: 2px; }
+        .zone-pin.is-selected { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+        .zone-pin.is-selected span { color: var(--surface-2); }
+
+        .leaflet-tooltip.map-tip {
+            background: var(--surface-raised);
+            color: var(--ink);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-float);
+            padding: 8px 10px;
+            font-family: var(--font);
+            font-size: 12.5px;
         }
 
-        .zone-pin span {
-            display: block;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--ink-muted);
-        }
+        .leaflet-tooltip.map-tip::before { display: none; }
+        .leaflet-control-attribution { font-size: 10.5px; }
+        .leaflet-bar a { background: var(--surface-raised); color: var(--ink); border-color: var(--border); }
 
-        .zone-pin.is-selected span {
-            color: #D4D4D8;
-        }
-
-        /* 4. Right Analytical Sidebar */
-        .sidebar {
-            width: 580px;
-            flex-shrink: 0;
-            background: var(--bg-subtle);
-            border-left: 1px solid var(--border-light);
-            padding: 18px;
-            overflow-y: auto;
+        /* ================= Panel ================= */
+        .panel {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            scroll-behavior: smooth;
+            min-height: 0;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
         }
 
-        .card {
-            background: var(--bg-white);
-            border: 1px solid var(--border-light);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 2px rgba(9, 9, 11, 0.03);
+        .unit-picker { padding: 14px 20px 0; }
+
+        .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 30px;
+            padding: 0 11px;
+            border-radius: 999px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-raised);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .card-head {
+        .chip:hover { background: var(--surface-2); }
+        .chip[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+        .chip .code { font-family: var(--mono); font-size: 11px; opacity: 0.75; }
+
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 14px;
+            gap: 2px;
+            padding: 12px 20px 0;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
         }
 
-        .section-kicker {
-            display: inline-block;
-            font-size: 10.5px;
+        .tab {
+            padding: 9px 12px 11px;
+            border: 0;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            font-size: 13.5px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ink-muted);
-            margin-bottom: 3px;
-        }
-
-        .card-title-lg {
-            font-size: 20px;
-            font-weight: 900;
-            color: var(--ink-black);
-            letter-spacing: -0.025em;
-            line-height: 1.15;
-        }
-
-        .card-title-md {
-            font-size: 15.5px;
-            font-weight: 900;
-            color: var(--ink-black);
-            letter-spacing: -0.015em;
-        }
-
-        .status-tag {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-            background: var(--ink-black);
-            color: var(--bg-white);
+            color: var(--ink-3);
+            cursor: pointer;
             white-space: nowrap;
         }
 
-        .unified-brief {
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-light);
-            border-left: 3.5px solid var(--ink-black);
-            border-radius: 8px;
+        .tab:hover { color: var(--ink); }
+        .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+        .tab-panels { flex: 1; overflow-y: auto; min-height: 0; }
+        .tab-panel { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+        .panel-title { font-size: 21px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.2; }
+        .section-title { font-size: 15px; font-weight: 900; letter-spacing: -0.01em; }
+        .lede { color: var(--ink-2); font-size: 14px; }
+        .fine { font-size: 12px; color: var(--ink-3); }
+
+        /* Stat tiles */
+        .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+        .tile {
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 12px 14px;
-            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
-            gap: 7px;
+            gap: 2px;
+            min-width: 0;
         }
 
-        .brief-summary {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--ink-black);
-        }
+        .tile-label { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+        .tile-value { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.2; }
+        .tile-value small { font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: 0; }
+        .tile-sub { font-size: 12px; color: var(--ink-3); }
+        .tile.is-flagged .tile-value { color: var(--ink-3); }
 
-        .brief-management {
-            padding-top: 7px;
-            border-top: 1px solid var(--border-light);
-            font-size: 12px;
-            color: var(--ink-body);
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .metric-box {
-            background: var(--bg-white);
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        .m-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10.5px;
-            font-weight: 700;
-            color: var(--ink-muted);
-        }
-
-        .tip-btn {
-            width: 16px;
-            height: 16px;
+        .info {
+            width: 18px; height: 18px; flex-shrink: 0;
+            display: inline-grid; place-items: center;
             border-radius: 50%;
-            border: 1px solid var(--border-mid);
-            background: var(--bg-subtle);
-            color: var(--ink-black);
-            font-family: 'Satoshi', sans-serif;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .m-val {
-            font-size: 17px;
-            font-weight: 900;
-            color: var(--ink-black);
-            letter-spacing: -0.02em;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .m-sub {
-            font-size: 10.5px;
-            font-weight: 500;
-            color: var(--ink-muted);
-        }
-
-        /* Chart & Explicitly Labelled Sensitivity Explorer */
-        .chart-wrap {
-            position: relative;
-            height: 225px;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        .obs-coverage-bar {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
+            border: 1px solid var(--border-strong);
+            background: transparent;
             font-size: 11px;
-            color: var(--ink-muted);
-            background: var(--bg-subtle);
-            padding: 7px 11px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-light);
-        }
-
-        .slider-box {
-            background: var(--bg-subtle);
-            border: 1px dashed var(--border-mid);
-            border-radius: 8px;
-            padding: 12px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-            margin-top: 12px;
-        }
-
-        .slider-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
             font-weight: 700;
+            color: var(--ink-2);
+            cursor: help;
         }
 
-        .sensitivity-disclaimer {
-            font-size: 11px;
-            color: var(--ink-muted);
-            line-height: 1.4;
-        }
+        /* Findings */
+        .findings { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 
-        .slider-box input[type="range"] {
-            width: 100%;
-            accent-color: var(--ink-black);
-            cursor: pointer;
-        }
-
-        /* Tables */
-        .benchmark-controls {
+        .finding {
             display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: end;
-            gap: 10px;
-            margin-bottom: 14px;
-            padding: 12px;
-            background: var(--bg-subtle);
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
+            grid-template-columns: 1fr auto;
+            gap: 4px 12px;
+            padding: 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface-raised);
         }
 
-        .benchmark-controls .clean-select {
-            width: 100%;
-        }
+        .finding-title { font-weight: 900; font-size: 14px; line-height: 1.35; }
+        .finding-body { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); }
+        .finding-stats { grid-column: 1 / -1; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 
-        .vs-pill {
-            font-size: 11px;
-            font-weight: 900;
-            color: var(--ink-muted);
-            padding-bottom: 8px;
-        }
-
-        .table-wrap {
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-
-        .clean-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .clean-table th {
-            background: var(--bg-subtle);
-            color: var(--ink-muted);
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            text-align: left;
-            padding: 8px 9px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .clean-table td {
-            padding: 8px 9px;
-            border-bottom: 1px solid var(--border-light);
-            color: var(--ink-body);
-            font-weight: 500;
-        }
-
-        .clean-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .diff-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: var(--bg-subtle);
-            color: var(--ink-black);
-            font-weight: 700;
-            font-size: 11px;
-        }
-
-        #cascade-table tbody tr {
-            cursor: pointer;
-            transition: background 0.12s;
-        }
-
-        #cascade-table tbody tr:hover {
-            background: var(--bg-subtle);
-        }
-
-        #cascade-table tbody tr.is-active-row {
-            background: var(--accent-blue-soft);
-            color: var(--ink-black);
-            font-weight: 700;
-        }
-
-        /* Clean Light-Mode Interactive Walkthrough Guide */
-        .tour-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 2500;
-        }
-
-        .tour-spotlight {
-            position: fixed;
-            border-radius: 12px;
-            border: 2.5px solid var(--ink-black);
-            box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.38), 0 0 0 6px rgba(255, 255, 255, 0.7);
-            transition: all 0.25s ease;
-            pointer-events: none;
-            z-index: 2501;
-        }
-
-        .tour-card {
-            position: fixed;
-            width: 375px;
-            background: var(--bg-white);
-            color: var(--ink-black);
-            border: 1.5px solid var(--ink-black);
-            border-radius: 12px;
-            padding: 20px 22px;
-            box-shadow: 0 24px 48px rgba(9, 9, 11, 0.24);
-            z-index: 2502;
-            transition: all 0.25s ease;
-        }
-
-        .tour-progress-track {
-            width: 100%;
-            height: 4px;
-            background: var(--bg-subtle);
-            border-radius: 999px;
-            overflow: hidden;
-            margin-bottom: 14px;
-        }
-
-        .tour-progress-fill {
-            height: 100%;
-            background: var(--ink-black);
-            transition: width 0.25s ease;
-        }
-
-        .tour-top {
-            display: flex;
-            justify-content: space-between;
+        .verdict {
+            align-self: start;
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .tour-step-tag {
-            font-size: 10.5px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent-blue);
-        }
-
-        .tour-skip {
-            background: none;
-            border: none;
-            font-family: 'Satoshi', sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--ink-muted);
-            cursor: pointer;
-        }
-
-        .tour-card h3 {
-            font-size: 16.5px;
-            font-weight: 900;
-            letter-spacing: -0.02em;
-            color: var(--ink-black);
-            margin-bottom: 6px;
-        }
-
-        .tour-card p {
-            font-size: 12.5px;
-            color: var(--ink-body);
-            line-height: 1.55;
-        }
-
-        .tour-tip-pill {
-            margin-top: 10px;
-            padding: 8px 10px;
-            background: var(--bg-subtle);
-            border-left: 3px solid var(--accent-blue);
-            border-radius: 6px;
-            font-size: 11.5px;
-            font-weight: 600;
-            color: var(--ink-black);
-        }
-
-        .tour-footer {
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .tour-dots {
-            display: flex;
             gap: 5px;
-        }
-
-        .tour-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--border-mid);
-        }
-
-        .tour-dot.active {
-            background: var(--ink-black);
-            width: 18px;
+            padding: 3px 9px;
             border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            border: 1px solid var(--border-strong);
+            color: var(--ink-2);
         }
 
-        .btn-tour-nav {
-            font-family: 'Satoshi', sans-serif;
+        .verdict.is-sig { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-soft); }
+        .verdict.is-fragile { color: var(--warning-ink); border-color: var(--warning); background: rgba(250, 178, 25, 0.12); }
+
+        /* Unit tab */
+        .unit-head { display: flex; gap: 12px; align-items: flex-start; }
+
+        .unit-code {
+            flex-shrink: 0;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: var(--surface-2);
+            font-family: var(--mono);
             font-size: 12px;
             font-weight: 700;
-            padding: 6px 13px;
-            border-radius: 7px;
-            border: 1.5px solid var(--border-mid);
-            background: var(--bg-white);
-            color: var(--ink-black);
+        }
+
+        .unit-meta { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+
+        .note { padding: 12px 14px; border-radius: var(--radius); background: var(--surface-2); font-size: 13px; color: var(--ink-2); }
+        .note strong { color: var(--ink); }
+
+        .unit-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+
+        .unit-row {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-raised);
+            text-align: left;
             cursor: pointer;
         }
 
-        .btn-tour-nav.primary {
-            background: var(--ink-black);
-            border-color: var(--ink-black);
-            color: var(--bg-white);
+        .unit-row:hover { border-color: var(--border-strong); background: var(--surface-2); }
+        .unit-row .area { font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+        /* Time series */
+        .coverage { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .pill {
+            display: inline-flex;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            font-size: 12px;
+            color: var(--ink-2);
+            font-variant-numeric: tabular-nums;
         }
 
-        /* Scientific Methods Modal */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(9, 9, 11, 0.45);
-            backdrop-filter: blur(2px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 2600;
-        }
+        .pill strong { color: var(--ink); }
 
-        .modal-card {
-            background: var(--bg-white);
-            border: 1.5px solid var(--ink-black);
-            border-radius: 12px;
-            max-width: 720px;
+        .multiples { background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px 8px; }
+        .multiple + .multiple { border-top: 1px solid var(--grid); margin-top: 6px; padding-top: 8px; }
+        .multiple-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .multiple-title { font-size: 13px; font-weight: 900; }
+        .multiple-unit { font-size: 11.5px; color: var(--ink-3); }
+        .multiple-canvas { position: relative; height: 92px; }
+        .multiple:last-child .multiple-canvas { height: 116px; }
+
+        details.table-view summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--accent-ink); }
+        details.table-view .table-wrap { margin-top: 10px; max-height: 360px; overflow: auto; }
+
+        /* Statistics & compare */
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+        .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 200px; }
+        .field-label, .field label { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+
+        .select {
+            appearance: none;
+            -webkit-appearance: none;
             width: 100%;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+            height: 36px;
+            padding: 0 32px 0 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-strong);
+            background: var(--surface-raised) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23898781' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .modal-head {
-            padding: 16px 22px;
-            border-bottom: 1px solid var(--border-light);
+        .segmented { display: inline-flex; padding: 3px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
+        .segmented .seg { padding: 5px 10px; }
+        .segmented .seg[aria-checked="true"] { background: var(--surface-raised); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+
+        .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; background: var(--surface-raised); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        th {
+            text-align: left;
+            padding: 9px 12px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--ink-3);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+
+        td { padding: 9px 12px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; vertical-align: top; }
+        tbody tr:last-child td { border-bottom: 0; }
+        td .sub { display: block; font-size: 11.5px; color: var(--ink-3); }
+        tr.is-clickable { cursor: pointer; }
+        tr.is-clickable:hover td { background: var(--surface-2); }
+        tr.is-active td { background: var(--accent-soft); }
+        .flag { color: var(--ink-3); font-size: 11.5px; }
+
+        /* Dialogs */
+        dialog {
+            width: min(720px, calc(100vw - 32px));
+            max-height: 85vh;
+            margin: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface-raised);
+            color: var(--ink);
+            box-shadow: var(--shadow-float);
+            padding: 0;
+        }
+
+        dialog::backdrop { background: rgba(11, 11, 11, 0.45); backdrop-filter: blur(2px); }
+
+        .dialog-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .btn-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--ink-muted);
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 20px 22px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
             gap: 12px;
-            font-size: 13px;
-            color: var(--ink-body);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--surface-raised);
         }
+
+        .dialog-body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; color: var(--ink-2); }
+        .dialog-body h4 { color: var(--ink); font-size: 14px; font-weight: 900; margin-top: 6px; }
+        .dialog-body ol, .dialog-body ul { padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 
         .floating-tip {
             position: fixed;
-            max-width: 260px;
-            background: var(--ink-black);
-            color: var(--bg-white);
-            padding: 9px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            line-height: 1.45;
             z-index: 3000;
+            max-width: 280px;
+            padding: 9px 11px;
+            border-radius: var(--radius-sm);
+            background: var(--ink);
+            color: var(--surface);
+            font-size: 12.5px;
+            line-height: 1.45;
             pointer-events: none;
+            box-shadow: var(--shadow-float);
         }
 
-        .leaflet-tooltip.clean-tip {
-            background: rgba(255, 255, 255, 0.98);
-            color: var(--ink-black);
-            border: 1.5px solid var(--ink-black);
-            border-radius: 8px;
-            padding: 8px 11px;
-            font-family: 'Satoshi', sans-serif;
-            font-size: 12px;
-        }
-
-        /* Data Provenance Banner */
-        .provenance-banner {
-            background: #FEF3C7;
-            border-bottom: 1.5px solid #D97706;
-            color: #78350F;
-            padding: 9px 24px;
-            font-size: 12.5px;
-            font-weight: 500;
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-        }
-
-        .provenance-banner strong {
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .sim-flag {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            z-index: 900;
-            background: #D97706;
-            color: #FFFFFF;
-            font-size: 11.5px;
-            font-weight: 900;
-            padding: 5px 10px;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-        }
-
-        .findings-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .findings-list li {
-            font-size: 12.5px;
-            color: var(--ink-body);
-            padding: 8px 10px;
-            border: 1px solid var(--border-light);
-            border-left: 3px solid var(--border-mid);
-            border-radius: 6px;
-        }
-
-        .findings-list li.is-significant {
-            border-left-color: var(--accent-blue);
-        }
-
-        .findings-list li strong {
-            color: var(--ink-black);
-        }
-
-        .chart-note {
-            font-size: 11px;
-            color: var(--ink-muted);
-            margin-bottom: 8px;
-        }
-
-        .diag-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 8px 0 6px;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        .tip-btn:focus-visible,
-        .btn-pill:focus-visible,
-        .link-action:focus-visible,
-        .clean-select:focus-visible {
-            outline: 2px solid var(--accent-blue);
-            outline-offset: 2px;
-        }
-
-        @media (max-width: 1080px) {
-            body { overflow: auto; height: auto; }
-            .app-shell { height: auto; }
-            .workspace { flex-direction: column; }
-            .map-stage { flex: none; height: 440px; }
-            .sidebar { width: 100%; height: auto; }
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        /* ================= Responsive ================= */
+        @media (max-width: 1100px) {
+            .app { height: auto; min-height: 100vh; }
+            .layout { grid-template-columns: minmax(0, 1fr); }
+            .map-pane { height: 58vh; min-height: 380px; }
+            .panel { border-left: 0; border-top: 1px solid var(--border); }
+            .tab-panels { overflow: visible; }
+            .tabs { position: sticky; top: 0; z-index: 900; background: var(--surface); }
         }
 
         @media (max-width: 640px) {
-            .topbar, .summary-strip, .provenance-banner { padding-left: 16px; padding-right: 16px; }
-            .top-controls, .field-group, .clean-select { width: 100%; }
-            .control-divider { display: none; }
-            .sidebar { padding: 12px; }
-            .card { padding: 14px; }
-            .benchmark-controls { grid-template-columns: 1fr; }
-            .vs-pill { padding-bottom: 0; }
-            .map-stage { height: 360px; }
-            .card-head { flex-wrap: wrap; }
-            .status-tag { white-space: normal; }
-            .map-credit { flex-direction: column; gap: 2px; }
-            .tour-card { width: calc(100vw - 32px) !important; }
+            .appbar { flex-wrap: wrap; padding: 10px 16px; gap: 8px 10px; }
+            .brand { flex: 1 1 100%; }
+            .brand-title { font-size: 15px; }
+            .brand-sub { display: none; }
+            .status-chip { flex: 1 1 auto; min-width: 0; }
+            .status-chip span { overflow: hidden; text-overflow: ellipsis; }
+            .appbar-actions { flex: 0 0 auto; }
+            .appbar-actions .label-text { display: none; }
+            .appbar-actions .btn { width: 34px; padding: 0; justify-content: center; }
+            .tab { padding: 9px 8px 11px; font-size: 13px; }
+            .unit-picker, .tabs { padding-left: 16px; padding-right: 16px; }
+            .tab-panel { padding: 16px; }
+            .layer-switch { left: 10px; right: 10px; top: 10px; max-width: none; }
+            .basemap-switch { display: none; }
+            .leaflet-top.leaflet-right { top: 56px; }
+            .legend { left: 10px; bottom: 10px; }
+            .tile-value { font-size: 21px; }
+            .banner { padding: 10px 16px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
         }
     </style>
 </head>
 <body>
-    <div class="app-shell">
-        <!-- 1. Top Navigation Bar -->
-        <header class="topbar" id="tour-topbar">
-            <div class="brand">
-                <div class="brand-mark">OCC</div>
-                <div>
-                    <span class="brand-kicker">Catchment-to-Coast Environmental Observatory</span>
-                    <h1 class="brand-title">Ogun River Basin &amp; Lagos Lagoon Interface</h1>
-                    <p class="brand-sub">CHIRPS Rainfall, ERA5-Land Shallow Soil Moisture, Sentinel-1 SAR &amp; Sentinel-2 Spectral NDTI</p>
-                </div>
+<div class="app">
+    <header class="appbar">
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"/><path d="M3 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"/><path d="M12 3c-2.2 3-3.5 5-3.5 6.5a3.5 3.5 0 0 0 7 0C15.5 8 14.2 6 12 3z"/></svg>
             </div>
-
-            <div class="top-controls">
-                <div class="field-group">
-                    <label class="field-label" for="zone-select">Analytical Unit</label>
-                    <select id="zone-select" class="clean-select">
-                        <option value="ALL" selected>All Study Units (Z1–Z4 Catchment + Z5 Estuary)</option>
-                        <option value="Z1">01 · Upper Ogun Headwaters (Sub-Basin)</option>
-                        <option value="Z2">02 · Oyan-Ofiki Tributary (Sub-Basin)</option>
-                        <option value="Z3">03 · Middle Ogun Mainstem (Sub-Basin)</option>
-                        <option value="Z4">04 · Lower Ogun Alluvial Corridor (Sub-Basin)</option>
-                        <option value="Z5">05 · NW Lagos Lagoon (Estuarine Zone)</option>
-                    </select>
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="layer-select">Map Indicator</label>
-                    <select id="layer-select" class="clean-select">
-                        <option value="flood" selected>SAR Low-Backscatter Inundation Proxy (km²)</option>
-                        <option value="rain">Mean Annual Rainfall (mm/yr)</option>
-                        <option value="ndti">Open-Water Spectral Turbidity Indicator (NDTI)</option>
-                        <option value="ndvi">2 km Riparian Buffer Canopy (NDVI)</option>
-                    </select>
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="basemap-select">Basemap</label>
-                    <select id="basemap-select" class="clean-select">
-                        <option value="light" selected>Light Cartographic</option>
-                        <option value="terrain">World Topographic</option>
-                        <option value="satellite">Esri Satellite</option>
-                    </select>
-                </div>
-
-                <div class="control-divider"></div>
-
-                <button type="button" id="btn-labels" class="btn-pill active">Labels</button>
-                <button type="button" id="btn-methods" class="btn-pill">Methods &amp; Audit</button>
-                <button type="button" id="btn-tour" class="btn-pill btn-guide">
-                    <span class="guide-dot-pulse"></span> Guide
-                </button>
-            </div>
-        </header>
-
-        <!-- Data Provenance Banner (driven by cascade_diagnostics.json provenance) -->
-        <div id="provenance-banner" class="provenance-banner is-hidden" role="status">
-            <strong>Demonstration data</strong>
-            <span id="provenance-text">The values shown are placeholders, not results from the Google Earth Engine export. Do not cite them as research findings.</span>
-        </div>
-
-        <!-- 2. Research Question & Export Strip -->
-        <div class="summary-strip" id="tour-summary">
-            <div id="research-question-bar">
-                <strong>Research Question:</strong> How do rainfall variability and shallow soil-moisture conditions across the Ogun River catchment (Z1–Z4) relate to seasonal SAR inundation indicators and downstream estuarine spectral turbidity (<span class="mono">NDTI</span>) in the northwest Lagos Lagoon (Z5)?
-            </div>
-            <div class="summary-actions">
-                <button type="button" id="btn-export-csv" class="link-action">Export 72-Mo CSV ↓</button>
-                <button type="button" id="btn-export-geojson" class="link-action">Export Units GeoJSON ↓</button>
-                <button type="button" id="btn-reset" class="link-action">Reset View</button>
+            <div class="brand-text">
+                <h1 class="brand-title">Ogun Catchment-to-Coast Observatory</h1>
+                <p class="brand-sub">Rainfall, soil moisture, floodplain inundation and lagoon turbidity · 2019–2024</p>
             </div>
         </div>
 
-        <!-- 3. Split Workspace -->
-        <main class="workspace">
-            <!-- Left: Map + External Legend Dock -->
-            <div class="map-column">
-                <section class="map-stage" id="map-stage">
-                    <div id="map" class="map-canvas"></div>
-                    <!-- Explicit Error State if GeoJSON or CSV Fails to Load -->
-                    <div id="map-error-box" class="map-error-overlay is-hidden" role="alert">
-                        <span class="section-kicker" style="color:var(--err-ink);">Data Load Failure</span>
-                        <h3 class="card-title-md" id="err-title">Required Dataset Unavailable</h3>
-                        <p id="err-desc">The application could not load the required spatial or temporal dataset from <span class="mono">docs/data/</span>.</p>
-                    </div>
-                </section>
+        <span class="status-chip" id="data-chip" role="status">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
+            <span id="data-chip-text">Loading data…</span>
+        </span>
 
-                <div class="legend-dock" id="tour-legend">
-                    <div class="legend-dock-top">
-                        <div class="legend-title-wrap">
-                            <strong id="legend-title">SAR Seasonal Inundation Proxy (km²)</strong>
-                            <span id="legend-tag" class="legend-source-pill">Sentinel-1 IW VV ascending, dry-season change detection (Slope &lt; 5°, HAND &lt; 15 m)</span>
-                        </div>
-                        <div id="legend-classes" class="legend-classes"></div>
-                    </div>
-                    <div id="legend-bar" class="legend-bar"></div>
-                    <div class="legend-ticks">
-                        <span id="legend-min">—</span>
-                        <span id="legend-q25">—</span>
-                        <span id="legend-mid">—</span>
-                        <span id="legend-q75">—</span>
-                        <span id="legend-max">—</span>
-                    </div>
+        <div class="appbar-actions">
+            <button type="button" class="btn btn-icon" id="btn-theme" aria-label="Switch theme" title="Switch theme"></button>
+            <details class="menu" id="download-menu">
+                <summary class="btn" aria-label="Download data">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                    <span class="label-text">Data</span>
+                </summary>
+                <div class="menu-list">
+                    <a href="data/ogun_monthly_timeseries.csv" download>Monthly time series (CSV)<span>Catchment-wide, 72 months, with observation counts</span></a>
+                    <a href="data/ogun_unit_monthly_timeseries.csv" download>Per-unit monthly series (CSV)<span>Z1–Z5 × 72 months</span></a>
+                    <a href="data/ogun_subbasins.geojson" download>Analytical units (GeoJSON)<span>Boundaries and unit summaries</span></a>
+                    <a href="data/cascade_diagnostics.json" download>Statistical diagnostics (JSON)<span>Generated by src/02_compile_observatory.py</span></a>
                 </div>
+            </details>
+            <button type="button" class="btn" id="btn-methods">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+                <span class="label-text">Methods</span>
+            </button>
+            <button type="button" class="btn" id="btn-about">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span class="label-text">About</span>
+            </button>
+        </div>
+    </header>
 
-                <div class="map-credit">
-                    <span>CRS: EPSG:4326 (Geodesic Area km²) · WWF HydroBASINS L9 · CHIRPS v2.0 · ERA5-Land (0–7cm) · GLO-30 · Sentinel-1/2</span>
-                    <span>Click any unit polygon to inspect its properties</span>
-                </div>
+    <div class="banner" id="provenance-banner" role="status" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <div><strong>Demonstration data.</strong> <span id="provenance-text">These values are placeholders, not results from the Google Earth Engine export. Do not cite them.</span></div>
+    </div>
+
+    <main class="layout">
+        <section class="map-pane" aria-label="Map of the analytical units">
+            <div id="map"></div>
+
+            <div class="map-float layer-switch" role="radiogroup" aria-label="Map indicator">
+                <button type="button" class="seg" role="radio" data-layer="flood" aria-checked="true">Floodplain inundation</button>
+                <button type="button" class="seg" role="radio" data-layer="rain" aria-checked="false">Rainfall</button>
+                <button type="button" class="seg" role="radio" data-layer="ndti" aria-checked="false">Turbidity</button>
+                <button type="button" class="seg" role="radio" data-layer="ndvi" aria-checked="false">Riparian vegetation</button>
             </div>
 
-            <!-- Right: Analytical Sidebar -->
-            <aside class="sidebar" id="sidebar-scroll">
-                <!-- Card 01: Selected Geographical Unit -->
-                <div class="card" id="card-unit">
-                    <div class="card-head">
-                        <div>
-                            <span class="section-kicker" id="sel-eyebrow">01 · Selected Geographical Unit</span>
-                            <h2 class="card-title-lg" id="sel-title">All Study Units (Z1–Z4 Catchment + Z5 Estuary)</h2>
-                        </div>
-                        <span id="sel-badge" class="status-tag">Multi-Domain</span>
+            <div class="map-float basemap-switch">
+                <label class="sr-only" for="basemap-select">Basemap</label>
+                <select id="basemap-select">
+                    <option value="canvas" selected>Canvas</option>
+                    <option value="terrain">Topographic</option>
+                    <option value="satellite">Satellite</option>
+                </select>
+            </div>
+
+            <div class="map-float legend" id="legend" aria-live="polite">
+                <div class="legend-title" id="legend-title">Floodplain inundation (km²)</div>
+                <div class="legend-source" id="legend-source">Sentinel-1, Sep–Oct 2022</div>
+                <div class="legend-bar" id="legend-bar"></div>
+                <div class="legend-ticks"><span id="legend-min">—</span><span id="legend-mid">—</span><span id="legend-max">—</span></div>
+                <div class="legend-note" id="legend-note" hidden><span class="swatch swatch-unreliable"></span><span>Not reliable here (dry-season radar artefacts)</span></div>
+            </div>
+
+            <div class="map-error" id="map-error" role="alert" hidden>
+                <div class="eyebrow" style="color: var(--critical);">Data load failure</div>
+                <h3 class="section-title" id="err-title" style="margin: 4px 0;">Required dataset unavailable</h3>
+                <p class="lede" id="err-desc">The page could not load its data from <span class="mono">docs/data/</span>.</p>
+            </div>
+        </section>
+
+        <section class="panel" aria-label="Analysis">
+            <div class="unit-picker">
+                <div class="eyebrow" id="unit-picker-label">Analytical unit</div>
+                <div class="chips" id="unit-chips" role="group" aria-labelledby="unit-picker-label"></div>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Analysis views">
+                <button type="button" class="tab" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">Overview</button>
+                <button type="button" class="tab" role="tab" id="tab-unit" aria-controls="panel-unit" aria-selected="false" tabindex="-1">Unit</button>
+                <button type="button" class="tab" role="tab" id="tab-series" aria-controls="panel-series" aria-selected="false" tabindex="-1">Time series</button>
+                <button type="button" class="tab" role="tab" id="tab-stats" aria-controls="panel-stats" aria-selected="false" tabindex="-1">Statistics</button>
+                <button type="button" class="tab" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1">Compare</button>
+            </div>
+
+            <div class="tab-panels" id="tab-panels">
+                <!-- Overview -->
+                <div class="tab-panel" role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
+                    <div>
+                        <h2 class="panel-title">What the 2019–2024 data shows</h2>
+                        <p class="lede" style="margin-top: 6px;">Does rainfall and soil moisture across the Ogun River catchment drive floodplain inundation, and does that flooding reach the northwest Lagos Lagoon as turbidity?</p>
                     </div>
-
-                    <div class="unified-brief">
-                        <p class="brief-summary" id="sel-insight">
-                            Distinguishes the four hydrological sub-basins of the Ogun River catchment (Z1–Z4, 22,166 km²) from the downstream estuarine receiving environment in the northwest Lagos Lagoon (Z5, 970 km²).
-                        </p>
-                        <p class="brief-management" id="sel-management">
-                            <strong>Methodological Note:</strong> Uplands (Z1–Z4) govern rainfall-runoff partitioning and floodplain inundation, whereas spectral turbidity (NDTI) is evaluated over permanent open water (JRC &ge; 50%, MNDWI &gt; 0) in the estuarine receiving zone (Z5).
-                        </p>
+                    <div class="tiles" id="overview-tiles"></div>
+                    <div>
+                        <h3 class="section-title">Key findings</h3>
+                        <p class="fine" style="margin: 2px 0 10px;">Generated from the published diagnostics. Deseasonalized monthly anomalies; p-values adjusted for autocorrelation and multiple lags.</p>
+                        <ol class="findings" id="findings"><li class="fine">Diagnostics unavailable.</li></ol>
                     </div>
+                    <p class="note"><strong>How to read this.</strong> The radar inundation series is an uncalibrated index and could not be validated against optical data; treat findings about flooding as indicative. See <a href="#" data-open="methods-dialog">Methods</a>.</p>
+                </div>
 
-                    <div class="metrics-grid">
-                        <div class="metric-box">
-                            <span class="m-label">
-                                Annual Rainfall
-                                <button type="button" class="tip-btn" data-tip="Mean annual precipitation (mm/yr) from CHIRPS v2.0 pentadal totals (2019–2024).">?</button>
-                            </span>
-                            <strong class="m-val" id="val-rain">—</strong>
-                            <span class="m-sub" id="sub-rain">CHIRPS v2.0 (5.5 km)</span>
+                <!-- Unit -->
+                <div class="tab-panel" role="tabpanel" id="panel-unit" aria-labelledby="tab-unit" hidden>
+                    <div id="unit-empty">
+                        <h2 class="panel-title">Choose a unit</h2>
+                        <p class="lede" style="margin: 6px 0 14px;">Click a polygon on the map or pick a unit below. Z1–Z4 are sub-basins of the Ogun catchment; Z5 is the lagoon zone the river drains into.</p>
+                        <ul class="unit-list" id="unit-list"></ul>
+                    </div>
+                    <div id="unit-detail" style="display: flex; flex-direction: column; gap: 16px;" hidden>
+                        <div class="unit-head">
+                            <span class="unit-code" id="unit-code">Z1</span>
+                            <div>
+                                <h2 class="panel-title" id="unit-name">—</h2>
+                                <div class="unit-meta" id="unit-meta">—</div>
+                            </div>
                         </div>
-
-                        <div class="metric-box">
-                            <span class="m-label">
-                                SAR Flood Proxy
-                                <button type="button" class="tip-btn" data-tip="Seasonal flooding (km²) from Sentinel-1 IW VV ascending: below -16.5 dB and at least 3 dB darker than the dry-season reference, slope < 5°, height above drainage < 15 m, excluding permanent water. Catchment series covers the Z3–Z4 floodplain. Uncalibrated index.">?</button>
-                            </span>
-                            <strong class="m-val" id="val-flood">—</strong>
-                            <span class="m-sub" id="sub-flood">Perm. water: —</span>
-                        </div>
-
-                        <div class="metric-box">
-                            <span class="m-label">
-                                Spectral NDTI
-                                <button type="button" class="tip-btn" data-tip="Sentinel-2 Normalized Difference Turbidity Index (B4-B3)/(B4+B3) over cloud-free open water (SCL=6, MNDWI>0). Relative spectral indicator, not NTU or mg/L TSS.">?</button>
-                            </span>
-                            <strong class="m-val" id="val-ndti">—</strong>
-                            <span class="m-sub" id="sub-ndti">Open-water mask only</span>
-                        </div>
-
-                        <div class="metric-box">
-                            <span class="m-label">
-                                Shallow Soil Water
-                                <button type="button" class="tip-btn" data-tip="ERA5-Land volumetric_soil_water_layer_1 (0–7 cm surface skin layer, m³/m³). Not full root-zone soil moisture.">?</button>
-                            </span>
-                            <strong class="m-val" id="val-sm">—</strong>
-                            <span class="m-sub" id="sub-sm">ERA5-Land (0–7 cm)</span>
-                        </div>
-
-                        <div class="metric-box">
-                            <span class="m-label">
-                                Riparian NDVI
-                                <button type="button" class="tip-btn" data-tip="Sentinel-2 L2A mean NDVI within the 2 km buffer of Strahler order >= 3 rivers (cloud- and water-masked).">?</button>
-                            </span>
-                            <strong class="m-val" id="val-ndvi">—</strong>
-                            <span class="m-sub" id="sub-ndvi">2 km fluvial buffer</span>
-                        </div>
-
-                        <div class="metric-box">
-                            <span class="m-label">
-                                Mean Terrain Slope
-                                <button type="button" class="tip-btn" data-tip="Copernicus GLO-30 DEM mean slope (degrees).">?</button>
-                            </span>
-                            <strong class="m-val" id="val-slope">—</strong>
-                            <span class="m-sub" id="sub-area">Area: —</span>
-                        </div>
+                        <p class="lede" id="unit-summary"></p>
+                        <div class="tiles" id="unit-tiles"></div>
+                        <p class="note" id="unit-management"></p>
                     </div>
                 </div>
 
-                <!-- Card: Key Findings (generated from cascade_diagnostics.json) -->
-                <div class="card" id="card-findings">
-                    <div class="card-head">
-                        <div>
-                            <span class="section-kicker">Key Findings · generated from the diagnostics</span>
-                            <h3 class="card-title-md">What the 2019–2024 data shows</h3>
-                        </div>
+                <!-- Time series -->
+                <div class="tab-panel" role="tabpanel" id="panel-series" aria-labelledby="tab-series" hidden>
+                    <div>
+                        <h2 class="panel-title">Monthly time series</h2>
+                        <p class="lede" id="series-scope" style="margin-top: 6px;">—</p>
                     </div>
-                    <ul class="findings-list" id="findings-list"><li>Diagnostics unavailable.</li></ul>
-                    <p class="sensitivity-disclaimer" id="findings-note"></p>
+                    <div class="coverage" id="coverage"></div>
+                    <div class="multiples" id="multiples">
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Rainfall</span><span class="multiple-unit">mm / month · CHIRPS v2.0</span></div><div class="multiple-canvas"><canvas id="chart-rain" role="img" aria-label="Monthly rainfall, 2019 to 2024"></canvas></div></div>
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Radar inundation index</span><span class="multiple-unit">km² · Sentinel-1</span></div><div class="multiple-canvas"><canvas id="chart-sar" role="img" aria-label="Monthly radar inundation index, 2019 to 2024"></canvas></div></div>
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Optical flooding check</span><span class="multiple-unit">km² · Dynamic World</span></div><div class="multiple-canvas"><canvas id="chart-dw" role="img" aria-label="Monthly Dynamic World flooding, 2019 to 2024"></canvas></div></div>
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Lagoon turbidity (Z5)</span><span class="multiple-unit">NDTI · Sentinel-2 · gaps = cloud</span></div><div class="multiple-canvas"><canvas id="chart-ndti" role="img" aria-label="Monthly lagoon turbidity, 2019 to 2024"></canvas></div></div>
+                    </div>
+                    <details class="table-view">
+                        <summary>View the monthly values as a table</summary>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Month</th><th>Rain (mm)</th><th>Radar (km²)</th><th>Optical (km²)</th><th>NDTI</th></tr></thead>
+                                <tbody id="series-table"></tbody>
+                            </table>
+                        </div>
+                    </details>
                 </div>
 
-                <!-- Card 02: 72-Month Time Series & Observation Coverage -->
-                <div class="card" id="card-hydrograph">
-                    <div class="card-head">
-                        <div>
-                            <span class="section-kicker">02 · Monthly Time Series &amp; Statistical Coupling (2019–2024)</span>
-                            <h3 class="card-title-md">Catchment Rainfall &amp; SAR Inundation vs. Estuarine NDTI</h3>
+                <!-- Statistics -->
+                <div class="tab-panel" role="tabpanel" id="panel-stats" aria-labelledby="tab-stats" hidden>
+                    <div>
+                        <h2 class="panel-title">Statistical audit</h2>
+                        <p class="lede" style="margin-top: 6px;">Pairwise complete months only. Effective n corrects for autocorrelation (Bretherton); p-values are Benjamini–Hochberg adjusted across lags 0–2.</p>
+                    </div>
+                    <div class="controls">
+                        <div class="field">
+                            <label for="diag-pair">Relationship</label>
+                            <select id="diag-pair" class="select">
+                                <option value="rain" selected>Rain → radar inundation</option>
+                                <option value="sm">Soil moisture → radar inundation</option>
+                                <option value="reservoir">Rain → inundation, controlling for Oyan Reservoir</option>
+                                <option value="dam">Rain → inundation, controlling for Oyan Dam releases</option>
+                                <option value="ndti">Inundation → lagoon turbidity</option>
+                                <option value="dw">Validation: radar vs Dynamic World</option>
+                            </select>
                         </div>
-                        <span class="status-tag" id="lag-badge">—</span>
+                        <div class="field" style="flex: 0 0 auto;">
+                            <span class="field-label" id="mode-label">Series</span>
+                            <div class="segmented" role="radiogroup" aria-labelledby="mode-label">
+                                <button type="button" class="seg" role="radio" data-mode="deseasonalized" aria-checked="true">Anomalies</button>
+                                <button type="button" class="seg" role="radio" data-mode="seasonal" aria-checked="false">Raw seasonal</button>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="obs-coverage-bar" id="obs-coverage-bar">
-                        <span>Total Months: <strong id="cov-total">—</strong></span>
-                        <span>CHIRPS Valid: <strong id="cov-rain">—</strong></span>
-                        <span>S1 SAR Valid: <strong id="cov-sar">—</strong></span>
-                        <span>S2 Estuary NDTI Valid: <strong id="cov-ndti">—</strong> (<span id="cov-ndti-miss">—</span> cloudy/masked; wet season Apr–Oct: <strong id="cov-ndti-wet">—</strong>, dry: <strong id="cov-ndti-dry">—</strong>)</span>
+                    <p class="fine" id="diag-explain"></p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Lag</th><th>n</th><th>Eff. n</th><th>Spearman ρ</th><th>Pearson r (95% CI)</th><th id="diag-p-head">FDR p</th></tr></thead>
+                            <tbody id="diag-tbody"></tbody>
+                        </table>
                     </div>
-
-                    <p class="chart-note" id="chart-note">Catchment-wide monthly series (Z1–Z4 rainfall; SAR proxy over the Z3–Z4 floodplain; Z5 estuary NDTI).</p>
-
-                    <div class="chart-wrap">
-                        <canvas id="cascadeChart"></canvas>
-                    </div>
-
+                    <div id="robustness"></div>
                 </div>
 
-                <!-- Card 03: Statistical Diagnostics & Unit Comparison Table -->
-                <div class="card" id="card-benchmark">
-                    <div class="card-head">
-                        <div>
-                            <span class="section-kicker">03 · Statistical Lag &amp; Unit Comparison</span>
-                            <h3 class="card-title-md">Compare Any Two Study Units</h3>
-                        </div>
+                <!-- Compare -->
+                <div class="tab-panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" hidden>
+                    <div>
+                        <h2 class="panel-title">Compare units</h2>
+                        <p class="lede" style="margin-top: 6px;">Unit summaries: mean annual rainfall and soil water for 2019–2024; radar inundation for Sep–Oct 2022.</p>
                     </div>
-                    <div class="benchmark-controls">
-                        <div class="field-group">
-                            <label class="field-label" for="comp-a">Unit A (Updates on Click)</label>
-                            <select id="comp-a" class="clean-select"></select>
-                        </div>
-                        <span class="vs-pill">VS</span>
-                        <div class="field-group">
-                            <label class="field-label" for="comp-b">Unit B (Reference)</label>
-                            <select id="comp-b" class="clean-select"></select>
-                        </div>
+                    <div class="controls">
+                        <div class="field"><label for="comp-a">Unit A</label><select id="comp-a" class="select"></select></div>
+                        <div class="field"><label for="comp-b">Unit B</label><select id="comp-b" class="select"></select></div>
                     </div>
                     <div class="table-wrap">
-                        <table class="clean-table">
-                            <thead>
-                                <tr>
-                                    <th>Indicator</th>
-                                    <th id="th-comp-a">Unit A</th>
-                                    <th id="th-comp-b">Unit B</th>
-                                    <th>Difference (A &minus; B)</th>
-                                </tr>
-                            </thead>
+                        <table>
+                            <thead><tr><th>Indicator</th><th id="th-comp-a">A</th><th id="th-comp-b">B</th><th>A − B</th></tr></thead>
                             <tbody id="comp-tbody"></tbody>
                         </table>
                     </div>
-
-                    <div style="margin-top: 14px;">
-                        <span class="section-kicker">Statistical Lag &amp; Autocorrelation Audit Table</span>
-                        <div class="diag-controls">
-                            <div class="field-group">
-                                <label class="field-label" for="diag-pair">Relationship</label>
-                                <select id="diag-pair" class="clean-select">
-                                    <option value="rain" selected>CHIRPS Rain &rarr; SAR Proxy</option>
-                                    <option value="sm">ERA5-Land Soil Water &rarr; SAR Proxy</option>
-                                    <option value="reservoir">CHIRPS Rain &rarr; SAR Proxy, controlling for Oyan Reservoir</option>
-                                    <option value="dam">CHIRPS Rain &rarr; SAR Proxy, controlling for Oyan Dam releases</option>
-                                    <option value="ndti">SAR Proxy &rarr; Estuary NDTI (lag 0)</option>
-                                    <option value="dw">Validation: SAR Proxy vs Dynamic World flooding</option>
-                                </select>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="diag-mode">Series</label>
-                                <select id="diag-mode" class="clean-select">
-                                    <option value="deseasonalized" selected>Deseasonalized anomalies</option>
-                                    <option value="seasonal">Raw seasonal values</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="table-wrap" style="margin-top: 6px;">
-                            <table class="clean-table">
-                                <thead>
-                                    <tr>
-                                        <th>Lag (&tau;)</th>
-                                        <th>Pairs (n)</th>
-                                        <th>Eff. n</th>
-                                        <th>Spearman &rho;</th>
-                                        <th>Pearson r (95% CI)</th>
-                                        <th id="diag-p-head">FDR p-val</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="diag-tbody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 04: Complete 5-Unit Table -->
-                <div class="card" id="card-table">
-                    <div class="card-head">
-                        <div>
-                            <span class="section-kicker">04 · Study Units Summary (Z1–Z4 Sub-Basins + Z5 Estuary)</span>
-                            <h3 class="card-title-md">Click Any Row to Inspect Unit</h3>
-                        </div>
-                    </div>
+                    <h3 class="section-title">All units</h3>
                     <div class="table-wrap">
-                        <table class="clean-table" id="cascade-table">
-                            <thead>
-                                <tr>
-                                    <th>Analytical Unit</th>
-                                    <th>Unit Type</th>
-                                    <th>Area (km²)</th>
-                                    <th>Rain (mm)</th>
-                                    <th>SAR Proxy</th>
-                                    <th>NDTI</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cascade-tbody"></tbody>
+                        <table>
+                            <thead><tr><th>Unit</th><th>Area</th><th>Rain</th><th>Inundation</th><th>NDTI</th></tr></thead>
+                            <tbody id="units-tbody"></tbody>
                         </table>
                     </div>
                 </div>
-            </aside>
-        </main>
-    </div>
-
-    <!-- Scientific Methods & Audit Modal -->
-    <div id="methods-modal" class="modal-backdrop is-hidden" role="dialog" aria-modal="true">
-        <div class="modal-card">
-            <div class="modal-head">
-                <div>
-                    <span class="section-kicker">Methodological Lineage, Statistical Audit &amp; Limitations</span>
-                    <h2 class="card-title-lg">Sensor Processing &amp; Scientific Boundaries</h2>
-                </div>
-                <button type="button" id="btn-close-methods" class="btn-close" aria-label="Close methods">&times;</button>
             </div>
-            <div class="modal-body">
+        </section>
+    </main>
+</div>
+
+<dialog id="methods-dialog" aria-labelledby="methods-title">
+    <div class="dialog-head">
+        <div>
+            <div class="eyebrow">Methods, audit &amp; limitations</div>
+            <h2 class="panel-title" id="methods-title">How this was measured</h2>
+        </div>
+        <button type="button" class="btn btn-icon" data-close aria-label="Close">✕</button>
+    </div>
+    <div class="dialog-body">
                 <h4>1. Geographical Separation: Catchment Sub-Basins vs. Estuarine Zone</h4>
                 <p>Units Z1–Z4 represent topographic sub-basins delineated from <span class="mono">WWF/HydroSHEDS/v1/Basins/hybas_9</span> within the Ogun River drainage system. Each sub-basin is traced upstream through the HydroBASINS <span class="mono">NEXT_DOWN</span> network from a fixed level-9 outlet unit (Oyan Dam for Z2, the upper Ogun above the Oyan confluence for Z1, the lower mainstem at about 6.9&deg;N for Z3), with the reaches below that forming Z4. The catchment is the 22,166 km&sup2; drainage area above the Ogun mouth. Unit Z5 (<span class="mono">Northwest Lagos Lagoon Estuary</span>) is an estuarine receiving water domain where open-water pixels (<span class="mono">JRC occurrence &ge; 50%</span>) are analysed for spectral turbidity (<span class="mono">NDTI</span>). Catchment and estuarine units are not interchangeable.</p>
 
@@ -1397,961 +957,835 @@
 
                 <h4>7. Known Limitations</h4>
                 <p>Cloud-masked NDTI months cluster in the wet season, so SAR&ndash;NDTI associations are weighted towards dry-season conditions. Six years give only six values per calendar month for deseasonalising. Tides, dredging, sand mining and urban runoff also affect lagoon turbidity and are not modelled. No in-situ flood extents or gravimetric TSS samples were available for validation.</p>
-            </div>
-        </div>
+            
     </div>
+</dialog>
 
-    <!-- Clean White Interactive Walkthrough Guide -->
-    <div id="tour-layer" class="tour-layer is-hidden" role="dialog" aria-modal="true">
-        <div id="tour-spotlight" class="tour-spotlight"></div>
-        <div id="tour-card" class="tour-card">
-            <div class="tour-progress-track">
-                <div id="tour-progress-fill" class="tour-progress-fill" style="width: 16.6%;"></div>
-            </div>
-            <div class="tour-top">
-                <span class="tour-step-tag" id="tour-step-num">Walkthrough · Step 1 of 6</span>
-                <button type="button" id="tour-close" class="tour-skip">Close Esc &times;</button>
-            </div>
-            <h3 id="tour-title">1. Catchment-to-Coast Hydrological Map</h3>
-            <p id="tour-desc">Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L9, Units Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Unit Z5).</p>
-            <div class="tour-tip-pill" id="tour-action-hint">
-                Tip: Click any polygon on the map to inspect its specific unit type, permanent water area, and seasonal metrics.
-            </div>
-            <div class="tour-footer">
-                <div id="tour-dots" class="tour-dots"></div>
-                <div style="display:flex; gap:8px;">
-                    <button type="button" id="tour-prev" class="btn-tour-nav">&larr; Back</button>
-                    <button type="button" id="tour-next" class="btn-tour-nav primary">Next &rarr;</button>
-                </div>
-            </div>
+<dialog id="about-dialog" aria-labelledby="about-title">
+    <div class="dialog-head">
+        <div>
+            <div class="eyebrow">About this observatory</div>
+            <h2 class="panel-title" id="about-title">How to use this site</h2>
         </div>
+        <button type="button" class="btn btn-icon" data-close aria-label="Close">✕</button>
     </div>
+    <div class="dialog-body">
+        <p>This observatory tests whether rainfall and shallow soil moisture across the roughly 22,200 km² Ogun River catchment relate to floodplain inundation, and whether that flooding reaches the northwest Lagos Lagoon as turbidity. All data come from one Google Earth Engine export (2019–2024) and are recomputed by the repository's own scripts.</p>
+        <h4>Using the site</h4>
+        <ol>
+            <li><strong>Overview</strong> gives the headline numbers and the findings, each with a verdict.</li>
+            <li><strong>Map</strong>: switch indicators at the top left; click a unit to open it. Units drawn hatched with a dashed outline have no reliable value for that indicator.</li>
+            <li><strong>Unit</strong> shows one unit's measurements. <strong>Time series</strong> shows 72 months as four aligned charts; hover to read the same month across all of them.</li>
+            <li><strong>Statistics</strong> is the full audit table. <strong>Compare</strong> puts two units side by side.</li>
+            <li>The address bar keeps your selection, so you can share a specific unit and view.</li>
+        </ol>
+        <h4>Data &amp; licence</h4>
+        <p>Code MIT; derived data CC BY 4.0. Source datasets keep their own terms (see <span class="mono">LICENSE-DATA.md</span>). Source code and reproduction steps: <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">github.com/oloyededavid/Ogun-Catchment-Coast-Observatory</a>.</p>
+    </div>
+</dialog>
 
-    <div id="floating-tip" class="floating-tip is-hidden" role="tooltip"></div>
+<div class="floating-tip" id="floating-tip" role="tooltip" hidden></div>
 
-    <script>
-    (function () {
-        const PALETTES = {
-            flood: ['#EFF6FF', '#BFDBFE', '#60A5FA', '#2563EB', '#1E3A8A'],
-            rain: ['#F0FDFA', '#99F6E4', '#2DD4BF', '#0D9488', '#115E59'],
-            ndti: ['#FEFCE8', '#FDE047', '#F59E0B', '#D97706', '#78350F'],
-            ndvi: ['#FEF2F2', '#D9F99D', '#4ADE80', '#16A34A', '#14532D']
-        };
+<script>
+(function () {
+    'use strict';
 
-        // SAR flood values in these units are dominated by dry-season artefacts
-        // (burnt savanna and dry ground); see Methods.
-        const SAR_UNRELIABLE = new Set(['Z1', 'Z2']);
-        const sarVal = p => SAR_UNRELIABLE.has(p.zone_id) ? null : p.sim_flood;
-        const sarTxt = (p, suffix = ' km²') => SAR_UNRELIABLE.has(p.zone_id)
-            ? `${fmtNum(p.sim_flood, 1, suffix)} (unreliable)` : fmtNum(p.sim_flood, 1, suffix);
+    // ================= Helpers =================
+    const $ = id => document.getElementById(id);
+    const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-        const STATE = {
-            geojson: null,
-            features: [],
-            series: [],
-            diagnostics: null,
-            selectedZone: 'ALL',
-            layer: 'flood',
-            compA: 'Z1',
-            compB: 'Z4',
-            rainShockPct: 0,
-            showLabels: true,
-            csvText: '',
-            unitSeries: {},
-            diagPair: 'rain',
-            diagMode: 'deseasonalized'
-        };
+    function escHtml(v) {
+        return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
 
-        function fmtP(v) {
-            if (v === null || v === undefined || Number.isNaN(Number(v))) return 'N/A';
-            const n = Number(v);
-            if (n < 0.000001) return '< 1e-6';
-            return n < 0.0001 ? n.toExponential(1) : n.toFixed(4);
-        }
+    function num(v) {
+        if (v === null || v === undefined) return null;
+        const s = String(v).replace(/"/g, '').trim();
+        if (s === '' || s.toLowerCase() === 'null' || s.toLowerCase() === 'nan') return null;
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+    }
 
-        function escHtml(v) {
-            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        }
+    const isNum = v => v !== null && v !== undefined && Number.isFinite(Number(v));
+    const fmt = (v, digits = 1, suffix = '') => isNum(v) ? `${Number(v).toFixed(digits)}${suffix}` : '—';
+    const fmtInt = (v, suffix = '') => isNum(v) ? `${Math.round(v).toLocaleString('en-GB')}${suffix}` : '—';
 
-        function renderProvenance() {
-            const banner = document.getElementById('provenance-banner');
-            const prov = STATE.diagnostics && STATE.diagnostics.provenance;
-            if (!prov) {
-                setTxt('provenance-text', 'Statistical diagnostics (data/cascade_diagnostics.json) could not be loaded, so data provenance cannot be confirmed.');
-                banner.classList.remove('is-hidden');
-                return;
-            }
-            const isDemo = prov.is_demonstration_data !== false || prov.status !== 'VERIFIED_GEE_EXPORT';
-            if (isDemo) {
-                setTxt('provenance-text', prov.warning || 'The values shown are placeholders, not results from the Google Earth Engine export. Do not cite them as research findings.');
-            }
-            banner.classList.toggle('is-hidden', !isDemo);
-        }
+    function fmtP(v) {
+        if (!isNum(v)) return '—';
+        const n = Number(v);
+        if (n < 0.000001) return '< 1e-6';
+        return n < 0.0001 ? n.toExponential(1) : n.toFixed(4);
+    }
 
-        function setTxt(id, val, isHtml) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (isHtml) el.innerHTML = val;
-            else el.innerText = val;
-        }
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = ym => ym ? `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}` : '—';
+    const isWet = ym => { const m = Number(ym.slice(5, 7)); return m >= 4 && m <= 10; };
 
-        function fmtNum(v, digits = 1, suffix = '') {
-            if (v === null || v === undefined || Number.isNaN(Number(v))) return 'N/A (Masked)';
-            return `${Number(v).toFixed(digits)}${suffix}`;
-        }
-
-        function splitCsvLine(line) {
-            const result = [];
-            let cur = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') inQuotes = !inQuotes;
-                else if (ch === ',' && !inQuotes) { result.push(cur.trim()); cur = ''; }
+    function parseCsv(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+        const split = line => {
+            const out = []; let cur = ''; let q = false;
+            for (const ch of line) {
+                if (ch === '"') q = !q;
+                else if (ch === ',' && !q) { out.push(cur); cur = ''; }
                 else cur += ch;
             }
-            result.push(cur.trim());
-            return result;
-        }
-
-        function parseNullableFloat(raw) {
-            if (raw === undefined || raw === null) return null;
-            const cleaned = String(raw).replace(/"/g, '').trim();
-            if (cleaned === '' || cleaned.toLowerCase() === 'null' || cleaned.toLowerCase() === 'nan') return null;
-            const num = Number(cleaned);
-            return Number.isFinite(num) ? num : null;
-        }
-
-        function parseGeeCsv(csvText) {
-            const lines = csvText.trim().split(/\r?\n/);
-            if (lines.length < 2) return [];
-            const headers = splitCsvLine(lines[0]);
-            const idxYm = headers.indexOf('year_month');
-            const idxRain = headers.indexOf('rain_mm');
-            const idxSm = headers.indexOf('shallow_sm_m3m3');
-            const idxFlood = headers.indexOf('sar_flood_km2');
-            const idxNdti = headers.indexOf('estuary_ndti');
-            const idxDw = headers.indexOf('dw_flood_km2');
-            const idxStatus = headers.indexOf('data_status');
-            const idxZone = headers.indexOf('zone_id');
-            if (idxYm === -1 || idxRain === -1) return [];
-
-            return lines.slice(1).map(line => {
-                const cols = splitCsvLine(line);
-                return {
-                    zone_id: idxZone !== -1 ? String(cols[idxZone] || '').replace(/"/g, '').trim() : null,
-                    year_month: String(cols[idxYm] || '').replace(/"/g, '').trim(),
-                    rain_mm: parseNullableFloat(cols[idxRain]),
-                    shallow_sm_m3m3: idxSm !== -1 ? parseNullableFloat(cols[idxSm]) : null,
-                    sar_flood_km2: parseNullableFloat(cols[idxFlood]),
-                    estuary_ndti: parseNullableFloat(cols[idxNdti]),
-                    dw_flood_km2: idxDw !== -1 ? parseNullableFloat(cols[idxDw]) : null,
-                    data_status: idxStatus !== -1 ? String(cols[idxStatus] || '').replace(/"/g, '').trim() : 'VERIFIED_GEE_EXPORT'
-                };
-            }).filter(r => r.year_month.length >= 7)
-              .sort((a, b) => a.year_month.localeCompare(b.year_month));
-        }
-
-        function interpolateColor(val, min, max, ramp) {
-            if (val === null || val === undefined || Number.isNaN(Number(val))) return '#D4D4D8';
-            const t = Math.max(0, Math.min(1, (val - min) / ((max - min) || 1)));
-            const idx = Math.min(ramp.length - 1, Math.floor(t * ramp.length));
-            return ramp[idx];
-        }
-
-        // 1. Initialize Leaflet Map
-        const map = L.map('map', {
-            zoomControl: false,
-            wheelPxPerZoomLevel: 90
-        }).setView([7.65, 3.38], 8);
-
-        L.control.zoom({ position: 'topright' }).addTo(map);
-
-        const BASEMAPS = {
-            light: L.layerGroup([
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }),
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16, opacity: 0.6 })
-            ]),
-            terrain: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }),
-            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 })
+            out.push(cur);
+            return out.map(s => s.trim());
         };
+        const head = split(lines[0]);
+        const textCols = new Set(['year_month', 'zone_id', 'data_status', 'export_utc', 'script_version']);
+        return lines.slice(1).map(line => {
+            const cols = split(line);
+            const row = {};
+            head.forEach((h, i) => { row[h] = textCols.has(h) ? (cols[i] || '').replace(/"/g, '') : num(cols[i]); });
+            return row;
+        }).filter(r => /^\d{4}-\d{2}$/.test(r.year_month))
+          .sort((a, b) => a.year_month.localeCompare(b.year_month));
+    }
 
-        let activeBasemap = BASEMAPS.light.addTo(map);
-        let geojsonLayer = null;
-        let riverStemLayer = null;
-        let labelGroup = L.layerGroup().addTo(map);
-        let chartInstance = null;
+    // ================= State =================
+    // Radar inundation values in these units are dominated by dry-season artefacts (see Methods).
+    const SAR_UNRELIABLE = new Set(['Z1', 'Z2']);
 
-        const OGUN_RIVER_STEM = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": { "name": "Ogun River Mainstem" },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
-                            [3.66, 8.75], [3.61, 8.48], [3.56, 8.22], [3.51, 7.96],
-                            [3.46, 7.72], [3.41, 7.45], [3.35, 7.15], [3.34, 6.95],
-                            [3.36, 6.76], [3.38, 6.61], [3.40, 6.50]
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": { "name": "Oyan-Ofiki Tributary" },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
-                            [2.85, 8.05], [2.94, 7.82], [3.05, 7.60], [3.18, 7.36], [3.35, 7.15]
-                        ]
-                    }
-                }
-            ]
-        };
+    const STATE = {
+        features: [],
+        series: [],
+        unitSeries: {},
+        diagnostics: null,
+        zone: 'ALL',
+        layer: 'flood',
+        tab: 'overview',
+        diagPair: 'rain',
+        diagMode: 'deseasonalized',
+        compA: 'Z3',
+        compB: 'Z4'
+    };
 
-        function showExplicitLoadError(title, message) {
-            const errBox = document.getElementById('map-error-box');
-            errBox.classList.remove('is-hidden');
-            setTxt('err-title', title);
-            setTxt('err-desc', message);
+    const featureById = id => STATE.features.find(f => f.properties.zone_id === id);
+    const shortName = p => String(p.zone_name || '').replace(/ Sub-Basin$/, '').replace(/^Northwest /, 'NW ');
+
+    // ================= Theme =================
+    function currentTheme() {
+        const set = document.documentElement.getAttribute('data-theme');
+        if (set) return set;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function paintThemeButton() {
+        const dark = currentTheme() === 'dark';
+        $('btn-theme').setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+        $('btn-theme').innerHTML = dark
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+    }
+
+    function repaintForTheme() {
+        paintThemeButton();
+        setBasemap($('basemap-select').value);
+        styleMap();
+        buildCharts();
+    }
+
+    try { const saved = localStorage.getItem('ogun_theme'); if (saved) document.documentElement.setAttribute('data-theme', saved); } catch (e) {}
+    paintThemeButton();
+
+    $('btn-theme').addEventListener('click', () => {
+        const next = currentTheme() === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('ogun_theme', next); } catch (e) {}
+        repaintForTheme();
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (!document.documentElement.getAttribute('data-theme')) repaintForTheme();
+    });
+
+    // ================= Map =================
+    const map = L.map('map', { zoomControl: false, wheelPxPerZoomLevel: 90, zoomSnap: 0.25, zoomDelta: 0.5 });
+    L.control.zoom({ position: 'topright' }).addTo(map);
+    map.setView([7.4, 3.4], 8);
+
+    const esri = path => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`, {
+        maxZoom: 16, attribution: 'Basemap © Esri'
+    });
+
+    let basemapLayer = null;
+    let unitsLayer = null;
+    const labelLayer = L.layerGroup().addTo(map);
+
+    function setBasemap(kind) {
+        if (basemapLayer) map.removeLayer(basemapLayer);
+        const dark = currentTheme() === 'dark';
+        basemapLayer = kind === 'terrain' ? esri('World_Topo_Map')
+            : kind === 'satellite' ? esri('World_Imagery')
+            : L.layerGroup([
+                esri(dark ? 'Canvas/World_Dark_Gray_Base' : 'Canvas/World_Light_Gray_Base'),
+                esri(dark ? 'Canvas/World_Dark_Gray_Reference' : 'Canvas/World_Light_Gray_Reference')
+            ]);
+        basemapLayer.addTo(map);
+        if (unitsLayer) unitsLayer.bringToFront();
+    }
+
+    $('basemap-select').addEventListener('change', e => setBasemap(e.target.value));
+
+    const LAYERS = {
+        flood: {
+            title: 'Floodplain inundation (km²)',
+            source: 'Sentinel-1 radar, mean flooded area, Sep–Oct 2022',
+            value: p => SAR_UNRELIABLE.has(p.zone_id) ? null : p.sar_inundation_km2,
+            raw: p => p.sar_inundation_km2,
+            fmt: v => `${fmt(v, 1)} km²`,
+            unreliable: p => SAR_UNRELIABLE.has(p.zone_id)
+        },
+        rain: {
+            title: 'Mean annual rainfall (mm / yr)',
+            source: 'CHIRPS v2.0, 2019–2024',
+            value: p => p.rain_mm, raw: p => p.rain_mm,
+            fmt: v => `${fmtInt(v)} mm`,
+            unreliable: () => false
+        },
+        ndti: {
+            title: 'Open-water turbidity (NDTI)',
+            source: 'Sentinel-2 cloud-free open water; higher = more turbid',
+            value: p => p.ndti, raw: p => p.ndti,
+            fmt: v => fmt(v, 3),
+            unreliable: () => false
+        },
+        ndvi: {
+            title: 'Riparian vegetation (NDVI)',
+            source: 'Sentinel-2, within 2 km of rivers',
+            value: p => p.ndvi, raw: p => p.ndvi,
+            fmt: v => fmt(v, 2),
+            unreliable: () => false
         }
+    };
 
-        // Load GeoJSON, CSV, and Python Statistical Diagnostics from docs/data/
-        Promise.all([
-            fetch('data/ogun_subbasins.geojson').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
-            fetch('data/ogun_monthly_timeseries.csv').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }),
-            fetch('data/cascade_diagnostics.json').then(r => r.ok ? r.json() : null).catch(() => null),
-            fetch('data/ogun_unit_monthly_timeseries.csv').then(r => r.ok ? r.text() : '').catch(() => '')
-        ]).then(([geojson, csvText, diagnostics, unitCsvText]) => {
-            if (!geojson || !Array.isArray(geojson.features) || geojson.features.length === 0) {
-                showExplicitLoadError('GeoJSON Boundary Dataset Empty or Invalid', 'docs/data/ogun_subbasins.geojson contained no valid features.');
-                return;
-            }
-            const parsedSeries = parseGeeCsv(csvText);
-            if (parsedSeries.length === 0) {
-                showExplicitLoadError('Monthly Time-Series CSV Empty or Invalid', 'docs/data/ogun_monthly_timeseries.csv could not be parsed or contained zero monthly records.');
-                return;
-            }
+    const ramp = () => ['--seq-1', '--seq-2', '--seq-3', '--seq-4', '--seq-5'].map(css);
 
-            geojson.features.sort((a, b) => (Number(a.properties.order) || 0) - (Number(b.properties.order) || 0));
-            geojson.features.forEach((f, idx) => {
-                const p = f.properties;
-                p.zone_id = p.zone_id || `Z${idx + 1}`;
-                p.order = Number(p.order) || (idx + 1);
-                p.zone_name = p.zone_name || `Unit ${idx + 1}`;
-                p.unit_type = p.unit_type || (p.zone_id === 'Z5' ? 'Estuarine Receiving Zone' : 'Hydrological Sub-Basin');
-                p.regime = p.regime || 'Analytical Unit';
-                p.role_color = p.role_color || '#0284C7';
-                p.area_km2 = parseNullableFloat(p.area_km2);
-                p.rain_mm = parseNullableFloat(p.rain_mm);
-                p.sar_inundation_km2 = parseNullableFloat(p.sar_inundation_km2 !== undefined ? p.sar_inundation_km2 : p.flood_km2);
-                p.perm_water_km2 = parseNullableFloat(p.perm_water_km2);
-                p.ndti = parseNullableFloat(p.ndti);
-                p.ndvi = parseNullableFloat(p.ndvi);
-                p.shallow_sm_m3m3 = parseNullableFloat(p.shallow_sm_m3m3 !== undefined ? p.shallow_sm_m3m3 : p.soil_moisture);
-                p.slope_deg = parseNullableFloat(p.slope_deg);
+    function colorFor(v, min, max) {
+        if (!isNum(v)) return null;
+        const r = ramp();
+        const t = max > min ? (v - min) / (max - min) : 0.5;
+        return r[Math.min(r.length - 1, Math.max(0, Math.floor(t * r.length)))];
+    }
+
+    function buildMap() {
+        unitsLayer = L.geoJSON({ type: 'FeatureCollection', features: STATE.features }, {
+            style: () => ({ weight: 1.5, fillOpacity: 0.85 }),
+            onEachFeature: (feature, layer) => {
+                const p = feature.properties;
+                p._center = layer.getBounds().getCenter();
+                layer.bindTooltip('', { sticky: true, className: 'map-tip', direction: 'top', offset: [0, -10] });
+                layer.on('mouseover', () => { if (STATE.zone !== p.zone_id) layer.setStyle({ weight: 3 }); });
+                layer.on('mouseout', () => { if (STATE.zone !== p.zone_id) layer.setStyle({ weight: 1.5 }); });
+                layer.on('click', () => { selectZone(p.zone_id); setTab('unit'); });
+            }
+        }).addTo(map);
+        fitAll(false);
+        // Refit whenever the map pane changes size (initial layout, window resize, rotation).
+        let lastSize = '';
+        new ResizeObserver(entries => {
+            const r = entries[0].contentRect;
+            const size = `${Math.round(r.width)}x${Math.round(r.height)}`;
+            if (size === lastSize) return;
+            lastSize = size;
+            map.invalidateSize();
+            if (STATE.zone === 'ALL') fitAll(false);
+        }).observe(document.querySelector('.map-pane'));
+    }
+
+    // Keep the units clear of the floating layer switcher (top) and legend (bottom left).
+    function fitAll(animate) {
+        if (!unitsLayer) return;
+        map.invalidateSize();
+        const small = window.innerWidth <= 640;
+        const opts = { paddingTopLeft: [small ? 20 : 40, small ? 70 : 80], paddingBottomRight: [small ? 20 : 40, small ? 150 : 40] };
+        if (animate) map.flyToBounds(unitsLayer.getBounds(), Object.assign({ duration: 0.5 }, opts));
+        else map.fitBounds(unitsLayer.getBounds(), Object.assign({ animate: false }, opts));
+    }
+
+    function styleMap() {
+        if (!unitsLayer) return;
+        const spec = LAYERS[STATE.layer];
+        const vals = STATE.features.map(f => spec.value(f.properties)).filter(isNum);
+        const min = vals.length ? Math.min(...vals) : 0;
+        const max = vals.length ? Math.max(...vals) : 1;
+        const ink = css('--ink'), ink2 = css('--ink-2'), ink3 = css('--ink-3');
+
+        unitsLayer.eachLayer(layer => {
+            const p = layer.feature.properties;
+            const sel = STATE.zone === p.zone_id;
+            const unrel = spec.unreliable(p);
+            layer.setStyle({
+                fillColor: colorFor(spec.value(p), min, max) || css('--unreliable'),
+                fillOpacity: unrel ? 0.4 : 0.85,
+                color: ink,
+                weight: sel ? 3.5 : 1.5,
+                dashArray: unrel ? '6 5' : null
             });
-
-            STATE.geojson = geojson;
-            STATE.features = geojson.features;
-            STATE.series = parsedSeries;
-            STATE.diagnostics = diagnostics;
-            STATE.csvText = csvText;
-            STATE.unitSeries = {};
-            if (unitCsvText) {
-                parseGeeCsv(unitCsvText).forEach(r => {
-                    if (!r.zone_id) return;
-                    (STATE.unitSeries[r.zone_id] = STATE.unitSeries[r.zone_id] || []).push(r);
-                });
-            }
-            applyHashState();
-
-            initDropdowns();
-            buildMapLayers();
-            initHydroChart();
-            updateEverything();
-            renderDiagnosticsTable();
-            renderProvenance();
-            renderFindings();
-            initTourIfFirstVisit();
-        }).catch(err => {
-            showExplicitLoadError(
-                'Dataset Fetch Failed',
-                `Failed to load required files from docs/data/ (${err.message}).`
-            );
+            const val = unrel ? `${spec.fmt(spec.raw(p))} — not reliable here` : spec.fmt(spec.value(p));
+            layer.setTooltipContent(`<strong>${escHtml(p.zone_id)} · ${escHtml(p.zone_name)}</strong><br><span style="color:${ink2}">${escHtml(spec.title)}: ${escHtml(val)}</span><br><span style="color:${ink3};font-size:11.5px">Click to open this unit</span>`);
         });
 
-        function renderFindings() {
-            const d = STATE.diagnostics;
-            const list = document.getElementById('findings-list');
-            if (!d || !Array.isArray(d.key_findings)) return;
-            const est = f => `ρ = ${fmtNum(f.spearman_rho, 2)}, r = ${fmtNum(f.pearson_r, 2)}, ${escHtml(f.p_value_type)} p = ${fmtP(f.p_value)}`;
-            const items = d.key_findings.map(f => f.status !== 'VALID'
-                ? `<li><strong>${escHtml(f.relationship)}:</strong> not enough observations.</li>`
-                : `<li class="${f.significant && f.robust_to_single_month !== false ? 'is-significant' : ''}"><strong>${escHtml(f.relationship)}:</strong> ${
-                    !f.significant ? 'no significant association'
-                    : f.robust_to_single_month === false ? `significant, but <strong>not robust</strong>: it depends on ${escHtml(f.most_influential_month)}`
-                    : 'significant association'} (${est(f)}, n = ${f.n_pairs}).</li>`);
-            const rb = d.robustness && d.robustness.rain_to_sar_lag_0_deseasonalized;
-            if (rb && rb.status === 'VALID') {
-                const w = rb.without_most_influential_month || {};
-                items.push(`<li><strong>Robustness:</strong> leaving out any single month gives r between ${fmtNum(rb.leave_one_out_pearson_r_min, 2)} and ${fmtNum(rb.leave_one_out_pearson_r_max, 2)}. Without ${escHtml(rb.most_influential_month)}, the most influential month, r = ${fmtNum(w.pearson_r, 2)} (ρ = ${fmtNum(w.spearman_rho, 2)}, p = ${fmtP(w.p_value_autocorr_adj)}).</li>`);
-            }
-            list.innerHTML = items.join('');
-            setTxt('findings-note', 'All values are recomputed by src/02_compile_observatory.py from the published data. The SAR flood proxy is an uncalibrated index (see Methods & Audit).');
-            const f0 = d.key_findings[0];
-            if (f0 && f0.status === 'VALID') setTxt('lag-badge', `Rain → flood (same month): ρ = ${fmtNum(f0.spearman_rho, 2)}, r = ${fmtNum(f0.pearson_r, 2)}`);
+        labelLayer.clearLayers();
+        STATE.features.forEach(f => {
+            const p = f.properties;
+            const sub = spec.unreliable(p) ? 'not reliable' : spec.fmt(spec.value(p));
+            const sel = STATE.zone === p.zone_id;
+            const html = sel
+                ? `<div class="zone-pin is-selected">${escHtml(p.zone_id)} · ${escHtml(shortName(p))}<span>${escHtml(sub)}</span></div>`
+                : `<div class="zone-pin is-compact">${escHtml(p.zone_id)} <span>${escHtml(sub)}</span></div>`;
+            labelLayer.addLayer(L.marker(p._center, {
+                interactive: false,
+                zIndexOffset: sel ? 1000 : 0,
+                icon: L.divIcon({ className: 'zone-label', iconSize: [0, 0], html })
+            }));
+        });
+
+        $('legend-title').textContent = spec.title;
+        $('legend-source').textContent = spec.source;
+        $('legend-bar').style.background = `linear-gradient(90deg, ${ramp().join(', ')})`;
+        $('legend-min').textContent = spec.fmt(min);
+        $('legend-mid').textContent = spec.fmt((min + max) / 2);
+        $('legend-max').textContent = spec.fmt(max);
+        $('legend-note').hidden = !STATE.features.some(f => spec.unreliable(f.properties));
+    }
+
+    document.querySelectorAll('.layer-switch .seg').forEach(btn => btn.addEventListener('click', () => {
+        STATE.layer = btn.dataset.layer;
+        document.querySelectorAll('.layer-switch .seg').forEach(b => b.setAttribute('aria-checked', String(b === btn)));
+        styleMap();
+        writeHash();
+    }));
+
+    // ================= Unit selection =================
+    function renderChips() {
+        const chips = [{ id: 'ALL', label: 'Whole system' }].concat(STATE.features.map(f => ({ id: f.properties.zone_id, label: shortName(f.properties) })));
+        $('unit-chips').innerHTML = chips.map(c => `<button type="button" class="chip" data-zone="${escHtml(c.id)}" aria-pressed="${STATE.zone === c.id}">${c.id !== 'ALL' ? `<span class="code">${escHtml(c.id)}</span>` : ''}${escHtml(c.label)}</button>`).join('');
+        $('unit-chips').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+            selectZone(b.dataset.zone);
+            if (b.dataset.zone !== 'ALL' && STATE.tab === 'overview') setTab('unit');
+        }));
+    }
+
+    function selectZone(id, opts = {}) {
+        STATE.zone = id;
+        if (id !== 'ALL') { STATE.compA = id; $('comp-a').value = id; }
+        $('unit-chips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.zone === id)));
+        styleMap();
+        renderUnit();
+        renderSeries();
+        renderCompare();
+        writeHash();
+        if (opts.fly === false || !unitsLayer) return;
+        if (id === 'ALL') {
+            fitAll(true);
+        } else {
+            unitsLayer.eachLayer(l => { if (l.feature.properties.zone_id === id) map.flyToBounds(l.getBounds(), { padding: [60, 60], duration: 0.5, maxZoom: 10 }); });
         }
+    }
 
-        function renderDiagnosticsTable() {
-            const tbody = document.getElementById('diag-tbody');
-            const d = STATE.diagnostics;
-            const empty = msg => { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--ink-muted);">${msg}</td></tr>`; };
-            if (!d) return empty('Diagnostics unavailable.');
+    // ================= Tabs =================
+    const TABS = ['overview', 'unit', 'series', 'stats', 'compare'];
 
-            let entries;
-            if (STATE.diagPair === 'reservoir' || STATE.diagPair === 'dam') {
-                const block = STATE.diagPair === 'dam'
-                    ? d.rain_to_sar_inundation_controlling_for_oyan_dam_releases
-                    : d.rain_to_sar_inundation_controlling_for_oyan_reservoir;
-                if (!block) return empty('Not in cascade_diagnostics.json. Re-run src/02_compile_observatory.py.');
-                if (block.status !== 'VALID') return empty(escHtml(block.reason || block.status));
-                const lagsObj = block[STATE.diagMode];
-                entries = lagsObj ? Object.keys(lagsObj).map(k => [k.replace('lag_', 'Lag ').replace('_month', ' mo'), lagsObj[k]]) : [];
-            } else if (STATE.diagPair === 'ndti' || STATE.diagPair === 'dw') {
-                const block = STATE.diagPair === 'dw' ? d.sar_validation_against_dynamic_world : d.sar_inundation_to_estuary_ndti;
-                if (block && block.status === 'NOT_AVAILABLE') return empty(escHtml(block.reason));
-                const item = block && block[STATE.diagMode];
-                entries = item ? [['Lag 0 mo', item]] : [];
-            } else {
-                const prefix = STATE.diagPair === 'sm' ? 'soil_moisture_to_sar_inundation_lags_' : 'rain_to_sar_inundation_lags_';
-                const lagsObj = d[prefix + STATE.diagMode];
-                entries = lagsObj ? Object.keys(lagsObj).map(k => [k.replace('lag_', 'Lag ').replace('_month', ' mo'), lagsObj[k]]) : [];
-            }
-            const singleTest = STATE.diagPair === 'ndti' || STATE.diagPair === 'dw';
-            setTxt('diag-p-head', singleTest ? 'Autocorr.-adj. p' : 'FDR p-val');
-            if (!entries.length) return empty('This relationship is not in cascade_diagnostics.json. Re-run src/02_compile_observatory.py.');
+    function setTab(name, focus) {
+        STATE.tab = name;
+        TABS.forEach(t => {
+            const on = t === name;
+            $(`tab-${t}`).setAttribute('aria-selected', String(on));
+            $(`tab-${t}`).tabIndex = on ? 0 : -1;
+            $(`panel-${t}`).hidden = !on;
+        });
+        if (focus) $(`tab-${name}`).focus();
+        $('tab-panels').scrollTop = 0;
+        if (name === 'series') buildCharts();
+        writeHash();
+    }
 
-            tbody.innerHTML = entries.map(([label, item]) => {
-                if (item.status && item.status !== 'VALID') {
-                    return `<tr><td><strong>${label}</strong></td><td>${item.n_pairs ?? 'N/A'}</td><td colspan="4" style="color:var(--ink-muted);">${escHtml(item.status)}</td></tr>`;
-                }
-                const pVal = singleTest ? item.p_value_autocorr_adj : item.p_value_bh_fdr;
-                const ci = item.pearson_ci95 && item.pearson_ci95[0] !== null && item.pearson_ci95[0] !== undefined
-                    ? `[${item.pearson_ci95[0]}, ${item.pearson_ci95[1]}]` : '';
-                return `
-                    <tr>
-                        <td><strong>${label}</strong></td>
-                        <td>${item.n_pairs ?? 'N/A'}</td>
-                        <td>${item.n_effective ?? 'N/A'}</td>
-                        <td>${fmtNum(item.spearman_rho, 2).replace('N/A (Masked)', 'N/A')}</td>
-                        <td><strong>${fmtNum(item.pearson_r, 2).replace('N/A (Masked)', 'N/A')}</strong> <span style="font-size:10.5px; color:var(--ink-muted);">${ci}</span></td>
-                        <td><span class="mono">${fmtP(pVal)}</span></td>
-                    </tr>
-                `;
-            }).join('');
-        }
+    TABS.forEach((t, i) => {
+        const tab = $(`tab-${t}`);
+        tab.addEventListener('click', () => setTab(t));
+        tab.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') setTab(TABS[(i + 1) % TABS.length], true);
+            else if (e.key === 'ArrowLeft') setTab(TABS[(i - 1 + TABS.length) % TABS.length], true);
+            else if (e.key === 'Home') setTab(TABS[0], true);
+            else if (e.key === 'End') setTab(TABS[TABS.length - 1], true);
+            else return;
+            e.preventDefault();
+        });
+    });
 
-        function initDropdowns() {
-            const opts = STATE.features.map(f =>
-                `<option value="${escHtml(f.properties.zone_id)}">0${f.properties.order} · ${escHtml(f.properties.zone_name)}</option>`
-            ).join('');
-            const selA = document.getElementById('comp-a');
-            const selB = document.getElementById('comp-b');
-            selA.innerHTML = opts;
-            selB.innerHTML = opts;
-            selA.value = STATE.compA;
-            selB.value = STATE.compB;
-        }
+    // ================= Overview =================
+    function tile(label, value, sub, tip, flagged) {
+        return `<div class="tile ${flagged ? 'is-flagged' : ''}">
+            <div class="tile-label"><span>${label}</span>${tip ? `<button type="button" class="info" data-tip="${escHtml(tip)}" aria-label="About: ${escHtml(label)}">i</button>` : ''}</div>
+            <div class="tile-value">${value}</div>
+            ${sub ? `<div class="tile-sub">${sub}</div>` : ''}
+        </div>`;
+    }
 
-        function buildMapLayers() {
-            if (geojsonLayer) map.removeLayer(geojsonLayer);
-            if (riverStemLayer) map.removeLayer(riverStemLayer);
+    function plain(rel) {
+        return String(rel)
+            .replace(/ \(same month, deseasonalized\)/, ', same month')
+            .replace(/ \(1-month lag, deseasonalized\)/, ', one month later')
+            .replace(/ \(deseasonalized\)/, '')
+            .replace(/ -> /g, ' → ')
+            .replace(/[Ff]loodplain SAR inundation/, m => m[0] === 'F' ? 'Floodplain inundation' : 'floodplain inundation')
+            .replace('SAR inundation vs Dynamic World flooding', 'Radar vs optical flooding (validation)');
+    }
 
-            geojsonLayer = L.geoJSON(STATE.geojson, {
-                style: () => ({
-                    fillColor: '#60A5FA',
-                    weight: 1.8,
-                    color: '#18181B',
-                    fillOpacity: 0.78
-                }),
-                onEachFeature: (feature, layer) => {
-                    const p = feature.properties;
-                    const centerLatLng = layer.getBounds().getCenter();
-                    p._center = [centerLatLng.lng, centerLatLng.lat];
-                    layer.bindTooltip('', { sticky: true, className: 'clean-tip' });
+    const ICON_CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+    const ICON_WARN = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 6v8"/><path d="M12 18h.01"/></svg>';
+    const ICON_DASH = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>';
 
-                    layer.on('mouseover', () => {
-                        if (STATE.selectedZone !== p.zone_id) layer.setStyle({ weight: 3, fillOpacity: 0.92 });
-                    });
-                    layer.on('mouseout', () => {
-                        if (STATE.selectedZone !== p.zone_id) layer.setStyle({ weight: 1.8, fillOpacity: 0.78 });
-                    });
-                    layer.on('click', () => selectZone(p.zone_id));
-                }
-            }).addTo(map);
+    function renderOverview() {
+        const catchment = STATE.features.filter(f => f.properties.zone_id !== 'Z5');
+        const area = catchment.reduce((s, f) => s + (f.properties.area_km2 || 0), 0);
+        const years = new Set(STATE.series.map(r => r.year_month.slice(0, 4))).size || 1;
+        const annualRain = STATE.series.reduce((s, r) => s + (r.rain_mm || 0), 0) / years;
+        const d = STATE.diagnostics || {};
+        const ext = d.extremes || {};
+        const ndtiValid = STATE.series.filter(r => isNum(r.estuary_ndti)).length;
+        const wet = STATE.series.filter(r => isWet(r.year_month));
+        const ndtiWet = wet.filter(r => isNum(r.estuary_ndti)).length;
 
-            riverStemLayer = L.geoJSON(OGUN_RIVER_STEM, {
-                style: { color: '#0284C7', weight: 2.8, dashArray: '4, 4', interactive: false }
-            }).addTo(map);
+        $('overview-tiles').innerHTML = [
+            tile('Catchment area', `${fmtInt(area)} <small>km²</small>`, 'Four HydroBASINS level-9 sub-basins', 'Drainage area of the Ogun River above its mouth in the Lagos Lagoon (WWF HydroBASINS level 9).'),
+            tile('Mean annual rainfall', `${fmtInt(annualRain)} <small>mm</small>`, `Catchment mean over ${years} years`, 'CHIRPS v2.0 rainfall, summed per year and averaged over the catchment.'),
+            tile('Peak floodplain inundation', `${fmt(ext.peak_sar_inundation_km2, 1)} <small>km²</small>`, monthName(ext.peak_sar_inundation_month), 'Highest monthly mean flooded area over the Z3–Z4 floodplain from Sentinel-1 radar. An uncalibrated index.'),
+            tile('Lagoon turbidity coverage', `${ndtiValid} <small>/ ${STATE.series.length} months</small>`, `${ndtiWet} of ${wet.length} wet-season months`, 'Months with at least 100 cloud-free open-water Sentinel-2 pixels in the lagoon. Missing months are mostly cloudy wet-season months.')
+        ].join('');
 
-            map.fitBounds(geojsonLayer.getBounds(), { padding: [24, 24] });
-        }
+        if (!Array.isArray(d.key_findings)) return;
+        $('findings').innerHTML = d.key_findings.map(f => {
+            if (f.status !== 'VALID') return `<li class="finding"><div class="finding-title">${escHtml(plain(f.relationship))}</div><span class="verdict">No data</span><div class="finding-body">Not enough observations.</div></li>`;
+            const fragile = f.significant && f.robust_to_single_month === false;
+            const verdict = fragile ? `<span class="verdict is-fragile">${ICON_WARN}Not robust</span>`
+                : f.significant ? `<span class="verdict is-sig">${ICON_CHECK}Significant</span>`
+                : `<span class="verdict">${ICON_DASH}No link</span>`;
+            const body = fragile
+                ? `A link appears, but it rests on one month (${escHtml(monthName(f.most_influential_month))}); without it the association is no longer significant.`
+                : f.significant ? 'A statistically significant association.' : 'No statistically significant association.';
+            return `<li class="finding"><div class="finding-title">${escHtml(plain(f.relationship))}</div>${verdict}<div class="finding-body">${body}</div><div class="finding-stats">ρ = ${fmt(f.spearman_rho, 2)} · r = ${fmt(f.pearson_r, 2)} · p = ${fmtP(f.p_value)} · n = ${f.n_pairs}</div></li>`;
+        }).join('');
+    }
 
-        function updateEverything() {
-            const shockFactor = 1 + (STATE.rainShockPct / 100);
-            const floodFactor = Math.pow(shockFactor, 1.25);
-            const ndtiFactor = 1 + (STATE.rainShockPct / 100) * 0.65;
+    // ================= Unit =================
+    function renderUnitList() {
+        $('unit-list').innerHTML = STATE.features.map(f => {
+            const p = f.properties;
+            return `<li><button type="button" class="unit-row" data-zone="${escHtml(p.zone_id)}"><span class="unit-code">${escHtml(p.zone_id)}</span><span><strong>${escHtml(p.zone_name)}</strong><span class="fine" style="display:block">${escHtml(p.regime || '')}</span></span><span class="area">${fmtInt(p.area_km2)} km²</span></button></li>`;
+        }).join('');
+        $('unit-list').querySelectorAll('.unit-row').forEach(b => b.addEventListener('click', () => selectZone(b.dataset.zone)));
+    }
 
-            STATE.features.forEach(f => {
-                const p = f.properties;
-                p.sim_rain = p.rain_mm !== null ? +(p.rain_mm * shockFactor).toFixed(0) : null;
-                p.sim_flood = p.sar_inundation_km2 !== null ? +(p.sar_inundation_km2 * floodFactor).toFixed(1) : null;
-                p.sim_ndti = p.ndti !== null ? +(p.ndti * ndtiFactor).toFixed(3) : null;
-            });
+    function renderUnit() {
+        const f = STATE.zone === 'ALL' ? null : featureById(STATE.zone);
+        $('unit-empty').hidden = !!f;
+        $('unit-detail').hidden = !f;
+        if (!f) return;
+        const p = f.properties;
+        const unrel = SAR_UNRELIABLE.has(p.zone_id);
+        $('unit-code').textContent = p.zone_id;
+        $('unit-name').textContent = p.zone_name;
+        $('unit-meta').textContent = `${p.unit_type} · ${fmtInt(p.area_km2)} km²`;
+        $('unit-summary').textContent = p.summary || '';
+        $('unit-management').innerHTML = `<strong>Monitoring &amp; management focus.</strong> ${escHtml(p.management || '—')}`;
+        $('unit-tiles').innerHTML = [
+            tile('Mean annual rainfall', `${fmtInt(p.rain_mm)} <small>mm</small>`, 'CHIRPS v2.0, 2019–2024', 'Mean annual precipitation from CHIRPS v2.0 pentadal totals.'),
+            tile('Floodplain inundation', `${fmt(p.sar_inundation_km2, 1)} <small>km²</small>`, unrel ? 'Not reliable here: dry-season radar artefacts' : `Sep–Oct 2022 · permanent water ${fmt(p.perm_water_km2, 1)} km²`, 'Mean flooded area across Sentinel-1 passes in Sep–Oct 2022: dark, at least 3 dB below the dry-season reference, slope under 5°, under 15 m above drainage, outside permanent water.', unrel),
+            tile('Open-water turbidity', fmt(p.ndti, 3), p.zone_id === 'Z5' ? 'NDTI, lagoon open water' : 'NDTI, river-channel water', 'Sentinel-2 NDTI = (B4 − B3) / (B4 + B3) over cloud-free open water. A relative index, not NTU or mg/L.'),
+            tile('Shallow soil water', `${fmt(p.shallow_sm_m3m3, 3)} <small>m³/m³</small>`, 'ERA5-Land, top 7 cm', 'ERA5-Land volumetric soil water in the top 7 cm. Not root-zone moisture.'),
+            tile('Riparian vegetation', fmt(p.ndvi, 2), 'NDVI within 2 km of rivers', 'Sentinel-2 NDVI on cloud-free land pixels within 2 km of Strahler order 3+ rivers.'),
+            tile('Mean terrain slope', `${fmt(p.slope_deg, 1)}<small>°</small>`, 'Copernicus GLO-30 DEM', 'Mean slope in degrees from the 30 m Copernicus DEM.')
+        ].join('');
+    }
 
-            const nTotal = STATE.series.length;
-            const nRain = STATE.series.filter(d => d.rain_mm !== null).length;
-            const nSar = STATE.series.filter(d => d.sar_flood_km2 !== null).length;
-            const nNdti = STATE.series.filter(d => d.estuary_ndti !== null).length;
-            setTxt('cov-total', `${nTotal}`);
-            setTxt('cov-rain', `${nRain}/${nTotal}`);
-            setTxt('cov-sar', `${nSar}/${nTotal}`);
-            setTxt('cov-ndti', `${nNdti}/${nTotal}`);
-            setTxt('cov-ndti-miss', `${nTotal - nNdti}`);
-            const isWet = ym => { const m = Number(ym.slice(5, 7)); return m >= 4 && m <= 10; };
-            setTxt('cov-ndti-wet', `${STATE.series.filter(d => d.estuary_ndti !== null && isWet(d.year_month)).length}/${STATE.series.filter(d => isWet(d.year_month)).length}`);
-            setTxt('cov-ndti-dry', `${STATE.series.filter(d => d.estuary_ndti !== null && !isWet(d.year_month)).length}/${STATE.series.filter(d => !isWet(d.year_month)).length}`);
+    // ================= Time series (small multiples) =================
+    const charts = {};
 
-            styleMapAndLegend();
-            renderUnitCard();
-            updateHydroChart(shockFactor, floodFactor, ndtiFactor);
-            renderBenchmark();
-            renderCascadeTable();
-        }
-
-        function styleMapAndLegend() {
-            labelGroup.clearLayers();
-            const vals = STATE.features.map(f => {
-                const p = f.properties;
-                if (STATE.layer === 'flood') return sarVal(p);
-                if (STATE.layer === 'rain') return p.sim_rain;
-                if (STATE.layer === 'ndti') return p.sim_ndti;
-                return p.ndvi;
-            }).filter(v => v !== null && !Number.isNaN(v));
-
-            const vMin = vals.length ? Math.min(...vals) : 0;
-            const vMax = vals.length ? Math.max(...vals) : 1;
-            const ramp = PALETTES[STATE.layer];
-
-            geojsonLayer.eachLayer(layer => {
-                const p = layer.feature.properties;
-                const val = STATE.layer === 'flood' ? sarVal(p)
-                          : STATE.layer === 'rain' ? p.sim_rain
-                          : STATE.layer === 'ndti' ? p.sim_ndti
-                          : p.ndvi;
-                p._color = interpolateColor(val, vMin, vMax, ramp);
-                const isSel = STATE.selectedZone === p.zone_id;
-
-                layer.setStyle({
-                    fillColor: p._color,
-                    weight: isSel ? 3.8 : 1.8,
-                    color: isSel ? '#09090B' : '#27272A',
-                    fillOpacity: isSel ? 0.95 : 0.78
-                });
-
-                layer.setTooltipContent(`
-                    <strong>0${p.order} · ${escHtml(p.zone_name)}</strong><br/>
-                    <span style="color:#71717A">${escHtml(p.unit_type)}</span><br/>
-
-                    SAR Flood Proxy: <b>${sarTxt(p)}</b> (Perm. Water: ${fmtNum(p.perm_water_km2, 1, ' km²')})<br/>
-                    Rain: <b>${fmtNum(p.sim_rain, 0, ' mm/yr')}</b> · Spectral NDTI: <b>${fmtNum(p.sim_ndti, 3)}</b>
-                `);
-            });
-
-            const meta = {
-                flood: ['SAR Low-Backscatter Inundation Proxy (km²)', 'Sentinel-1 IW VV ascending, dry-season change detection (Slope < 5°, HAND < 15 m)', v => `${v.toFixed(vMax < 10 ? 1 : 0)} km²`],
-                rain: ['Mean Annual Precipitation (mm/yr)', 'CHIRPS v2.0 Pentadal (5.5 km)', v => `${v.toFixed(0)} mm`],
-                ndti: ['Open-Water Spectral Turbidity Indicator (NDTI)', 'Sentinel-2 L2A (SCL=6, MNDWI > 0, JRC >= 50%)', v => v.toFixed(3)],
-                ndvi: ['2 km Riparian Buffer Canopy (NDVI)', 'Sentinel-2 L2A Cloud-Free Land Pixels', v => v.toFixed(2)]
+    function seriesRows() {
+        const zone = STATE.zone;
+        const unit = zone !== 'ALL' && zone !== 'Z5' ? STATE.unitSeries[zone] : null;
+        const byMonth = {};
+        (unit || []).forEach(r => { byMonth[r.year_month] = r; });
+        return STATE.series.map(r => {
+            const u = unit ? (byMonth[r.year_month] || {}) : r;
+            return {
+                ym: r.year_month,
+                rain: u.rain_mm ?? null,
+                sar: unit && SAR_UNRELIABLE.has(zone) ? null : (u.sar_flood_km2 ?? null),
+                dw: u.dw_flood_km2 ?? null,
+                ndti: r.estuary_ndti ?? null
             };
+        });
+    }
 
-            const [title, baseTag, fmt] = meta[STATE.layer];
-            const tag = baseTag;
-            // Equal-interval classes matching exactly how interpolateColor() bins values
-            const step = (vMax - vMin) / ramp.length;
-            const classes = ramp.map((c, i) => [c, `${fmt(vMin + step * i)} – ${fmt(vMin + step * (i + 1))}`]);
-            setTxt('legend-title', title);
-            setTxt('legend-tag', tag);
-            document.getElementById('legend-bar').style.background = `linear-gradient(90deg, ${ramp.join(', ')})`;
-            setTxt('legend-min', fmt(vMin));
-            setTxt('legend-q25', fmt(vMin + (vMax - vMin) * 0.25));
-            setTxt('legend-mid', fmt((vMin + vMax) * 0.5));
-            setTxt('legend-q75', fmt(vMin + (vMax - vMin) * 0.75));
-            setTxt('legend-max', fmt(vMax));
-            setTxt('legend-classes', classes.map(([c, l]) =>
-                `<div class="legend-item"><span class="swatch-dot" style="background:${c}"></span><span>${l}</span></div>`
-            ).join(''), true);
+    function renderSeries() {
+        const zone = STATE.zone;
+        const hasUnit = zone !== 'ALL' && zone !== 'Z5' && STATE.unitSeries[zone];
+        const f = featureById(zone);
+        $('series-scope').textContent = hasUnit
+            ? `Rainfall and flooding for ${zone} · ${f ? f.properties.zone_name : ''}${SAR_UNRELIABLE.has(zone) ? ' (radar index hidden: not reliable in this unit)' : ''}. Turbidity is always the Z5 lagoon.`
+            : 'Catchment-wide: rainfall averaged over Z1–Z4, flooding over the Z3–Z4 floodplain, turbidity over the Z5 lagoon. Pick a unit to see its own series.';
 
-            if (!STATE.showLabels) return;
-            STATE.features.forEach(f => {
-                const p = f.properties;
-                const isSel = STATE.selectedZone === p.zone_id;
-                const subTxt = STATE.layer === 'flood' ? (SAR_UNRELIABLE.has(p.zone_id) ? 'SAR unreliable' : fmtNum(p.sim_flood, 1, ' km² proxy'))
-                             : STATE.layer === 'rain' ? fmtNum(p.sim_rain, 0, ' mm/yr')
-                             : STATE.layer === 'ndti' ? `NDTI: ${fmtNum(p.sim_ndti, 3)}`
-                             : `NDVI: ${fmtNum(p.ndvi, 2)}`;
-                const marker = L.marker([p._center[1], p._center[0]], {
-                    interactive: false,
-                    icon: L.divIcon({
-                        className: 'zone-label-icon',
-                        html: `<div class="zone-pin ${isSel ? 'is-selected' : ''}">0${p.order} · ${escHtml(p.zone_name)}<span>${subTxt}</span></div>`,
-                        iconSize: [0, 0]
-                    })
-                });
-                labelGroup.addLayer(marker);
-            });
+        const n = STATE.series.length;
+        const count = k => STATE.series.filter(r => isNum(r[k])).length;
+        const wet = STATE.series.filter(r => isWet(r.year_month));
+        $('coverage').innerHTML = [
+            ['Months', n], ['Rainfall', `${count('rain_mm')}/${n}`], ['Radar', `${count('sar_flood_km2')}/${n}`],
+            ['Optical', `${count('dw_flood_km2')}/${n}`], ['Turbidity', `${count('estuary_ndti')}/${n}`],
+            ['Wet-season turbidity', `${wet.filter(r => isNum(r.estuary_ndti)).length}/${wet.length}`]
+        ].map(([k, v]) => `<span class="pill">${k} <strong>${v}</strong></span>`).join('');
+
+        $('series-table').innerHTML = seriesRows().map(r => `<tr><td>${r.ym}</td><td>${fmt(r.rain, 1)}</td><td>${fmt(r.sar, 2)}</td><td>${fmt(r.dw, 1)}</td><td>${fmt(r.ndti, 3)}</td></tr>`).join('');
+        buildCharts();
+    }
+
+    const crosshair = {
+        id: 'crosshair',
+        afterDatasetsDraw(chart) {
+            const idx = chart.$syncIndex;
+            if (idx === undefined || idx === null) return;
+            const x = chart.scales.x.getPixelForValue(idx);
+            const { top, bottom } = chart.chartArea;
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.strokeStyle = css('--baseline');
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+            ctx.restore();
         }
+    };
 
-        function selectZone(zoneId) {
-            STATE.selectedZone = zoneId;
-            document.getElementById('zone-select').value = zoneId;
-            if (zoneId !== 'ALL') {
-                STATE.compA = zoneId;
-                document.getElementById('comp-a').value = zoneId;
-            }
-            writeHashState();
-            updateEverything();
-        }
+    function syncHover(index) {
+        Object.values(charts).forEach(c => {
+            c.$syncIndex = index;
+            const v = index === null ? null : c.data.datasets[0].data[index];
+            const els = index === null || !isNum(v) ? [] : [{ datasetIndex: 0, index }];
+            c.setActiveElements(els);
+            c.tooltip.setActiveElements(els, { x: index === null ? 0 : c.scales.x.getPixelForValue(index), y: c.chartArea.top });
+            c.update('none');
+        });
+    }
 
-        // Shareable links: #zone=Z3&layer=rain
-        function writeHashState() {
-            const params = new URLSearchParams();
-            if (STATE.selectedZone !== 'ALL') params.set('zone', STATE.selectedZone);
-            if (STATE.layer !== 'flood') params.set('layer', STATE.layer);
-            const hash = params.toString();
-            try { history.replaceState(null, '', hash ? `#${hash}` : location.pathname + location.search); } catch (e) {}
-        }
-
-        function applyHashState() {
-            const params = new URLSearchParams(location.hash.slice(1));
-            const zone = params.get('zone');
-            const layer = params.get('layer');
-            if (zone && STATE.features.some(f => f.properties.zone_id === zone)) {
-                STATE.selectedZone = zone;
-                STATE.compA = zone;
-                document.getElementById('zone-select').value = zone;
-            }
-            if (layer && PALETTES[layer]) {
-                STATE.layer = layer;
-                document.getElementById('layer-select').value = layer;
-            }
-        }
-
-        function renderUnitCard() {
-            if (STATE.selectedZone === 'ALL') {
-                const catchmentUnits = STATE.features.filter(f => f.properties.zone_id !== 'Z5');
-                const estuaryUnit = STATE.features.find(f => f.properties.zone_id === 'Z5') || STATE.features[STATE.features.length - 1];
-                const totCatchmentArea = catchmentUnits.reduce((s, f) => s + (f.properties.area_km2 || 0), 0);
-                const totFlood = catchmentUnits.filter(f => !SAR_UNRELIABLE.has(f.properties.zone_id))
-                    .reduce((s, f) => s + (f.properties.sim_flood || 0), 0);
-                const totPerm = catchmentUnits.reduce((s, f) => s + (f.properties.perm_water_km2 || 0), 0);
-                const meanRain = catchmentUnits.reduce((s, f) => s + (f.properties.sim_rain || 0), 0) / (catchmentUnits.length || 1);
-                const meanSm = catchmentUnits.reduce((s, f) => s + (f.properties.shallow_sm_m3m3 || 0), 0) / (catchmentUnits.length || 1);
-                const meanNdvi = catchmentUnits.reduce((s, f) => s + (f.properties.ndvi || 0), 0) / (catchmentUnits.length || 1);
-                const meanSlope = catchmentUnits.reduce((s, f) => s + (f.properties.slope_deg || 0), 0) / (catchmentUnits.length || 1);
-
-                setTxt('sel-eyebrow', '01 · Multi-Domain Overview (Z1–Z4 Catchment + Z5 Estuary)');
-                setTxt('sel-title', 'Ogun Catchment (Z1–Z4) & Estuary (Z5)');
-                setTxt('sel-badge', 'Observed 2019–2024');
-                setTxt('sel-insight', 'Separates the four upland hydrological sub-basins (Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Z5).');
-                setTxt('sel-management', '<strong>Scientific Distinction:</strong> Catchment rainfall and shallow soil moisture (0–7 cm) are aggregated across Z1–Z4, the SAR inundation series is measured over the Z3–Z4 floodplain, and estuarine spectral NDTI is evaluated strictly over open water in Z5.', true);
-
-                setTxt('val-rain', fmtNum(meanRain, 0, ' mm'));
-                setTxt('val-flood', fmtNum(totFlood, 1, ' km²'));
-                setTxt('sub-flood', `Z3–Z4 floodplain, Sep–Oct 2022 · Perm. water: ${fmtNum(totPerm, 1, ' km²')}`);
-                setTxt('val-ndti', fmtNum(estuaryUnit ? estuaryUnit.properties.sim_ndti : null, 3));
-                setTxt('sub-ndti', 'Z5 Estuary open water');
-                setTxt('val-sm', fmtNum(meanSm, 3, ' m³/m³'));
-                setTxt('val-ndvi', fmtNum(meanNdvi, 3));
-                setTxt('val-slope', fmtNum(meanSlope, 2, '°'));
-                const z5Area = estuaryUnit && estuaryUnit.properties.zone_id === 'Z5' ? estuaryUnit.properties.area_km2 : null;
-                setTxt('sub-area', `Catchment: ${Math.round(totCatchmentArea).toLocaleString()} km²${z5Area ? ` (+${Math.round(z5Area).toLocaleString()} km² Z5)` : ''}`);
-                return;
-            }
-
-            const feat = STATE.features.find(f => f.properties.zone_id === STATE.selectedZone);
-            if (!feat) return;
-            const p = feat.properties;
-
-            setTxt('sel-eyebrow', `01 · ${p.unit_type} (Unit 0${p.order})`);
-            setTxt('sel-title', p.zone_name);
-            setTxt('sel-badge', p.regime);
-            setTxt('sel-insight', p.summary || '');
-            setTxt('sel-management', `<strong>Monitoring &amp; Management Focus:</strong> ${escHtml(p.management || '—')}`, true);
-
-            setTxt('val-rain', fmtNum(p.sim_rain, 0, ' mm'));
-            setTxt('val-flood', fmtNum(p.sim_flood, 1, ' km²'));
-            setTxt('sub-flood', SAR_UNRELIABLE.has(p.zone_id)
-                ? 'Unreliable here: dry-season artefacts'
-                : `Sep–Oct 2022 · Perm. water: ${fmtNum(p.perm_water_km2, 1, ' km²')}`);
-            setTxt('val-ndti', fmtNum(p.sim_ndti, 3));
-            setTxt('sub-ndti', p.zone_id === 'Z5' ? 'Verified estuarine water' : 'Channel water pixels only');
-            setTxt('val-sm', fmtNum(p.shallow_sm_m3m3, 3, ' m³/m³'));
-            setTxt('val-ndvi', fmtNum(p.ndvi, 3));
-            setTxt('val-slope', fmtNum(p.slope_deg, 2, '°'));
-            setTxt('sub-area', `Area: ${Math.round(p.area_km2 || 0).toLocaleString()} km²`);
-        }
-
-        function initHydroChart() {
-            const ctx = document.getElementById('cascadeChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'line',
+    function buildCharts() {
+        if (!STATE.series.length || $('panel-series').hidden) return;
+        const rows = seriesRows();
+        const labels = rows.map(r => r.ym);
+        const ink3 = css('--ink-3'), grid = css('--grid'), base = css('--baseline');
+        const series = css('--series'), surface = css('--surface-raised');
+        const specs = [
+            { id: 'chart-rain', key: 'rain', type: 'bar', digits: 0, unit: ' mm' },
+            { id: 'chart-sar', key: 'sar', type: 'line', digits: 2, unit: ' km²' },
+            { id: 'chart-dw', key: 'dw', type: 'line', digits: 1, unit: ' km²' },
+            { id: 'chart-ndti', key: 'ndti', type: 'line', digits: 3, unit: '' }
+        ];
+        specs.forEach((s, i) => {
+            const last = i === specs.length - 1;
+            if (charts[s.id]) charts[s.id].destroy();
+            charts[s.id] = new Chart($(s.id), {
+                type: s.type,
                 data: {
-                    labels: STATE.series.map(d => d.year_month),
-                    datasets: [
-                        {
-                            label: 'CHIRPS Rainfall (mm/mo)',
-                            data: [],
-                            type: 'bar',
-                            backgroundColor: 'rgba(13, 148, 136, 0.22)',
-                            borderColor: '#0D9488',
-                            borderWidth: 1,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'SAR Inundation Proxy (km²)',
-                            data: [],
-                            type: 'line',
-                            borderColor: '#09090B',
-                            backgroundColor: '#09090B',
-                            borderWidth: 2.2,
-                            pointRadius: 1.5,
-                            spanGaps: false,
-                            tension: 0.25,
-                            yAxisID: 'y1'
-                        },
-                        {
-                            label: 'Estuarine NDTI (gaps = cloudy)',
-                            data: [],
-                            type: 'line',
-                            borderColor: '#0284C7',
-                            borderDash: [4, 3],
-                            borderWidth: 1.8,
-                            pointRadius: 2,
-                            spanGaps: false,
-                            tension: 0.25,
-                            yAxisID: 'y2'
-                        },
-                        {
-                            label: 'Dynamic World flooding (km², optical check)',
-                            data: [],
-                            type: 'line',
-                            borderColor: '#16A34A',
-                            borderDash: [2, 3],
-                            borderWidth: 1.6,
-                            pointRadius: 1.5,
-                            spanGaps: false,
-                            tension: 0.25,
-                            yAxisID: 'y1'
-                        }
-                    ]
+                    labels,
+                    datasets: [{
+                        data: rows.map(r => r[s.key]),
+                        backgroundColor: series,
+                        borderColor: series,
+                        borderWidth: s.type === 'bar' ? 0 : 2,
+                        borderRadius: s.type === 'bar' ? { topLeft: 3, topRight: 3 } : 0,
+                        barPercentage: 0.78,
+                        categoryPercentage: 0.92,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        pointHoverBorderWidth: 2,
+                        pointHoverBorderColor: surface,
+                        pointHoverBackgroundColor: series,
+                        spanGaps: false,
+                        tension: 0.2
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false,
                     interaction: { mode: 'index', intersect: false },
+                    layout: { padding: { top: 4, right: 4 } },
+                    onHover: (evt, els, chart) => {
+                        const idx = Math.round(chart.scales.x.getValueForPixel(evt.x));
+                        if (idx >= 0 && idx < labels.length && chart.$syncIndex !== idx) syncHover(idx);
+                    },
                     plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { font: { family: 'Satoshi', size: 11, weight: '700' }, usePointStyle: true }
+                        legend: { display: false },
+                        tooltip: {
+                            displayColors: false,
+                            backgroundColor: css('--ink'),
+                            titleColor: css('--surface'),
+                            bodyColor: css('--surface'),
+                            titleFont: { family: 'Satoshi, system-ui', weight: '700', size: 12 },
+                            bodyFont: { family: 'Satoshi, system-ui', size: 12 },
+                            padding: 8,
+                            caretSize: 0,
+                            callbacks: {
+                                title: items => items.length ? monthName(items[0].label) : '',
+                                label: item => isNum(item.raw) ? `${Number(item.raw).toFixed(s.digits)}${s.unit}` : 'No data'
+                            }
                         }
                     },
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { maxTicksLimit: 12, font: { family: 'Satoshi', size: 10 } }
+                            border: { color: base },
+                            ticks: {
+                                display: last,
+                                color: ink3,
+                                font: { family: 'Satoshi, system-ui', size: 11 },
+                                autoSkip: false,
+                                maxRotation: 0,
+                                callback: (val, idx) => labels[idx] && labels[idx].endsWith('-01') ? labels[idx].slice(0, 4) : ''
+                            }
                         },
                         y: {
-                            position: 'left',
-                            title: { display: true, text: 'Rainfall (mm/mo)', font: { family: 'Satoshi', size: 10, weight: '700' } }
-                        },
-                        y1: {
-                            position: 'right',
-                            grid: { drawOnChartArea: false },
-                            title: { display: true, text: 'SAR Proxy (km²)', font: { family: 'Satoshi', size: 10, weight: '700' } }
-                        },
-                        y2: {
-                            position: 'right',
-                            grid: { drawOnChartArea: false },
-                            ticks: { color: '#0284C7' },
-                            title: { display: true, text: 'Estuary NDTI', color: '#0284C7', font: { family: 'Satoshi', size: 10, weight: '700' } }
+                            beginAtZero: s.key !== 'ndti',
+                            grid: { color: grid, drawTicks: false },
+                            border: { display: false },
+                            ticks: { color: ink3, font: { family: 'Satoshi, system-ui', size: 10.5 }, maxTicksLimit: 3, padding: 6 },
+                            afterFit: sc => { sc.width = 44; }
                         }
                     }
-                }
+                },
+                plugins: [crosshair]
             });
+            $(s.id).onmouseleave = () => syncHover(null);
+        });
+    }
+
+    // ================= Statistics =================
+    const EXPLAIN = {
+        rain: 'Catchment rainfall in month t against floodplain radar inundation in month t + lag.',
+        sm: 'ERA5-Land soil water (top 7 cm) in month t against floodplain radar inundation in month t + lag.',
+        reservoir: 'Rain against inundation after removing the linear effect of Oyan Reservoir water area, a proxy for dam regulation.',
+        dam: 'Rain against inundation after removing the effect of recorded Oyan Dam releases.',
+        ndti: 'Floodplain radar inundation against lagoon turbidity in the same month.',
+        dw: 'Radar inundation index against Google Dynamic World water and flooded vegetation over the same floodplain. Agreement would support the radar index.'
+    };
+
+    function renderDiagnostics() {
+        const tbody = $('diag-tbody');
+        const d = STATE.diagnostics;
+        const empty = msg => { tbody.innerHTML = `<tr><td colspan="6" class="fine" style="text-align:center;padding:16px">${msg}</td></tr>`; };
+        $('diag-explain').textContent = EXPLAIN[STATE.diagPair] || '';
+        $('robustness').innerHTML = '';
+        if (!d) return empty('Diagnostics unavailable.');
+
+        const single = STATE.diagPair === 'ndti' || STATE.diagPair === 'dw';
+        $('diag-p-head').textContent = single ? 'Autocorr.-adj. p' : 'FDR p';
+        let entries = [];
+        if (STATE.diagPair === 'reservoir' || STATE.diagPair === 'dam') {
+            const block = STATE.diagPair === 'dam' ? d.rain_to_sar_inundation_controlling_for_oyan_dam_releases : d.rain_to_sar_inundation_controlling_for_oyan_reservoir;
+            if (!block) return empty('Not in the diagnostics. Re-run src/02_compile_observatory.py.');
+            if (block.status !== 'VALID') return empty(escHtml(block.reason || block.status));
+            const lags = block[STATE.diagMode] || {};
+            entries = Object.keys(lags).map(k => [k, lags[k]]);
+        } else if (single) {
+            const block = STATE.diagPair === 'dw' ? d.sar_validation_against_dynamic_world : d.sar_inundation_to_estuary_ndti;
+            if (!block) return empty('Not in the diagnostics.');
+            if (block.status === 'NOT_AVAILABLE') return empty(escHtml(block.reason));
+            if (block[STATE.diagMode]) entries = [['lag_0_month', block[STATE.diagMode]]];
+        } else {
+            const prefix = STATE.diagPair === 'sm' ? 'soil_moisture_to_sar_inundation_lags_' : 'rain_to_sar_inundation_lags_';
+            const lags = d[prefix + STATE.diagMode] || {};
+            entries = Object.keys(lags).map(k => [k, lags[k]]);
         }
+        if (!entries.length) return empty('No results for this selection.');
 
-        function updateHydroChart(shockFactor, floodFactor, ndtiFactor) {
-            if (!chartInstance) return;
-            const zone = STATE.selectedZone;
-            const unitRows = zone !== 'ALL' && zone !== 'Z5' ? STATE.unitSeries[zone] : null;
-            const byMonth = {};
-            (unitRows || []).forEach(r => { byMonth[r.year_month] = r; });
-            const upland = STATE.series.map(d => unitRows ? (byMonth[d.year_month] || { rain_mm: null, sar_flood_km2: null }) : d);
+        tbody.innerHTML = entries.map(([k, it]) => {
+            const lag = k.replace('lag_', '').replace('_month', '');
+            const label = lag === '0' ? 'Same month' : lag === '1' ? '+1 month' : `+${lag} months`;
+            if (it.status && it.status !== 'VALID') return `<tr><td>${label}</td><td>${it.n_pairs ?? '—'}</td><td colspan="4" class="fine">${escHtml(it.status)}</td></tr>`;
+            const p = single ? it.p_value_autocorr_adj : it.p_value_bh_fdr;
+            const ci = it.pearson_ci95 && isNum(it.pearson_ci95[0]) ? `<span class="sub">${fmt(it.pearson_ci95[0], 2)} to ${fmt(it.pearson_ci95[1], 2)}</span>` : '';
+            return `<tr><td><strong>${label}</strong></td><td>${it.n_pairs ?? '—'}</td><td>${fmt(it.n_effective, 1)}</td><td>${fmt(it.spearman_rho, 2)}</td><td><strong>${fmt(it.pearson_r, 2)}</strong>${ci}</td><td><span class="mono">${fmtP(p)}</span>${isNum(p) && p < 0.05 ? '<span class="sub">p &lt; 0.05</span>' : ''}</td></tr>`;
+        }).join('');
 
-            if (unitRows) {
-                setTxt('chart-note', `Rainfall and SAR proxy for ${zone} only; estuary NDTI is always Z5 open water.`);
-            } else if (zone !== 'ALL' && zone !== 'Z5') {
-                setTxt('chart-note', `Per-unit monthly series are not in docs/data yet, so this shows the catchment-wide series, not ${zone}. Export ogun_unit_monthly_timeseries from the Earth Engine script to enable per-unit charts.`);
-            } else {
-                setTxt('chart-note', 'Catchment-wide monthly series (Z1–Z4 rainfall; SAR proxy over the Z3–Z4 floodplain; Z5 estuary NDTI).');
-            }
-
-            chartInstance.data.labels = STATE.series.map(d => d.year_month);
-            chartInstance.data.datasets[0].data = upland.map(d => d.rain_mm !== null ? +(d.rain_mm * shockFactor).toFixed(1) : null);
-            chartInstance.data.datasets[1].data = upland.map(d => d.sar_flood_km2 !== null ? +(d.sar_flood_km2 * floodFactor).toFixed(2) : null);
-            chartInstance.data.datasets[3].data = upland.map(d => d.dw_flood_km2 !== null && d.dw_flood_km2 !== undefined ? +d.dw_flood_km2.toFixed(2) : null);
-            chartInstance.data.datasets[2].data = STATE.series.map(d => d.estuary_ndti !== null ? +(d.estuary_ndti * ndtiFactor).toFixed(4) : null);
-            chartInstance.update('none');
+        const rb = d.robustness && d.robustness.rain_to_sar_lag_0_deseasonalized;
+        if (STATE.diagPair === 'rain' && STATE.diagMode === 'deseasonalized' && rb && rb.status === 'VALID') {
+            const w = rb.without_most_influential_month || {};
+            $('robustness').innerHTML = `<p class="note"><strong>Robustness (same month).</strong> Leaving out any single month gives r from ${fmt(rb.leave_one_out_pearson_r_min, 2)} to ${fmt(rb.leave_one_out_pearson_r_max, 2)}. Without ${escHtml(monthName(rb.most_influential_month))}, the most influential month, r = ${fmt(w.pearson_r, 2)} (ρ = ${fmt(w.spearman_rho, 2)}, p = ${fmtP(w.p_value_autocorr_adj)}).</p>`;
         }
+    }
 
-        function renderBenchmark() {
-            const fA = STATE.features.find(f => f.properties.zone_id === STATE.compA) || STATE.features[0];
-            const fB = STATE.features.find(f => f.properties.zone_id === STATE.compB) || STATE.features[3];
-            if (!fA || !fB) return;
-            const a = fA.properties, b = fB.properties;
+    $('diag-pair').addEventListener('change', e => { STATE.diagPair = e.target.value; renderDiagnostics(); });
+    document.querySelectorAll('[data-mode]').forEach(btn => btn.addEventListener('click', () => {
+        STATE.diagMode = btn.dataset.mode;
+        document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-checked', String(b === btn)));
+        renderDiagnostics();
+    }));
 
-            setTxt('th-comp-a', a.zone_name);
-            setTxt('th-comp-b', b.zone_name);
-
-            function diffStr(va, vb, dec, unit) {
-                if (va === null || vb === null || Number.isNaN(va) || Number.isNaN(vb)) return 'N/A';
-                const d = va - vb;
-                return `${d >= 0 ? '+' : ''}${d.toFixed(dec)}${unit}`;
-            }
-
-            const rows = [
-                ['SAR Inundation Proxy (Sep–Oct 2022)', sarTxt(a), sarTxt(b), diffStr(sarVal(a), sarVal(b), 1, ' km²')],
-                ['Permanent Water (JRC)', fmtNum(a.perm_water_km2, 1, ' km²'), fmtNum(b.perm_water_km2, 1, ' km²'), diffStr(a.perm_water_km2, b.perm_water_km2, 1, ' km²')],
-                ['Annual Rainfall', fmtNum(a.sim_rain, 0, ' mm'), fmtNum(b.sim_rain, 0, ' mm'), diffStr(a.sim_rain, b.sim_rain, 0, ' mm')],
-                ['Spectral NDTI', fmtNum(a.sim_ndti, 3), fmtNum(b.sim_ndti, 3), diffStr(a.sim_ndti, b.sim_ndti, 3, '')],
-                ['Shallow Soil Water (0–7cm)', fmtNum(a.shallow_sm_m3m3, 3), fmtNum(b.shallow_sm_m3m3, 3), diffStr(a.shallow_sm_m3m3, b.shallow_sm_m3m3, 3, '')],
-                ['Mean Slope (GLO-30)', fmtNum(a.slope_deg, 2, '°'), fmtNum(b.slope_deg, 2, '°'), diffStr(a.slope_deg, b.slope_deg, 2, '°')]
-            ];
-
-            setTxt('comp-tbody', rows.map(([m, va, vb, d]) =>
-                `<tr><td>${m}</td><td><strong>${va}</strong></td><td><strong>${vb}</strong></td><td><span class="diff-badge mono">${d}</span></td></tr>`
-            ).join(''), true);
-        }
-
-        function renderCascadeTable() {
-            const tbody = document.getElementById('cascade-tbody');
-            tbody.innerHTML = STATE.features.map(f => {
-                const p = f.properties;
-                const active = STATE.selectedZone === p.zone_id ? 'is-active-row' : '';
-                return `
-                    <tr class="${active}" data-zone="${p.zone_id}">
-                        <td><span class="swatch-dot" style="background:${p._color};display:inline-block;margin-right:6px;vertical-align:middle;"></span><strong>0${p.order} · ${escHtml(p.zone_name)}</strong></td>
-                        <td><span class="mono" style="font-size:11px;">${escHtml(p.unit_type)}</span></td>
-                        <td>${Math.round(p.area_km2 || 0).toLocaleString()}</td>
-                        <td>${fmtNum(p.sim_rain, 0)}</td>
-                        <td><strong>${sarTxt(p)}</strong></td>
-                        <td>${fmtNum(p.sim_ndti, 3)}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            tbody.querySelectorAll('tr').forEach(tr => {
-                tr.addEventListener('click', () => selectZone(tr.getAttribute('data-zone')));
-            });
-        }
-
-        // Controls & Listeners
-        document.getElementById('zone-select').addEventListener('change', e => selectZone(e.target.value));
-        document.getElementById('layer-select').addEventListener('change', e => {
-            STATE.layer = e.target.value;
-            writeHashState();
-            styleMapAndLegend();
-        });
-        document.getElementById('basemap-select').addEventListener('change', e => {
-            const next = BASEMAPS[e.target.value];
-            if (next && next !== activeBasemap) {
-                map.removeLayer(activeBasemap);
-                activeBasemap = next.addTo(map);
-                if (geojsonLayer) geojsonLayer.bringToFront();
-                if (riverStemLayer) riverStemLayer.bringToFront();
-            }
-        });
-        document.getElementById('comp-a').addEventListener('change', e => { STATE.compA = e.target.value; renderBenchmark(); });
-        document.getElementById('comp-b').addEventListener('change', e => { STATE.compB = e.target.value; renderBenchmark(); });
-        document.getElementById('diag-pair').addEventListener('change', e => { STATE.diagPair = e.target.value; renderDiagnosticsTable(); });
-        document.getElementById('diag-mode').addEventListener('change', e => { STATE.diagMode = e.target.value; renderDiagnosticsTable(); });
-
-        document.getElementById('btn-labels').addEventListener('click', e => {
-            STATE.showLabels = !STATE.showLabels;
-            e.currentTarget.classList.toggle('active', STATE.showLabels);
-            styleMapAndLegend();
-        });
-        document.getElementById('btn-reset').addEventListener('click', () => {
-            STATE.selectedZone = 'ALL';
-            document.getElementById('zone-select').value = 'ALL';
-            if (geojsonLayer) map.flyToBounds(geojsonLayer.getBounds(), { padding: [24, 24], duration: 0.6 });
-            updateEverything();
-        });
-
-        function downloadBlob(content, filename, mime) {
-            const blob = new Blob([content], { type: mime });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = filename;
-            document.body.appendChild(a); a.click();
-            document.body.removeChild(a); URL.revokeObjectURL(url);
-        }
-
-        document.getElementById('btn-export-csv').addEventListener('click', () => {
-            // Export the source CSV unmodified, including observation-count columns
-            if (!STATE.csvText) return;
-            downloadBlob(STATE.csvText, 'ogun_catchment_timeseries_export.csv', 'text/csv');
-        });
-
-        document.getElementById('btn-export-geojson').addEventListener('click', () => {
-            if (!STATE.geojson) return;
-            downloadBlob(JSON.stringify(STATE.geojson, null, 2), 'ogun_analytical_units_export.geojson', 'application/geo+json');
-        });
-
-        const methodsModal = document.getElementById('methods-modal');
-        document.getElementById('btn-methods').addEventListener('click', () => methodsModal.classList.remove('is-hidden'));
-        document.getElementById('btn-close-methods').addEventListener('click', () => methodsModal.classList.add('is-hidden'));
-        methodsModal.addEventListener('click', e => { if (e.target === methodsModal) methodsModal.classList.add('is-hidden'); });
-        document.addEventListener('keydown', e => {
-            if (e.key !== 'Escape') return;
-            if (!methodsModal.classList.contains('is-hidden')) methodsModal.classList.add('is-hidden');
-            if (!tourLayer.classList.contains('is-hidden')) closeTour();
-            tipEl.classList.add('is-hidden');
-        });
-
-        const tipEl = document.getElementById('floating-tip');
-        document.querySelectorAll('.tip-btn').forEach(btn => {
-            const show = () => {
-                const r = btn.getBoundingClientRect();
-                tipEl.innerText = btn.getAttribute('data-tip');
-                tipEl.classList.remove('is-hidden');
-                tipEl.style.top = `${Math.max(8, r.top - tipEl.offsetHeight - 8)}px`;
-                tipEl.style.left = `${Math.min(window.innerWidth - 270, Math.max(8, r.left - 110))}px`;
-            };
-            const hide = () => tipEl.classList.add('is-hidden');
-            btn.setAttribute('aria-label', btn.getAttribute('data-tip'));
-            btn.addEventListener('mouseenter', show);
-            btn.addEventListener('mouseleave', hide);
-            btn.addEventListener('focus', show);
-            btn.addEventListener('blur', hide);
-            btn.addEventListener('click', e => {
-                e.stopPropagation();
-                if (tipEl.classList.contains('is-hidden')) show(); else hide();
-            });
-        });
-
-        // 6-Step Clean Walkthrough Guide
-        const TOUR_STEPS = [
-            {
-                target: '#map-stage',
-                title: '1. Catchment Sub-Basins (Z1–Z4) vs. Estuary (Z5)',
-                desc: 'Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L9) from the downstream estuarine receiving water body in the northwest Lagos Lagoon.',
-                hint: 'Click any polygon on the map to inspect its specific unit type, permanent water area, and seasonal metrics.'
-            },
-            {
-                target: '#tour-topbar',
-                title: '2. Multi-Sensor Layer & Unit Controls',
-                desc: 'Switch the active map layer between Sentinel-1 SAR Inundation Proxy, CHIRPS Annual Rainfall, Sentinel-2 Spectral Turbidity (NDTI), and 2 km Riparian Canopy (NDVI).',
-                hint: 'Use the "Methods & Audit" button to inspect the sensor preprocessing equations and limitations.'
-            },
-            {
-                target: '#tour-legend',
-                title: '3. External Sensor Legend Dock',
-                desc: 'Positioned below the map canvas so floating cards never obscure the river corridor, reporting exact sensor thresholds (Slope < 5°, JRC < 80%).',
-                hint: 'Updates quantile ticks and physical classifications automatically when you switch layers.'
-            },
-            {
-                target: '#card-unit',
-                title: '4. Unit Diagnostics & Permanent Water Separation',
-                desc: 'Reports permanent surface water (JRC >= 80%) separately from seasonal SAR low-backscatter inundation proxy areas, and labels ERA5-Land accurately as shallow (0–7 cm) soil moisture.',
-                hint: 'Hover over any (?) badge to read the exact sensor resolution and physical definition.'
-            },
-            {
-                target: '#card-hydrograph',
-                title: '5. 72-Month Time Series',
-                desc: 'Displays valid observation counts per sensor and preserves cloudy months as gaps (never substituting 0). Select a unit to see its own rainfall and SAR series.',
-                hint: 'The dashed green line is the independent Dynamic World (Sentinel-2) flooding check.'
-            },
-            {
-                target: '#card-benchmark',
-                title: '6. Statistical Lag Audit & Reproducible Exports',
-                desc: 'Inspect the Bretherton autocorrelation-adjusted sample sizes (Eff. n), Spearman rho, deseasonalized Pearson r, and FDR p-values across lags 0, 1, and 2 months.',
-                hint: 'Export the full 72-month CSV or GeoJSON boundaries anytime from the top summary bar.'
-            }
+    // ================= Compare =================
+    function renderCompare() {
+        const a = featureById(STATE.compA), b = featureById(STATE.compB);
+        if (!a || !b) return;
+        const pa = a.properties, pb = b.properties;
+        $('th-comp-a').textContent = `${pa.zone_id} · ${shortName(pa)}`;
+        $('th-comp-b').textContent = `${pb.zone_id} · ${shortName(pb)}`;
+        const diff = (x, y, d, u) => isNum(x) && isNum(y)
+            ? `${x - y >= 0 ? '+' : '−'}${Math.abs(x - y).toLocaleString('en-GB', { minimumFractionDigits: d, maximumFractionDigits: d })}${u}` : '—';
+        const sar = p => SAR_UNRELIABLE.has(p.zone_id) ? null : p.sar_inundation_km2;
+        const sarCell = p => SAR_UNRELIABLE.has(p.zone_id) ? `${fmt(p.sar_inundation_km2, 1)} km²<span class="sub">not reliable</span>` : `${fmt(p.sar_inundation_km2, 1)} km²`;
+        const rows = [
+            ['Area', `${fmtInt(pa.area_km2)} km²`, `${fmtInt(pb.area_km2)} km²`, diff(pa.area_km2, pb.area_km2, 0, ' km²')],
+            ['Mean annual rainfall', `${fmtInt(pa.rain_mm)} mm`, `${fmtInt(pb.rain_mm)} mm`, diff(pa.rain_mm, pb.rain_mm, 0, ' mm')],
+            ['Floodplain inundation', sarCell(pa), sarCell(pb), diff(sar(pa), sar(pb), 1, ' km²')],
+            ['Permanent water', `${fmt(pa.perm_water_km2, 1)} km²`, `${fmt(pb.perm_water_km2, 1)} km²`, diff(pa.perm_water_km2, pb.perm_water_km2, 1, ' km²')],
+            ['Turbidity (NDTI)', fmt(pa.ndti, 3), fmt(pb.ndti, 3), diff(pa.ndti, pb.ndti, 3, '')],
+            ['Soil water (top 7 cm)', fmt(pa.shallow_sm_m3m3, 3), fmt(pb.shallow_sm_m3m3, 3), diff(pa.shallow_sm_m3m3, pb.shallow_sm_m3m3, 3, '')],
+            ['Riparian NDVI', fmt(pa.ndvi, 2), fmt(pb.ndvi, 2), diff(pa.ndvi, pb.ndvi, 2, '')],
+            ['Mean slope', `${fmt(pa.slope_deg, 1)}°`, `${fmt(pb.slope_deg, 1)}°`, diff(pa.slope_deg, pb.slope_deg, 1, '°')]
         ];
+        $('comp-tbody').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="mono">${r[3]}</td></tr>`).join('');
 
-        let tourIdx = 0;
-        const tourLayer = document.getElementById('tour-layer');
-        const tourSpot = document.getElementById('tour-spotlight');
-        const tourCard = document.getElementById('tour-card');
-
-        function positionTourStep() {
-            const step = TOUR_STEPS[tourIdx];
-            const el = document.querySelector(step.target);
-            if (!el) return;
-            if (el.closest('#sidebar-scroll')) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            setTimeout(() => {
-                const r = el.getBoundingClientRect();
-                const pad = 6;
-                tourSpot.style.top = `${Math.max(4, r.top - pad)}px`;
-                tourSpot.style.left = `${Math.max(4, r.left - pad)}px`;
-                tourSpot.style.width = `${Math.min(window.innerWidth - 8, r.width + pad * 2)}px`;
-                tourSpot.style.height = `${Math.min(window.innerHeight - 8, r.height + pad * 2)}px`;
-
-                const pct = ((tourIdx + 1) / TOUR_STEPS.length) * 100;
-                document.getElementById('tour-progress-fill').style.width = `${pct}%`;
-                setTxt('tour-step-num', `Walkthrough · Step ${tourIdx + 1} of ${TOUR_STEPS.length}`);
-                setTxt('tour-title', step.title);
-                setTxt('tour-desc', step.desc);
-                setTxt('tour-action-hint', step.hint);
-                setTxt('tour-dots', TOUR_STEPS.map((_, i) => `<span class="tour-dot ${i === tourIdx ? 'active' : ''}"></span>`).join(''), true);
-                document.getElementById('tour-prev').style.visibility = tourIdx === 0 ? 'hidden' : 'visible';
-                setTxt('tour-next', tourIdx === TOUR_STEPS.length - 1 ? 'Finish ✓' : 'Next →');
-
-                const cardW = 375, cardH = tourCard.offsetHeight || 240;
-                let leftPos = r.left < 420 ? r.right - cardW - 20 : r.left - cardW - 18;
-                if (step.target === '#map-stage') leftPos = r.left + 28;
-                if (step.target === '#tour-topbar') leftPos = window.innerWidth - cardW - 28;
-                let topPos = Math.max(16, Math.min(window.innerHeight - cardH - 16, r.top + 18));
-                if (step.target === '#tour-topbar') topPos = r.bottom + 14;
-                if (step.target === '#tour-legend') topPos = Math.max(16, r.top - cardH - 14);
-
-                leftPos = Math.max(16, Math.min(window.innerWidth - cardW - 16, leftPos));
-                tourCard.style.top = `${topPos}px`;
-                tourCard.style.left = `${leftPos}px`;
-            }, 200);
-        }
-
-        function openTour() { tourIdx = 0; tourLayer.classList.remove('is-hidden'); positionTourStep(); }
-        function closeTour() {
-            tourLayer.classList.add('is-hidden');
-            try { localStorage.setItem('ogun_obs_tour_v5', '1'); } catch (e) {}
-        }
-        function initTourIfFirstVisit() {
-            try { if (!localStorage.getItem('ogun_obs_tour_v5')) setTimeout(openTour, 350); } catch (e) {}
-        }
-
-        document.getElementById('btn-tour').addEventListener('click', openTour);
-        document.getElementById('tour-close').addEventListener('click', closeTour);
-        document.getElementById('tour-prev').addEventListener('click', () => { if (tourIdx > 0) { tourIdx--; positionTourStep(); } });
-        document.getElementById('tour-next').addEventListener('click', () => {
-            if (tourIdx < TOUR_STEPS.length - 1) { tourIdx++; positionTourStep(); } else closeTour();
+        $('units-tbody').innerHTML = STATE.features.map(f => {
+            const p = f.properties;
+            return `<tr class="is-clickable ${STATE.zone === p.zone_id ? 'is-active' : ''}" data-zone="${escHtml(p.zone_id)}" tabindex="0"><td><strong>${escHtml(p.zone_id)}</strong> ${escHtml(shortName(p))}<span class="sub">${escHtml(p.unit_type)}</span></td><td>${fmtInt(p.area_km2)} km²</td><td>${fmtInt(p.rain_mm)} mm</td><td>${sarCell(p)}</td><td>${fmt(p.ndti, 3)}</td></tr>`;
+        }).join('');
+        $('units-tbody').querySelectorAll('tr').forEach(tr => {
+            const go = () => { selectZone(tr.dataset.zone); setTab('unit'); };
+            tr.addEventListener('click', go);
+            tr.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
         });
-    })();
-    </script>
+    }
+
+    $('comp-a').addEventListener('change', e => { STATE.compA = e.target.value; renderCompare(); });
+    $('comp-b').addEventListener('change', e => { STATE.compB = e.target.value; renderCompare(); });
+
+    // ================= Provenance =================
+    function renderProvenance() {
+        const prov = STATE.diagnostics && STATE.diagnostics.provenance;
+        const chip = $('data-chip');
+        const demo = !prov || prov.is_demonstration_data !== false || prov.status !== 'VERIFIED_GEE_EXPORT';
+        $('provenance-banner').hidden = !demo;
+        if (!prov) $('provenance-text').textContent = 'The statistical diagnostics could not be loaded, so data provenance cannot be confirmed.';
+        else if (demo && prov.warning) $('provenance-text').textContent = prov.warning;
+        chip.classList.toggle('is-good', !demo);
+        chip.classList.toggle('is-warning', demo);
+        chip.querySelector('svg').innerHTML = demo
+            ? '<circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5h.01"/>'
+            : '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>';
+        const ver = prov && prov.gee_script_version ? ` v${prov.gee_script_version}` : '';
+        $('data-chip-text').textContent = demo ? 'Demonstration data' : `Earth Engine export${ver}`;
+        chip.title = prov && prov.gee_export_utc ? `Exported ${prov.gee_export_utc}` : '';
+    }
+
+    // ================= Dialogs & tips =================
+    const openDialog = id => { const d = $(id); if (d && !d.open) d.showModal(); };
+    $('btn-methods').addEventListener('click', () => openDialog('methods-dialog'));
+    $('btn-about').addEventListener('click', () => openDialog('about-dialog'));
+
+    document.addEventListener('click', e => {
+        const opener = e.target.closest('[data-open]');
+        if (opener) { e.preventDefault(); openDialog(opener.dataset.open); }
+        const closer = e.target.closest('[data-close]');
+        if (closer) closer.closest('dialog').close();
+        if (e.target.tagName === 'DIALOG') e.target.close();
+        const menu = $('download-menu');
+        if (menu.open && !e.target.closest('#download-menu')) menu.open = false;
+        const info = e.target.closest('.info');
+        if (info) { tipEl.hidden ? showTip(info) : hideTip(); }
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { $('download-menu').open = false; hideTip(); }
+    });
+
+    const tipEl = $('floating-tip');
+    function showTip(btn) {
+        tipEl.textContent = btn.dataset.tip;
+        tipEl.hidden = false;
+        const r = btn.getBoundingClientRect();
+        const w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+        tipEl.style.left = `${Math.min(window.innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2))}px`;
+        tipEl.style.top = `${r.top - h - 8 < 8 ? r.bottom + 8 : r.top - h - 8}px`;
+    }
+    function hideTip() { tipEl.hidden = true; }
+    document.addEventListener('mouseover', e => { const b = e.target.closest('.info'); if (b) showTip(b); });
+    document.addEventListener('mouseout', e => { if (e.target.closest('.info')) hideTip(); });
+    document.addEventListener('focusin', e => { const b = e.target.closest('.info'); if (b) showTip(b); });
+    document.addEventListener('focusout', e => { if (e.target.closest('.info')) hideTip(); });
+    $('tab-panels').addEventListener('scroll', hideTip, { passive: true });
+
+    // ================= Shareable links =================
+    function writeHash() {
+        const p = new URLSearchParams();
+        if (STATE.zone !== 'ALL') p.set('zone', STATE.zone);
+        if (STATE.layer !== 'flood') p.set('layer', STATE.layer);
+        if (STATE.tab !== 'overview') p.set('tab', STATE.tab);
+        const h = p.toString();
+        try { history.replaceState(null, '', h ? `#${h}` : location.pathname + location.search); } catch (e) {}
+    }
+
+    function readHash() {
+        const p = new URLSearchParams(location.hash.slice(1));
+        const zone = p.get('zone'), layer = p.get('layer'), tab = p.get('tab');
+        if (zone && featureById(zone)) { STATE.zone = zone; STATE.compA = zone; }
+        if (layer && LAYERS[layer]) {
+            STATE.layer = layer;
+            document.querySelectorAll('.layer-switch .seg').forEach(b => b.setAttribute('aria-checked', String(b.dataset.layer === layer)));
+        }
+        if (tab && TABS.includes(tab)) STATE.tab = tab;
+    }
+
+    // ================= Load =================
+    function fail(title, msg) {
+        $('map-error').hidden = false;
+        $('err-title').textContent = title;
+        $('err-desc').textContent = msg;
+        $('data-chip-text').textContent = 'Data unavailable';
+    }
+
+    setBasemap('canvas');
+
+    Promise.all([
+        fetch('data/ogun_subbasins.geojson').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+        fetch('data/ogun_monthly_timeseries.csv').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); }),
+        fetch('data/cascade_diagnostics.json').then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch('data/ogun_unit_monthly_timeseries.csv').then(r => r.ok ? r.text() : '').catch(() => '')
+    ]).then(([geojson, csvText, diagnostics, unitCsv]) => {
+        if (!geojson || !Array.isArray(geojson.features) || !geojson.features.length) return fail('Unit boundaries missing', 'docs/data/ogun_subbasins.geojson contains no features.');
+        const series = parseCsv(csvText);
+        if (!series.length) return fail('Time series missing', 'docs/data/ogun_monthly_timeseries.csv could not be parsed.');
+
+        geojson.features.sort((a, b) => (Number(a.properties.order) || 0) - (Number(b.properties.order) || 0));
+        geojson.features.forEach(f => {
+            const p = f.properties;
+            ['area_km2', 'rain_mm', 'sar_inundation_km2', 'perm_water_km2', 'ndti', 'ndvi', 'shallow_sm_m3m3', 'slope_deg'].forEach(k => { p[k] = num(p[k]); });
+        });
+        STATE.features = geojson.features;
+        STATE.series = series;
+        STATE.diagnostics = diagnostics;
+        STATE.unitSeries = {};
+        if (unitCsv) parseCsv(unitCsv).forEach(r => { if (r.zone_id) (STATE.unitSeries[r.zone_id] = STATE.unitSeries[r.zone_id] || []).push(r); });
+
+        readHash();
+        const opts = STATE.features.map(f => `<option value="${escHtml(f.properties.zone_id)}">${escHtml(f.properties.zone_id)} · ${escHtml(shortName(f.properties))}</option>`).join('');
+        $('comp-a').innerHTML = opts;
+        $('comp-b').innerHTML = opts;
+        $('comp-a').value = STATE.compA;
+        $('comp-b').value = STATE.compB;
+
+        buildMap();
+        renderChips();
+        renderUnitList();
+        renderProvenance();
+        renderOverview();
+        renderDiagnostics();
+        setTab(STATE.tab);
+        selectZone(STATE.zone, { fly: false });
+        requestAnimationFrame(() => { if (STATE.zone === 'ALL') fitAll(false); else selectZone(STATE.zone); });
+    }).catch(err => fail('Data could not be loaded', `Failed to load files from docs/data/ (${err.message}).`));
+})();
+</script>
 </body>
 </html>
