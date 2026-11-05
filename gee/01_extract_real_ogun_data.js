@@ -69,11 +69,11 @@ var estuaryRawBox = ee.Geometry.Polygon([
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.0.0';
+var SCRIPT_VERSION = '2.0.1';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
-  var areaKm2 = geom.area(10).divide(1e6);
+  var areaKm2 = geom.area(100).divide(1e6);
   return ee.Feature(geom, {
     'zone_id': id,
     'order': order,
@@ -126,7 +126,9 @@ var analyticalUnits = ee.FeatureCollection([
 
 var fullStudyGeom = analyticalUnits.geometry().dissolve();
 var ogunRivers = rivers.filterBounds(fullStudyGeom).filter(ee.Filter.gte('ORD_STRA', 3));
-var riparianCorridorGeom = ogunRivers.geometry().buffer(2000).intersection(fullStudyGeom, 30);
+// 2 km riparian corridor as a raster distance mask (a vector buffer of the whole
+// river network exceeds Earth Engine's memory limit).
+var riparianMask = ogunRivers.distance(2000).lte(2000);
 
 Map.centerObject(fullStudyGeom, 8);
 Map.addLayer(analyticalUnits, {}, 'Audited Hydrological & Estuarine Units');
@@ -218,34 +220,37 @@ var s2MultiYear = s2Processed.median();
 
 var enrichedUnits = analyticalUnits.map(function(feat) {
   var geom = feat.geometry();
-  var riparianSub = geom.intersection(riparianCorridorGeom, 30);
 
   var climateSlopeStats = meanAnnualRain.addBands([meanShallowSm, slope]).reduceRegion({
     reducer: ee.Reducer.mean(),
     geometry: geom,
     scale: 100,
-    maxPixels: 1e10
+    maxPixels: 1e10,
+    tileScale: 16
   });
 
   var waterStats = s2MultiYear.select('ndti').reduceRegion({
     reducer: ee.Reducer.mean(),
     geometry: geom,
     scale: 30,
-    maxPixels: 1e10
+    maxPixels: 1e10,
+    tileScale: 16
   });
 
-  var riparianStats = s2MultiYear.select('ndvi').reduceRegion({
+  var riparianStats = s2MultiYear.select('ndvi').updateMask(riparianMask).reduceRegion({
     reducer: ee.Reducer.mean(),
-    geometry: riparianSub,
+    geometry: geom,
     scale: 30,
-    maxPixels: 1e10
+    maxPixels: 1e10,
+    tileScale: 16
   });
 
   var inundationSum = sarPeakProxyKm2.addBands(permanentWaterKm2).reduceRegion({
     reducer: ee.Reducer.sum(),
     geometry: geom,
     scale: 60,
-    maxPixels: 1e10
+    maxPixels: 1e10,
+    tileScale: 16
   });
 
   return feat.simplify(30)
@@ -265,10 +270,17 @@ Export.table.toDrive({
 var chirpsCol = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD').select('precipitation');
 var era5Col = ee.ImageCollection('ECMWF/ERA5_LAND/MONTHLY_AGGR').select('volumetric_soil_water_layer_1');
 
-var maskedChirpsTemplate = ee.Image.constant(0).rename('precipitation').updateMask(ee.Image.constant(0));
-var maskedEra5Template = ee.Image.constant(0).rename('volumetric_soil_water_layer_1').updateMask(ee.Image.constant(0));
-var maskedS1Template = ee.Image.constant(0).rename('VV').updateMask(ee.Image.constant(0));
-var maskedS2Template = ee.Image.constant([0, 0]).rename(['ndti', 'ndvi']).updateMask(ee.Image.constant(0));
+// Fully masked float placeholders, used only when a month has no images, so an
+// empty month yields null instead of an error. They are never merged with real
+// images (mixing their type with real bands fails in Earth Engine).
+var maskedChirpsTemplate = ee.Image.constant(0).toFloat().rename('precipitation').updateMask(0);
+var maskedEra5Template = ee.Image.constant(0).toFloat().rename('volumetric_soil_water_layer_1').updateMask(0);
+var maskedS1Template = ee.Image.constant(0).toFloat().rename('VV').updateMask(0);
+var maskedS2Template = ee.Image.constant([0, 0]).toFloat().rename(['ndti', 'ndvi']).updateMask(0);
+
+function orTemplate(col, template) {
+  return ee.ImageCollection(ee.Algorithms.If(col.size().gt(0), col, ee.ImageCollection([template])));
+}
 
 var months = ee.List.sequence(0, 71);
 var baseDate = ee.Date(startDateStr);
@@ -285,8 +297,8 @@ function monthImages(m) {
     .map(function(img) { return img.focal_median(50, 'circle', 'meters'); });
   var s2Month = s2Processed.filterDate(mStart, mEnd);
 
-  var s1MedImg = ee.ImageCollection([maskedS1Template]).merge(s1Month).median();
-  var s2MedImg = ee.ImageCollection([maskedS2Template]).merge(s2Month).median();
+  var s1MedImg = orTemplate(s1Month, maskedS1Template).median();
+  var s2MedImg = orTemplate(s2Month, maskedS2Template).median();
 
   return {
     yearMonth: mStart.format('YYYY-MM'),
@@ -294,8 +306,8 @@ function monthImages(m) {
     era5Count: era5Month.size(),
     s1Count: s1Month.size(),
     s2SceneCount: s2Month.size(),
-    rainImg: ee.ImageCollection([maskedChirpsTemplate]).merge(chirpsMonth).sum(),
-    smImg: ee.ImageCollection([maskedEra5Template]).merge(era5Month).mean(),
+    rainImg: orTemplate(chirpsMonth, maskedChirpsTemplate).sum(),
+    smImg: orTemplate(era5Month, maskedEra5Template).mean(),
     sarAreaImg: s1MedImg.lt(-16.5)
       .and(lowSlopeMask)
       .and(seasonalDomainMask)
@@ -312,16 +324,16 @@ function monthImages(m) {
 }
 
 function reduceMean(img, band, geom, scale) {
-  return img.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: scale, maxPixels: 1e9}).get(band);
+  return img.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: scale, maxPixels: 1e9, tileScale: 4}).get(band);
 }
 
 function reduceSum(img, geom, scale) {
-  return img.reduceRegion({reducer: ee.Reducer.sum(), geometry: geom, scale: scale, maxPixels: 1e9}).get('VV');
+  return img.reduceRegion({reducer: ee.Reducer.sum(), geometry: geom, scale: scale, maxPixels: 1e9, tileScale: 4}).get('VV');
 }
 
 function ndtiStats(mi, geom) {
   var px = ee.Number(mi.ndtiImg.reduceRegion({
-    reducer: ee.Reducer.count(), geometry: geom, scale: 30, maxPixels: 1e9
+    reducer: ee.Reducer.count(), geometry: geom, scale: 30, maxPixels: 1e9, tileScale: 4
   }).get('ndti', 0));
   var mean = reduceMean(mi.ndtiImg, 'ndti', geom, 30);
   return {px: px, ndti: ee.Algorithms.If(px.gte(100), mean, null)};
