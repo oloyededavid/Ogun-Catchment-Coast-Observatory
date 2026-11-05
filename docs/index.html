@@ -1121,7 +1121,7 @@
                 </div>
 
                 <div class="map-credit">
-                    <span>CRS: EPSG:4326 (Geodesic Area km²) · WWF HydroBASINS L7 · CHIRPS v2.0 · ERA5-Land (0–7cm) · GLO-30 · Sentinel-1/2</span>
+                    <span>CRS: EPSG:4326 (Geodesic Area km²) · WWF HydroBASINS L9 · CHIRPS v2.0 · ERA5-Land (0–7cm) · GLO-30 · Sentinel-1/2</span>
                     <span>Click any unit polygon to inspect its properties</span>
                 </div>
             </div>
@@ -1140,7 +1140,7 @@
 
                     <div class="unified-brief">
                         <p class="brief-summary" id="sel-insight">
-                            Distinguishes the four hydrological sub-basins of the Ogun River catchment (Z1–Z4, 21,400 km²) from the downstream estuarine receiving environment in the northwest Lagos Lagoon (Z5, 970 km²).
+                            Distinguishes the four hydrological sub-basins of the Ogun River catchment (Z1–Z4, 22,166 km²) from the downstream estuarine receiving environment in the northwest Lagos Lagoon (Z5, 970 km²).
                         </p>
                         <p class="brief-management" id="sel-management">
                             <strong>Methodological Note:</strong> Uplands (Z1–Z4) govern rainfall-runoff partitioning and floodplain inundation, whereas spectral turbidity (NDTI) is evaluated over permanent open water (JRC &ge; 50%, MNDWI &gt; 0) in the estuarine receiving zone (Z5).
@@ -1221,7 +1221,7 @@
                         <span>S2 Estuary NDTI Valid: <strong id="cov-ndti">—</strong> (<span id="cov-ndti-miss">—</span> cloudy/masked; wet season Apr–Oct: <strong id="cov-ndti-wet">—</strong>, dry: <strong id="cov-ndti-dry">—</strong>)</span>
                     </div>
 
-                    <p class="chart-note" id="chart-note">Catchment-wide monthly series (Z1–Z4 rainfall &amp; SAR proxy; Z5 estuary NDTI). Per-unit monthly series are not exported, so this chart does not change when a single unit is selected.</p>
+                    <p class="chart-note" id="chart-note">Catchment-wide monthly series (Z1–Z4 rainfall; SAR proxy over the Z3–Z4 floodplain; Z5 estuary NDTI).</p>
 
                     <div class="chart-wrap">
                         <canvas id="cascadeChart"></canvas>
@@ -1350,7 +1350,7 @@
             </div>
             <div class="modal-body">
                 <h4>1. Geographical Separation: Catchment Sub-Basins vs. Estuarine Zone</h4>
-                <p>Units Z1–Z4 represent topographic sub-basins delineated from <span class="mono">WWF/HydroSHEDS/v1/Basins/hybas_7</span> within the Ogun River drainage system. Each sub-basin is traced upstream through the HydroBASINS <span class="mono">NEXT_DOWN</span> network from a pour point (Oyan Dam for Z2, the upper Ogun outlet for Z1, Abeokuta for Z3), with the remaining downstream units forming Z4. Unit Z5 (<span class="mono">Northwest Lagos Lagoon Estuary</span>) is an estuarine receiving water domain where open-water pixels (<span class="mono">JRC occurrence &ge; 50%</span>) are analysed for spectral turbidity (<span class="mono">NDTI</span>). Catchment and estuarine units are not interchangeable.</p>
+                <p>Units Z1–Z4 represent topographic sub-basins delineated from <span class="mono">WWF/HydroSHEDS/v1/Basins/hybas_9</span> within the Ogun River drainage system. Each sub-basin is traced upstream through the HydroBASINS <span class="mono">NEXT_DOWN</span> network from a fixed level-9 outlet unit (Oyan Dam for Z2, the upper Ogun above the Oyan confluence for Z1, the lower mainstem at about 6.9&deg;N for Z3), with the reaches below that forming Z4. The catchment is the 22,166 km&sup2; drainage area above the Ogun mouth. Unit Z5 (<span class="mono">Northwest Lagos Lagoon Estuary</span>) is an estuarine receiving water domain where open-water pixels (<span class="mono">JRC occurrence &ge; 50%</span>) are analysed for spectral turbidity (<span class="mono">NDTI</span>). Catchment and estuarine units are not interchangeable.</p>
 
                 <h4>2. Sentinel-1 SAR Inundation Proxy &amp; Permanent Water Exclusion</h4>
                 <p>Sentinel-1 C-band GRD (<span class="mono">IW, VV, ASCENDING pass</span>; the descending track covers only ~5% of the catchment) scenes are filtered with a <span class="mono">50 m focal-median</span> kernel. A pixel counts as flooded when <span class="mono">VV &lt; -16.5 dB</span>, it is at least <span class="mono">3 dB</span> darker than its January&ndash;March dry-season reference, Copernicus GLO-30 <span class="mono">Slope &lt; 5.0°</span>, JRC water <span class="mono">Occurrence &lt; 80%</span> and MERIT Hydro height above nearest drainage <span class="mono">&lt; 15 m</span>. A plain threshold was dominated by dry-season false alarms (burnt savanna and dry ground in Z1&ndash;Z2), so the catchment series is measured over the lower-Ogun floodplain (Z3&ndash;Z4). Monthly median composites miss short floods and C-band radar cannot see water under vegetation, so this is an uncalibrated inundation index rather than a validated flood map.</p>
@@ -1382,7 +1382,7 @@
                 <button type="button" id="tour-close" class="tour-skip">Close Esc &times;</button>
             </div>
             <h3 id="tour-title">1. Catchment-to-Coast Hydrological Map</h3>
-            <p id="tour-desc">Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L7, Units Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Unit Z5).</p>
+            <p id="tour-desc">Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L9, Units Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Unit Z5).</p>
             <div class="tour-tip-pill" id="tour-action-hint">
                 Tip: Click any polygon on the map to inspect its specific unit type, permanent water area, and seasonal metrics.
             </div>
@@ -1911,7 +1911,7 @@
                 setTxt('sel-title', 'Ogun Catchment (Z1–Z4) & Estuary (Z5)');
                 setTxt('sel-badge', STATE.rainShockPct === 0 ? 'Baseline View' : `Sensitivity (${STATE.rainShockPct > 0 ? '+' : ''}${STATE.rainShockPct}%)`);
                 setTxt('sel-insight', 'Separates the four upland hydrological sub-basins (Z1–Z4) from the downstream estuarine receiving water body in the northwest Lagos Lagoon (Z5).');
-                setTxt('sel-management', '<strong>Scientific Distinction:</strong> Catchment rainfall, shallow soil moisture (0–7 cm), and SAR floodplain inundation are aggregated across Z1–Z4, whereas estuarine spectral NDTI is evaluated strictly over open water in Z5.', true);
+                setTxt('sel-management', '<strong>Scientific Distinction:</strong> Catchment rainfall and shallow soil moisture (0–7 cm) are aggregated across Z1–Z4, the SAR inundation series is measured over the Z3–Z4 floodplain, and estuarine spectral NDTI is evaluated strictly over open water in Z5.', true);
 
                 setTxt('val-rain', fmtNum(meanRain, 0, ' mm'));
                 setTxt('val-flood', fmtNum(totFlood, 1, ' km²'));
@@ -1922,7 +1922,7 @@
                 setTxt('val-ndvi', fmtNum(meanNdvi, 3));
                 setTxt('val-slope', fmtNum(meanSlope, 2, '°'));
                 const z5Area = estuaryUnit && estuaryUnit.properties.zone_id === 'Z5' ? estuaryUnit.properties.area_km2 : null;
-                setTxt('sub-area', `Catchment: ${totCatchmentArea.toLocaleString()} km²${z5Area ? ` (+${z5Area.toLocaleString()} km² Z5)` : ''}`);
+                setTxt('sub-area', `Catchment: ${Math.round(totCatchmentArea).toLocaleString()} km²${z5Area ? ` (+${Math.round(z5Area).toLocaleString()} km² Z5)` : ''}`);
                 return;
             }
 
@@ -1944,7 +1944,7 @@
             setTxt('val-sm', fmtNum(p.shallow_sm_m3m3, 3, ' m³/m³'));
             setTxt('val-ndvi', fmtNum(p.ndvi, 3));
             setTxt('val-slope', fmtNum(p.slope_deg, 2, '°'));
-            setTxt('sub-area', `Area: ${(p.area_km2 || 0).toLocaleString()} km²`);
+            setTxt('sub-area', `Area: ${Math.round(p.area_km2 || 0).toLocaleString()} km²`);
         }
 
         function initHydroChart() {
@@ -2035,9 +2035,9 @@
             if (unitRows) {
                 setTxt('chart-note', `Rainfall and SAR proxy for ${zone} only; estuary NDTI is always Z5 open water.`);
             } else if (zone !== 'ALL' && zone !== 'Z5') {
-                setTxt('chart-note', `Per-unit monthly series are not in docs/data yet, so this shows the catchment-wide series (Z1–Z4), not ${zone}. Export ogun_unit_monthly_timeseries from the Earth Engine script to enable per-unit charts.`);
+                setTxt('chart-note', `Per-unit monthly series are not in docs/data yet, so this shows the catchment-wide series, not ${zone}. Export ogun_unit_monthly_timeseries from the Earth Engine script to enable per-unit charts.`);
             } else {
-                setTxt('chart-note', 'Catchment-wide monthly series (Z1–Z4 rainfall & SAR proxy; Z5 estuary NDTI).');
+                setTxt('chart-note', 'Catchment-wide monthly series (Z1–Z4 rainfall; SAR proxy over the Z3–Z4 floodplain; Z5 estuary NDTI).');
             }
 
             chartInstance.data.labels = STATE.series.map(d => d.year_month);
@@ -2085,7 +2085,7 @@
                     <tr class="${active}" data-zone="${p.zone_id}">
                         <td><span class="swatch-dot" style="background:${p._color};display:inline-block;margin-right:6px;vertical-align:middle;"></span><strong>0${p.order} · ${escHtml(p.zone_name)}</strong></td>
                         <td><span class="mono" style="font-size:11px;">${escHtml(p.unit_type)}</span></td>
-                        <td>${(p.area_km2 || 0).toLocaleString()}</td>
+                        <td>${Math.round(p.area_km2 || 0).toLocaleString()}</td>
                         <td>${fmtNum(p.sim_rain, 0)}</td>
                         <td><strong>${fmtNum(p.sim_flood, 1, ' km²')}</strong></td>
                         <td>${fmtNum(p.sim_ndti, 3)}</td>
@@ -2197,7 +2197,7 @@
             {
                 target: '#map-stage',
                 title: '1. Catchment Sub-Basins (Z1–Z4) vs. Estuary (Z5)',
-                desc: 'Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L7) from the downstream estuarine receiving water body in the northwest Lagos Lagoon.',
+                desc: 'Separates the four hydrological sub-basins of the Ogun watershed (WWF HydroBASINS L9) from the downstream estuarine receiving water body in the northwest Lagos Lagoon.',
                 hint: 'Click any polygon on the map to inspect its specific unit type, permanent water area, and seasonal metrics.'
             },
             {

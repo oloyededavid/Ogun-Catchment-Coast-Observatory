@@ -49,7 +49,8 @@ def test_ingest_writes_files_and_diagnostics(ingester, tmp_path):
     summary = ingester.ingest(DATA / "ogun_monthly_timeseries.csv", DATA / "ogun_subbasins.geojson", None, tmp_path)
     assert (tmp_path / "ogun_monthly_timeseries.csv").exists()
     assert (tmp_path / "cascade_diagnostics.json").exists()
-    assert summary["provenance"]["status"] == "DEMONSTRATION_PREVIEW"
+    published = json.loads((DATA / "cascade_diagnostics.json").read_text(encoding="utf-8"))
+    assert summary["provenance"]["status"] == published["provenance"]["status"]
 
 
 def test_failed_validation_installs_nothing(ingester, tmp_path):
