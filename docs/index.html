@@ -1179,7 +1179,7 @@
 
                 <footer class="site-footer" id="site-footer">
                     <p class="byline">Research, analysis and design by <strong>David Oloyede</strong>.</p>
-                    <p id="footer-data">Data: Google Earth Engine export · 2019–2024</p>
+                    <p>Version 1.6</p>
                     <nav aria-label="Project links">
                         <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">Source code</a>
                         <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory/blob/main/CITATION.cff">How to cite</a>
@@ -2381,9 +2381,6 @@
         const ver = prov && prov.gee_script_version ? ` v${prov.gee_script_version}` : '';
         $('data-chip-text').textContent = demo ? 'Demonstration data' : `Earth Engine export${ver}`;
         chip.title = prov && prov.gee_export_utc ? `Exported ${prov.gee_export_utc}` : '';
-        const exported = prov && prov.gee_export_utc ? new Date(prov.gee_export_utc) : null;
-        const when = exported && !isNaN(exported) ? `, exported ${exported.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}` : '';
-        $('footer-data').textContent = demo ? 'Data: demonstration values, not a verified export.' : `Data: Google Earth Engine export${ver}${when} · covering 2019–2024.`;
     }
 
     // ================= Glossary =================
