@@ -74,3 +74,11 @@ def test_dam_releases_outside_period_rejected(ingester):
     rel = pd.DataFrame({"year_month": ["1999-01"], "oyan_release_mcm": [5.0]})
     with pytest.raises(ingester.ValidationError, match="outside the study period"):
         ingester.merge_dam_releases(monthly, rel)
+
+
+def test_context_layers_validated(ingester):
+    line = {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"ORD_STRA": 4},
+            "geometry": {"type": "LineString", "coordinates": [[3.3, 7.0], [3.4, 6.9]]}}]}
+    assert ingester.validate_context_layer(line, "rivers", ("LineString", "MultiLineString"))["features"]
+    with pytest.raises(ingester.ValidationError, match="geometry must be"):
+        ingester.validate_context_layer(line, "reservoir", ("Polygon", "MultiPolygon"))

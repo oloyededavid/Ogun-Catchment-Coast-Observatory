@@ -2,7 +2,7 @@
 
 The derived datasets in `docs/data/` (`ogun_subbasins.geojson`, `ogun_monthly_timeseries.csv`,
 `ogun_unit_monthly_timeseries.csv`, `cascade_diagnostics.json`) and the figures produced by this
-project are © 2026 oloyededavid and licensed under the
+project are © 2026 David Oloyede and licensed under the
 **Creative Commons Attribution 4.0 International licence (CC BY 4.0)**:
 https://creativecommons.org/licenses/by/4.0/legalcode
 

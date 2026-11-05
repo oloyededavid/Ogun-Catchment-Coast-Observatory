@@ -6,7 +6,9 @@ license:
   - MIT
   - CC-BY-4.0
 authors:
-  - alias: oloyededavid
+  - given-names: David
+    family-names: Oloyede
+    alias: oloyededavid
 repository-code: "https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory"
 url: "https://oloyededavid.github.io/Ogun-Catchment-Coast-Observatory/"
 keywords:

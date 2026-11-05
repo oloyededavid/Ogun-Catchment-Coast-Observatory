@@ -63,7 +63,7 @@ var estuaryRawBox = ee.Geometry.Polygon([
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.4.0';
+var SCRIPT_VERSION = '2.5.0';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
@@ -444,4 +444,40 @@ Export.table.toDrive({
   collection: unitMonthly,
   description: 'ogun_unit_monthly_timeseries',
   fileFormat: 'CSV'
+});
+
+// --- Map context layers (for the website map) --------------------------------
+// River network inside the catchment (Strahler order >= 3), simplified for the web.
+var riverNetwork = ogunRivers
+  .filterBounds(catchmentGeom)
+  .map(function(f) {
+    return ee.Feature(f.geometry().intersection(catchmentGeom, 100).simplify(150), {
+      'ORD_STRA': f.get('ORD_STRA')
+    });
+  });
+
+Export.table.toDrive({
+  collection: riverNetwork,
+  description: 'ogun_rivers',
+  fileFormat: 'GeoJSON'
+});
+
+// Oyan Reservoir outline: the largest JRC maximum-extent water body in the reservoir domain.
+var reservoirPolys = oyanReservoirMask.selfMask().reduceToVectors({
+  geometry: oyanBox.intersection(z2Geom, 30),
+  scale: 30,
+  geometryType: 'polygon',
+  eightConnected: true,
+  maxPixels: 1e9
+}).map(function(f) { return f.set('area_km2', f.geometry().area(30).divide(1e6)); });
+
+var reservoirOutline = ee.FeatureCollection([
+  ee.Feature(reservoirPolys.sort('area_km2', false).first()).simplify(60)
+    .set('name', 'Oyan Reservoir (JRC maximum water extent)')
+]);
+
+Export.table.toDrive({
+  collection: reservoirOutline,
+  description: 'oyan_reservoir',
+  fileFormat: 'GeoJSON'
 });

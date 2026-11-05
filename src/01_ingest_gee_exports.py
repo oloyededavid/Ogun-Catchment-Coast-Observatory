@@ -152,6 +152,19 @@ def validate_units(geojson: dict) -> dict:
     return geojson
 
 
+def validate_context_layer(geojson: dict, label: str, allowed: tuple[str, ...]) -> dict:
+    """Check an optional map context layer (river network or reservoir outline)."""
+    feats = geojson.get("features") if isinstance(geojson, dict) else None
+    if not feats:
+        raise ValidationError(f"{label}: no features")
+    bad = sorted({(f.get("geometry") or {}).get("type") for f in feats} - set(allowed))
+    if bad:
+        raise ValidationError(f"{label}: geometry must be {' or '.join(allowed)}, found {bad}")
+    for f in feats:
+        f.pop("id", None)
+    return {"type": "FeatureCollection", "features": feats}
+
+
 def _load_compiler():
     spec = importlib.util.spec_from_file_location("compile_observatory", REPO_ROOT / "src" / "02_compile_observatory.py")
     module = importlib.util.module_from_spec(spec)
@@ -159,18 +172,27 @@ def _load_compiler():
     return module
 
 
-def ingest(monthly: Path, units: Path, unit_monthly: Path | None, out_dir: Path = DATA_DIR,
-           dam_releases: Path | None = None) -> dict:
+def ingest(monthly: Path, units: Path | None, unit_monthly: Path | None, out_dir: Path = DATA_DIR,
+           dam_releases: Path | None = None, rivers: Path | None = None, reservoir: Path | None = None) -> dict:
     monthly_df = validate_monthly(pd.read_csv(monthly))
     if dam_releases:
         monthly_df = merge_dam_releases(monthly_df, pd.read_csv(dam_releases))
-    units_gj = validate_units(json.loads(Path(units).read_text(encoding="utf-8")))
+    units_gj = validate_units(json.loads(Path(units).read_text(encoding="utf-8"))) if units else None
     unit_df = validate_unit_monthly(pd.read_csv(unit_monthly)) if unit_monthly else None
+    rivers_gj = validate_context_layer(json.loads(Path(rivers).read_text(encoding="utf-8")), "rivers",
+                                       ("LineString", "MultiLineString")) if rivers else None
+    reservoir_gj = validate_context_layer(json.loads(Path(reservoir).read_text(encoding="utf-8")), "reservoir",
+                                          ("Polygon", "MultiPolygon")) if reservoir else None
 
     out_dir.mkdir(parents=True, exist_ok=True)
     monthly_out = out_dir / "ogun_monthly_timeseries.csv"
     monthly_df.to_csv(monthly_out, index=False)
-    (out_dir / "ogun_subbasins.geojson").write_text(json.dumps(units_gj, indent=2) + "\n", encoding="utf-8")
+    if units_gj is not None:
+        (out_dir / "ogun_subbasins.geojson").write_text(json.dumps(units_gj, indent=2) + "\n", encoding="utf-8")
+    if rivers_gj is not None:
+        (out_dir / "ogun_rivers.geojson").write_text(json.dumps(rivers_gj) + "\n", encoding="utf-8")
+    if reservoir_gj is not None:
+        (out_dir / "oyan_reservoir.geojson").write_text(json.dumps(reservoir_gj) + "\n", encoding="utf-8")
     if unit_df is not None:
         unit_df.to_csv(out_dir / "ogun_unit_monthly_timeseries.csv", index=False)
 
@@ -180,14 +202,17 @@ def ingest(monthly: Path, units: Path, unit_monthly: Path | None, out_dir: Path 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--monthly", type=Path, required=True, help="ogun_monthly_timeseries.csv from Earth Engine")
-    parser.add_argument("--units", type=Path, required=True, help="ogun_subbasins.geojson from Earth Engine")
+    parser.add_argument("--units", type=Path, help="ogun_subbasins.geojson from Earth Engine (omit to keep the installed one)")
     parser.add_argument("--unit-monthly", type=Path, help="ogun_unit_monthly_timeseries.csv from Earth Engine")
     parser.add_argument("--dam-releases", type=Path,
                         help="optional CSV of Oyan Dam releases with columns year_month, oyan_release_mcm")
+    parser.add_argument("--rivers", type=Path, help="optional ogun_rivers.geojson (map context layer)")
+    parser.add_argument("--reservoir", type=Path, help="optional oyan_reservoir.geojson (map context layer)")
     parser.add_argument("--out", type=Path, default=DATA_DIR, help="output directory (default: docs/data)")
     args = parser.parse_args(argv)
     try:
-        summary = ingest(args.monthly, args.units, args.unit_monthly, args.out, args.dam_releases)
+        summary = ingest(args.monthly, args.units, args.unit_monthly, args.out, args.dam_releases,
+                         args.rivers, args.reservoir)
     except ValidationError as exc:
         print(f"Validation failed; nothing was installed.\n{exc}", file=sys.stderr)
         return 1

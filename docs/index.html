@@ -742,11 +742,112 @@
         .toast strong { color: var(--ink); }
         .toast-actions { display: flex; gap: 8px; }
 
+        /* Month timeline on the map */
+        .timeline {
+            right: 14px;
+            bottom: 14px;
+            width: min(420px, calc(100% - 380px));
+            min-width: 300px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .timeline-row { display: flex; align-items: center; gap: 10px; }
+        .timeline-row .segmented { flex-shrink: 0; }
+        .timeline input[type="range"] { flex: 1; accent-color: var(--accent); min-width: 0; }
+        .timeline-label { font-size: 13px; font-weight: 900; min-width: 70px; text-align: right; font-variant-numeric: tabular-nums; }
+        .timeline-note { font-size: 11.5px; color: var(--ink-3); }
+        .play { width: 32px; height: 32px; flex-shrink: 0; }
+
+        .map-tools { top: 62px; right: 58px; display: flex; padding: 4px; gap: 2px; }
+        .map-tools .seg { padding: 5px 9px; }
+
+        .place-label {
+            pointer-events: none !important;
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap;
+            text-shadow: 0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 3px var(--surface);
+        }
+
+        .place-label::before {
+            content: '';
+            display: inline-block;
+            width: 7px; height: 7px;
+            margin-right: 5px;
+            border-radius: 50%;
+            background: var(--ink);
+            border: 1.5px solid var(--surface);
+            vertical-align: middle;
+        }
+
+        .series-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        /* Glossary terms */
+        .term {
+            border: 0;
+            background: none;
+            padding: 0;
+            font: inherit;
+            color: inherit;
+            text-decoration: underline dotted;
+            text-decoration-color: var(--ink-3);
+            text-underline-offset: 3px;
+            cursor: help;
+        }
+
+        .glossary { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 13px; }
+        .glossary dt { font-weight: 900; color: var(--ink); }
+        .glossary dd { color: var(--ink-2); }
+
+        /* Footer */
+        .site-footer {
+            margin: 4px 20px 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--ink-3);
+        }
+
+        .site-footer .byline { font-size: 13px; color: var(--ink-2); }
+        .site-footer .byline strong { color: var(--ink); }
+        .site-footer nav { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+        .site-footer a, .site-footer .link-btn { color: var(--ink-2); font-weight: 700; text-decoration: none; }
+        .site-footer a:hover, .site-footer .link-btn:hover { color: var(--accent-ink); text-decoration: underline; }
+        .link-btn { border: 0; background: none; padding: 0; font: inherit; cursor: pointer; }
+
+        .snack {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            z-index: 3100;
+            padding: 9px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--ink);
+            color: var(--surface);
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: var(--shadow-float);
+        }
+
         /* ================= Responsive ================= */
+        /* Narrow desktop: stack the timeline above the legend so they never overlap */
+        @media (min-width: 1101px) and (max-width: 1360px) {
+            .timeline { left: 14px; right: auto; bottom: 178px; width: min(340px, calc(100% - 28px)); min-width: 0; }
+        }
+
         @media (max-width: 1100px) {
             .app { height: auto; min-height: 100vh; }
             .layout { grid-template-columns: minmax(0, 1fr); }
-            .map-pane { height: 58vh; min-height: 380px; }
+            .map-pane { height: 62vh; min-height: 420px; }
             .panel { border-left: 0; border-top: 1px solid var(--border); }
             .tab-panels { overflow: visible; }
             .tabs { position: sticky; top: 0; z-index: 900; background: var(--surface); }
@@ -767,10 +868,34 @@
             .tab-panel { padding: 16px; }
             .layer-switch { left: 10px; right: 10px; top: 10px; max-width: none; }
             .basemap-switch { display: none; }
-            .leaflet-top.leaflet-right { top: 56px; }
+            .leaflet-top.leaflet-right { top: auto; bottom: 56px; }
             .legend { left: 10px; bottom: 10px; }
+            .timeline { left: 10px; right: 10px; bottom: auto; top: 58px; width: auto; min-width: 0; }
+            .map-tools { top: auto; bottom: 10px; right: 10px; }
+            .legend { width: calc(100% - 120px); padding: 9px 11px; }
+            .legend-source { display: none; }
+            .legend-title { font-size: 12.5px; margin-bottom: 6px; }
+            .legend-note { margin-top: 6px; font-size: 11px; }
+            .timeline { padding: 8px 10px; gap: 6px; }
+            .timeline-note { display: none; }
             .tile-value { font-size: 21px; }
             .banner { padding: 10px 16px; }
+        }
+
+        @media print {
+            @page { margin: 14mm; }
+            body { background: #ffffff; font-size: 11pt; }
+            .app { display: block; height: auto; }
+            .layout { display: block; }
+            .map-pane { height: 110mm; break-inside: avoid; border: 1px solid #ccc; }
+            .panel { border: 0; }
+            .appbar-actions, .layer-switch, .basemap-switch, .map-tools, .timeline, .leaflet-control-container,
+            .unit-picker, .tabs, .toast, .snack, #tour, .intro-actions, .info, details.table-view, .site-footer nav .no-print { display: none !important; }
+            .tab-panels { overflow: visible; }
+            .tab-panel[hidden] { display: none !important; }
+            .legend { box-shadow: none; }
+            .card, .tile, .finding, .table-wrap, .multiples { break-inside: avoid; }
+            a { color: inherit; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -810,6 +935,17 @@
                     <a href="data/cascade_diagnostics.json" download>Statistical diagnostics (JSON)<span>Generated by src/02_compile_observatory.py</span></a>
                 </div>
             </details>
+            <details class="menu" id="share-menu">
+                <summary class="btn" aria-label="Share or print">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4"/><path d="m15.4 6.5-6.8 4"/></svg>
+                    <span class="label-text">Share</span>
+                </summary>
+                <div class="menu-list">
+                    <a href="#" id="share-copy">Copy link to this view<span>Keeps the selected unit, map layer and tab</span></a>
+                    <a href="#" id="share-native" hidden>Share…<span>Use your device's share sheet</span></a>
+                    <a href="#" id="share-print">Print or save as PDF<span>A clean layout of the current tab and map</span></a>
+                </div>
+            </details>
             <button type="button" class="btn" id="btn-methods">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
                 <span class="label-text">Methods</span>
@@ -846,12 +982,37 @@
                 </select>
             </div>
 
+            <div class="map-float map-tools">
+                <button type="button" class="seg" id="btn-map-png" title="Download the map as an image">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+                    Map image
+                </button>
+            </div>
+
+            <div class="map-float timeline" id="timeline">
+                <div class="timeline-row">
+                    <div class="segmented" role="radiogroup" aria-label="Map period">
+                        <button type="button" class="seg" role="radio" data-period="summary" aria-checked="true">2019–2024</button>
+                        <button type="button" class="seg" role="radio" data-period="month" aria-checked="false">By month</button>
+                    </div>
+                    <span class="timeline-note" id="timeline-note">Summary values for the whole period</span>
+                </div>
+                <div class="timeline-row" id="timeline-controls" hidden>
+                    <button type="button" class="btn btn-icon play" id="tl-play" aria-label="Play through the months">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>
+                    </button>
+                    <label class="sr-only" for="tl-range">Month</label>
+                    <input type="range" id="tl-range" min="0" max="71" step="1" value="69">
+                    <span class="timeline-label" id="tl-label" aria-live="polite">—</span>
+                </div>
+            </div>
+
             <div class="map-float legend" id="legend" aria-live="polite">
                 <div class="legend-title" id="legend-title">Floodplain inundation (km²)</div>
                 <div class="legend-source" id="legend-source">Sentinel-1, Sep–Oct 2022</div>
                 <div class="legend-bar" id="legend-bar"></div>
                 <div class="legend-ticks"><span id="legend-min">—</span><span id="legend-mid">—</span><span id="legend-max">—</span></div>
-                <div class="legend-note" id="legend-note" hidden><span class="swatch swatch-unreliable"></span><span>Not reliable here (dry-season radar artefacts)</span></div>
+                <div class="legend-note" id="legend-note" hidden><span class="swatch swatch-unreliable"></span><span id="legend-note-text">Not reliable here (dry-season radar artefacts)</span></div>
             </div>
 
             <div class="map-error" id="map-error" role="alert" hidden>
@@ -901,7 +1062,7 @@
                     <div class="tiles" id="overview-tiles"></div>
                     <div>
                         <h3 class="section-title">Key findings</h3>
-                        <p class="fine" style="margin: 2px 0 10px;">Generated from the published diagnostics. Deseasonalized monthly anomalies; p-values adjusted for autocorrelation and multiple lags.</p>
+                        <p class="fine" style="margin: 2px 0 10px;">Generated from the published diagnostics, using <button type="button" class="term" data-term="anomaly">deseasonalized</button> monthly values. <button type="button" class="term" data-term="rho">ρ</button> and <button type="button" class="term" data-term="r">r</button> measure association; <button type="button" class="term" data-term="p">p</button> is adjusted for autocorrelation and multiple lags.</p>
                         <ol class="findings" id="findings"><li class="fine">Diagnostics unavailable.</li></ol>
                     </div>
                     <p class="note"><strong>How to read this.</strong> The radar inundation series is an uncalibrated index and could not be validated against optical data; treat findings about flooding as indicative. See <a href="#" data-open="methods-dialog">Methods</a>.</p>
@@ -934,18 +1095,28 @@
                         <h2 class="panel-title">Monthly time series</h2>
                         <p class="lede" id="series-scope" style="margin-top: 6px;">—</p>
                     </div>
+                    <div class="series-toolbar">
+                        <div class="segmented" role="radiogroup" aria-label="Time series view">
+                            <button type="button" class="seg" role="radio" data-series-mode="timeline" aria-checked="true">Timeline</button>
+                            <button type="button" class="seg" role="radio" data-series-mode="seasonal" aria-checked="false">Seasonal cycle</button>
+                        </div>
+                        <button type="button" class="btn" id="btn-chart-png">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                            Download charts (PNG)
+                        </button>
+                    </div>
                     <div class="coverage" id="coverage"></div>
                     <div class="multiples" id="multiples">
                         <div class="multiple"><div class="multiple-head"><span class="multiple-title">Rainfall</span><span class="multiple-unit">mm / month · CHIRPS v2.0</span></div><div class="multiple-canvas"><canvas id="chart-rain" role="img" aria-label="Monthly rainfall, 2019 to 2024"></canvas></div></div>
-                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Radar inundation index</span><span class="multiple-unit">km² · Sentinel-1</span></div><div class="multiple-canvas"><canvas id="chart-sar" role="img" aria-label="Monthly radar inundation index, 2019 to 2024"></canvas></div></div>
-                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Optical flooding check</span><span class="multiple-unit">km² · Dynamic World</span></div><div class="multiple-canvas"><canvas id="chart-dw" role="img" aria-label="Monthly Dynamic World flooding, 2019 to 2024"></canvas></div></div>
-                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Lagoon turbidity (Z5)</span><span class="multiple-unit">NDTI · Sentinel-2 · gaps = cloud</span></div><div class="multiple-canvas"><canvas id="chart-ndti" role="img" aria-label="Monthly lagoon turbidity, 2019 to 2024"></canvas></div></div>
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Radar inundation index</span><span class="multiple-unit">km² · <button type="button" class="term" data-term="sar">Sentinel-1 radar</button></span></div><div class="multiple-canvas"><canvas id="chart-sar" role="img" aria-label="Monthly radar inundation index, 2019 to 2024"></canvas></div></div>
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Optical flooding check</span><span class="multiple-unit">km² · <button type="button" class="term" data-term="dw">Dynamic World</button></span></div><div class="multiple-canvas"><canvas id="chart-dw" role="img" aria-label="Monthly Dynamic World flooding, 2019 to 2024"></canvas></div></div>
+                        <div class="multiple"><div class="multiple-head"><span class="multiple-title">Lagoon turbidity (Z5)</span><span class="multiple-unit"><button type="button" class="term" data-term="ndti">NDTI</button> · Sentinel-2 · gaps = cloud</span></div><div class="multiple-canvas"><canvas id="chart-ndti" role="img" aria-label="Monthly lagoon turbidity, 2019 to 2024"></canvas></div></div>
                     </div>
                     <details class="table-view">
-                        <summary>View the monthly values as a table</summary>
+                        <summary id="series-table-summary">View the monthly values as a table</summary>
                         <div class="table-wrap">
                             <table>
-                                <thead><tr><th>Month</th><th>Rain (mm)</th><th>Radar (km²)</th><th>Optical (km²)</th><th>NDTI</th></tr></thead>
+                                <thead><tr><th id="series-table-first">Month</th><th>Rain (mm)</th><th>Radar (km²)</th><th>Optical (km²)</th><th>NDTI</th></tr></thead>
                                 <tbody id="series-table"></tbody>
                             </table>
                         </div>
@@ -956,7 +1127,7 @@
                 <div class="tab-panel" role="tabpanel" id="panel-stats" aria-labelledby="tab-stats" hidden>
                     <div>
                         <h2 class="panel-title">Statistical audit</h2>
-                        <p class="lede" style="margin-top: 6px;">Pairwise complete months only. Effective n corrects for autocorrelation (Bretherton); p-values are Benjamini–Hochberg adjusted across lags 0–2.</p>
+                        <p class="lede" style="margin-top: 6px;">Pairwise complete months only. <button type="button" class="term" data-term="neff">Effective n</button> corrects for autocorrelation (Bretherton); <button type="button" class="term" data-term="p">p-values</button> are Benjamini–Hochberg adjusted across lags 0–2. Underlined terms explain themselves when you hover or tap them.</p>
                     </div>
                     <div class="controls">
                         <div class="field">
@@ -973,7 +1144,7 @@
                         <div class="field" style="flex: 0 0 auto;">
                             <span class="field-label" id="mode-label">Series</span>
                             <div class="segmented" role="radiogroup" aria-labelledby="mode-label">
-                                <button type="button" class="seg" role="radio" data-mode="deseasonalized" aria-checked="true">Anomalies</button>
+                                <button type="button" class="seg" role="radio" data-mode="deseasonalized" aria-checked="true" title="Each month compared with the average for that calendar month">Anomalies</button>
                                 <button type="button" class="seg" role="radio" data-mode="seasonal" aria-checked="false">Raw seasonal</button>
                             </div>
                         </div>
@@ -981,7 +1152,7 @@
                     <p class="fine" id="diag-explain"></p>
                     <div class="table-wrap">
                         <table>
-                            <thead><tr><th>Lag</th><th>n</th><th>Eff. n</th><th>Spearman ρ</th><th>Pearson r (95% CI)</th><th id="diag-p-head">FDR p</th></tr></thead>
+                            <thead><tr><th><button type="button" class="term" data-term="lag">Lag</button></th><th>n</th><th><button type="button" class="term" data-term="neff">Eff. n</button></th><th><button type="button" class="term" data-term="rho">Spearman ρ</button></th><th><button type="button" class="term" data-term="r">Pearson r</button> (95% CI)</th><th><button type="button" class="term" data-term="p" id="diag-p-head">FDR p</button></th></tr></thead>
                             <tbody id="diag-tbody"></tbody>
                         </table>
                     </div>
@@ -1012,10 +1183,36 @@
                         </table>
                     </div>
                 </div>
+
+                <footer class="site-footer" id="site-footer">
+                    <p class="byline">Research, analysis and design by <strong>David Oloyede</strong>.</p>
+                    <p id="footer-data">Data: Google Earth Engine export · 2019–2024</p>
+                    <nav aria-label="Project links">
+                        <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">Source code</a>
+                        <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory/blob/main/CITATION.cff">How to cite</a>
+                        <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory/blob/main/LICENSE-DATA.md">Licence: code MIT · data CC BY 4.0</a>
+                        <button type="button" class="link-btn no-print" data-open="glossary-dialog">Glossary</button>
+                        <button type="button" class="link-btn no-print" data-open="methods-dialog">Methods</button>
+                    </nav>
+                    <p>Contains modified Copernicus Sentinel data (2019–2024). Basemap © Esri.</p>
+                </footer>
             </div>
         </section>
     </main>
 </div>
+
+<dialog id="glossary-dialog" aria-labelledby="glossary-title">
+    <div class="dialog-head">
+        <div>
+            <div class="eyebrow">Plain-language definitions</div>
+            <h2 class="panel-title" id="glossary-title">Glossary</h2>
+        </div>
+        <button type="button" class="btn btn-icon" data-close aria-label="Close">✕</button>
+    </div>
+    <div class="dialog-body">
+        <dl class="glossary" id="glossary-list"></dl>
+    </div>
+</dialog>
 
 <dialog id="methods-dialog" aria-labelledby="methods-title">
     <div class="dialog-head">
@@ -1060,14 +1257,15 @@
     </div>
     <div class="dialog-body">
         <p>This observatory tests whether rainfall and shallow soil moisture across the roughly 22,200 km² Ogun River catchment relate to floodplain inundation, and whether that flooding reaches the northwest Lagos Lagoon as turbidity. All data come from one Google Earth Engine export (2019–2024) and are recomputed by the repository's own scripts.</p>
-        <p><button type="button" class="btn btn-primary" data-tour-start>Take the guided tour</button></p>
+        <p style="display: flex; gap: 8px; flex-wrap: wrap;"><button type="button" class="btn btn-primary" data-tour-start>Take the guided tour</button><button type="button" class="btn" data-open="glossary-dialog">Open the glossary</button></p>
         <h4>Using the site</h4>
         <ol>
             <li><strong>Overview</strong> gives the headline numbers and the findings, each with a verdict.</li>
             <li><strong>Map</strong>: switch indicators at the top left; click a unit to open it. Units drawn hatched with a dashed outline have no reliable value for that indicator.</li>
             <li><strong>Unit</strong> shows one unit's measurements. <strong>Time series</strong> shows 72 months as four aligned charts; hover to read the same month across all of them.</li>
             <li><strong>Statistics</strong> is the full audit table. <strong>Compare</strong> puts two units side by side.</li>
-            <li>The address bar keeps your selection, so you can share a specific unit and view.</li>
+            <li><strong>Share</strong> copies a link to exactly the view you are looking at, or prints it. <strong>Map image</strong> and <strong>Download charts</strong> save figures as PNG.</li>
+            <li><strong>By month</strong> on the map steps through 2019–2024; <strong>Seasonal cycle</strong> in Time series shows the average year.</li>
         </ol>
         <h4>Data &amp; licence</h4>
         <p>Code MIT; derived data CC BY 4.0. Source datasets keep their own terms (see <span class="mono">LICENSE-DATA.md</span>). Source code and reproduction steps: <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">github.com/oloyededavid/Ogun-Catchment-Coast-Observatory</a>.</p>
@@ -1176,7 +1374,12 @@
         diagPair: 'rain',
         diagMode: 'deseasonalized',
         compA: 'Z3',
-        compB: 'Z4'
+        compB: 'Z4',
+        period: 'summary',
+        month: 69,
+        seriesMode: 'timeline',
+        unitByMonth: {},
+        monthlyRange: {}
     };
 
     const featureById = id => STATE.features.find(f => f.properties.zone_id === id);
@@ -1200,6 +1403,7 @@
     function repaintForTheme() {
         paintThemeButton();
         setBasemap($('basemap-select').value);
+        drawExtras();
         styleMap();
         buildCharts();
     }
@@ -1280,6 +1484,43 @@
 
     const ramp = () => ['--seq-1', '--seq-2', '--seq-3', '--seq-4', '--seq-5'].map(css);
 
+    // Per-unit monthly values used by the map's "By month" view.
+    const MONTHLY = {
+        rain: { field: 'rain_mm', title: 'Rainfall', unit: 'mm', fmt: v => `${fmtInt(v)} mm`, note: 'Monthly rainfall in each unit' },
+        flood: { field: 'sar_flood_km2', title: 'Floodplain inundation', unit: 'km²', fmt: v => `${fmt(v, 2)} km²`, note: 'Monthly radar inundation per unit; not reliable in Z1–Z2' },
+        ndti: { field: 'estuary_ndti', title: 'Turbidity (NDTI)', unit: '', fmt: v => fmt(v, 3), note: 'Monthly turbidity exists for the lagoon (Z5) only' },
+        ndvi: null
+    };
+
+    const currentYm = () => STATE.series[STATE.month] ? STATE.series[STATE.month].year_month : null;
+
+    function cell(p) {
+        const spec = LAYERS[STATE.layer];
+        if (STATE.period !== 'month') {
+            const unrel = spec.unreliable(p);
+            return { v: spec.value(p), raw: spec.raw(p), unrel, fmt: spec.fmt, missing: unrel ? 'not reliable' : null };
+        }
+        const m = MONTHLY[STATE.layer];
+        if (!m) return { v: null, raw: null, unrel: true, fmt: spec.fmt, missing: 'no monthly data' };
+        const row = (STATE.unitByMonth[p.zone_id] || {})[currentYm()] || {};
+        const raw = row[m.field];
+        if (STATE.layer === 'flood' && SAR_UNRELIABLE.has(p.zone_id)) return { v: null, raw, unrel: true, fmt: m.fmt, missing: 'not reliable' };
+        if (!isNum(raw)) return { v: null, raw: null, unrel: true, fmt: m.fmt, missing: 'no data' };
+        return { v: raw, raw, unrel: false, fmt: m.fmt, missing: null };
+    }
+
+    function computeMonthlyRanges() {
+        Object.entries(MONTHLY).forEach(([layer, m]) => {
+            if (!m) return;
+            const vals = [];
+            Object.entries(STATE.unitByMonth).forEach(([zone, rows]) => {
+                if (layer === 'flood' && SAR_UNRELIABLE.has(zone)) return;
+                Object.values(rows).forEach(r => { if (isNum(r[m.field])) vals.push(r[m.field]); });
+            });
+            STATE.monthlyRange[layer] = vals.length ? [Math.min(...vals), Math.max(...vals)] : [0, 1];
+        });
+    }
+
     function colorFor(v, min, max) {
         if (!isNum(v)) return null;
         const r = ramp();
@@ -1313,11 +1554,21 @@
     }
 
     // Keep the units clear of the floating layer switcher (top) and legend (bottom left).
+    // Padding that keeps the units clear of whichever floating panels are open.
+    function mapPadding() {
+        const pane = document.querySelector('.map-pane').getBoundingClientRect();
+        const below = sel => { const el = document.querySelector(sel); if (!el || el.offsetParent === null) return 0; const r = el.getBoundingClientRect(); return r.top - pane.top < pane.height / 2 ? r.bottom - pane.top : 0; };
+        const above = sel => { const el = document.querySelector(sel); if (!el || el.offsetParent === null) return 0; const r = el.getBoundingClientRect(); return r.top - pane.top >= pane.height / 2 ? pane.bottom - r.top : 0; };
+        const top = Math.max(below('.layer-switch'), below('#timeline'), below('.map-tools')) + 12;
+        const bottom = Math.max(above('#legend'), above('#timeline'), above('.map-tools'), 24) + 12;
+        const side = window.innerWidth <= 640 ? 16 : 40;
+        return { paddingTopLeft: [side, top], paddingBottomRight: [side, bottom] };
+    }
+
     function fitAll(animate) {
         if (!unitsLayer) return;
         map.invalidateSize();
-        const small = window.innerWidth <= 640;
-        const opts = { paddingTopLeft: [small ? 20 : 40, small ? 70 : 80], paddingBottomRight: [small ? 20 : 40, small ? 150 : 40] };
+        const opts = mapPadding();
         if (animate) map.flyToBounds(unitsLayer.getBounds(), Object.assign({ duration: 0.5 }, opts));
         else map.fitBounds(unitsLayer.getBounds(), Object.assign({ animate: false }, opts));
     }
@@ -1325,30 +1576,40 @@
     function styleMap() {
         if (!unitsLayer) return;
         const spec = LAYERS[STATE.layer];
-        const vals = STATE.features.map(f => spec.value(f.properties)).filter(isNum);
-        const min = vals.length ? Math.min(...vals) : 0;
-        const max = vals.length ? Math.max(...vals) : 1;
+        const monthly = STATE.period === 'month';
+        const m = MONTHLY[STATE.layer];
+        const cells = new Map(STATE.features.map(f => [f.properties.zone_id, cell(f.properties)]));
+        let min, max;
+        if (monthly && m) [min, max] = STATE.monthlyRange[STATE.layer] || [0, 1];
+        else {
+            const vals = [...cells.values()].map(c => c.v).filter(isNum);
+            min = vals.length ? Math.min(...vals) : 0;
+            max = vals.length ? Math.max(...vals) : 1;
+        }
+        const fmtL = monthly && m ? m.fmt : spec.fmt;
+        const title = monthly ? (m ? `${m.title}, ${monthName(currentYm())}` : 'Riparian vegetation (NDVI)') : spec.title;
         const ink = css('--ink'), ink2 = css('--ink-2'), ink3 = css('--ink-3');
 
         unitsLayer.eachLayer(layer => {
             const p = layer.feature.properties;
+            const c = cells.get(p.zone_id);
             const sel = STATE.zone === p.zone_id;
-            const unrel = spec.unreliable(p);
             layer.setStyle({
-                fillColor: colorFor(spec.value(p), min, max) || css('--unreliable'),
-                fillOpacity: unrel ? 0.4 : 0.85,
+                fillColor: colorFor(c.v, min, max) || css('--unreliable'),
+                fillOpacity: c.unrel ? 0.4 : 0.85,
                 color: ink,
                 weight: sel ? 3.5 : 1.5,
-                dashArray: unrel ? '6 5' : null
+                dashArray: c.unrel ? '6 5' : null
             });
-            const val = unrel ? `${spec.fmt(spec.raw(p))} — not reliable here` : spec.fmt(spec.value(p));
-            layer.setTooltipContent(`<strong>${escHtml(p.zone_id)} · ${escHtml(p.zone_name)}</strong><br><span style="color:${ink2}">${escHtml(spec.title)}: ${escHtml(val)}</span><br><span style="color:${ink3};font-size:11.5px">Click to open this unit</span>`);
+            const val = c.unrel ? (isNum(c.raw) ? `${c.fmt(c.raw)} — ${c.missing}` : c.missing) : c.fmt(c.v);
+            layer.setTooltipContent(`<strong>${escHtml(p.zone_id)} · ${escHtml(p.zone_name)}</strong><br><span style="color:${ink2}">${escHtml(title)}: ${escHtml(val)}</span><br><span style="color:${ink3};font-size:11.5px">Click to open this unit</span>`);
         });
 
         labelLayer.clearLayers();
         STATE.features.forEach(f => {
             const p = f.properties;
-            const sub = spec.unreliable(p) ? 'not reliable' : spec.fmt(spec.value(p));
+            const c = cells.get(p.zone_id);
+            const sub = c.unrel ? c.missing : c.fmt(c.v);
             const sel = STATE.zone === p.zone_id;
             const html = sel
                 ? `<div class="zone-pin is-selected">${escHtml(p.zone_id)} · ${escHtml(shortName(p))}<span>${escHtml(sub)}</span></div>`
@@ -1360,14 +1621,24 @@
             }));
         });
 
-        $('legend-title').textContent = spec.title;
-        $('legend-source').textContent = spec.source;
+        $('legend-title').textContent = title;
+        $('legend-source').textContent = monthly
+            ? (m ? 'Per-unit monthly values; colour scale fixed across all 72 months' : 'Vegetation has no monthly series; switch to 2019–2024')
+            : spec.source;
         $('legend-bar').style.background = `linear-gradient(90deg, ${ramp().join(', ')})`;
-        $('legend-min').textContent = spec.fmt(min);
-        $('legend-mid').textContent = spec.fmt((min + max) / 2);
-        $('legend-max').textContent = spec.fmt(max);
-        $('legend-note').hidden = !STATE.features.some(f => spec.unreliable(f.properties));
+        $('legend-min').textContent = fmtL(min);
+        $('legend-mid').textContent = fmtL((min + max) / 2);
+        $('legend-max').textContent = fmtL(max);
+        const anyUnrel = [...cells.values()].some(c => c.unrel);
+        $('legend-note').hidden = !anyUnrel;
+        $('legend-note-text').textContent = !monthly ? 'Not reliable here (dry-season radar artefacts)'
+            : STATE.layer === 'flood' ? 'Hatched: not reliable (Z1–Z2) or no value this month' : 'Hatched: no value for this month';
+        $('timeline-note').textContent = monthly ? (m ? m.note : MONTHLY.ndvi === null ? 'Vegetation has no monthly series' : '') : 'Summary values for the whole period';
+        $('tl-label').textContent = monthName(currentYm());
+        LAST_MAP = { cells, min, max, title, fmtL, spec };
     }
+
+    let LAST_MAP = null;
 
     document.querySelectorAll('.layer-switch .seg').forEach(btn => btn.addEventListener('click', () => {
         STATE.layer = btn.dataset.layer;
@@ -1375,6 +1646,69 @@
         styleMap();
         writeHash();
     }));
+
+    // ================= Timeline (by month) =================
+    let playTimer = null;
+
+    function setPeriod(period) {
+        STATE.period = period;
+        document.querySelectorAll('[data-period]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.period === period)));
+        $('timeline-controls').hidden = period !== 'month';
+        if (period !== 'month') stopPlay();
+        styleMap();
+        if (STATE.zone === 'ALL') fitAll(true);
+    }
+
+    function setMonth(i, fromPlay) {
+        STATE.month = Math.max(0, Math.min(STATE.series.length - 1, i));
+        $('tl-range').value = STATE.month;
+        if (!fromPlay) stopPlay();
+        styleMap();
+        if (STATE.tab === 'series' && STATE.seriesMode === 'timeline' && Object.keys(charts).length) syncHover(STATE.month);
+    }
+
+    function stopPlay() {
+        if (playTimer) clearInterval(playTimer);
+        playTimer = null;
+        $('tl-play').setAttribute('aria-label', 'Play through the months');
+        $('tl-play').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>';
+    }
+
+    $('tl-play').addEventListener('click', () => {
+        if (playTimer) return stopPlay();
+        if (STATE.month >= STATE.series.length - 1) setMonth(0, true);
+        $('tl-play').setAttribute('aria-label', 'Pause');
+        $('tl-play').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+        playTimer = setInterval(() => {
+            if (STATE.month >= STATE.series.length - 1) return stopPlay();
+            setMonth(STATE.month + 1, true);
+        }, 700);
+    });
+
+    $('tl-range').addEventListener('input', e => setMonth(Number(e.target.value)));
+    document.querySelectorAll('[data-period]').forEach(b => b.addEventListener('click', () => setPeriod(b.dataset.period)));
+
+    // ================= Map extras =================
+    const PLACES = [
+        { name: 'Abeokuta', lat: 7.1475, lon: 3.3619 },
+        { name: 'Oyan Dam', lat: 7.2555, lon: 3.2557 },
+        { name: 'Lagos', lat: 6.4550, lon: 3.3941 }
+    ];
+    const EXTRAS = { rivers: null, reservoir: null };
+    const extrasLayer = L.layerGroup().addTo(map);
+
+    function drawExtras() {
+        extrasLayer.clearLayers();
+        if (EXTRAS.reservoir) L.geoJSON(EXTRAS.reservoir, { interactive: false, style: { color: css('--accent-ink'), weight: 1, fillColor: css('--accent'), fillOpacity: 0.55 } }).addTo(extrasLayer);
+        if (EXTRAS.rivers) L.geoJSON(EXTRAS.rivers, {
+            interactive: false,
+            style: f => ({ color: css('--accent-ink'), weight: Math.max(1, Math.min(3.5, ((f.properties && f.properties.ORD_STRA) || 3) - 2)), opacity: 0.85 })
+        }).addTo(extrasLayer);
+        PLACES.forEach(pl => L.marker([pl.lat, pl.lon], {
+            interactive: false,
+            icon: L.divIcon({ className: 'place-label', iconSize: [0, 0], iconAnchor: [5, 6], html: escHtml(pl.name) })
+        }).addTo(extrasLayer));
+    }
 
     // ================= Unit selection =================
     function renderChips() {
@@ -1399,9 +1733,8 @@
         if (id === 'ALL') {
             fitAll(true);
         } else {
-            const small = window.innerWidth <= 640;
-            // Leave room for the layer switcher (top) and the legend (bottom left).
-            unitsLayer.eachLayer(l => { if (l.feature.properties.zone_id === id) map.flyToBounds(l.getBounds(), { paddingTopLeft: [small ? 20 : 60, small ? 70 : 80], paddingBottomRight: [small ? 20 : 60, small ? 160 : 170], duration: 0.5, maxZoom: 10 }); });
+            // Leave room for the floating panels (layer switcher, timeline, legend).
+            unitsLayer.eachLayer(l => { if (l.feature.properties.zone_id === id) map.flyToBounds(l.getBounds(), Object.assign(mapPadding(), { duration: 0.5, maxZoom: 10 })); });
         }
     }
 
@@ -1508,11 +1841,12 @@
         { target: '.map-pane', tab: 'overview', title: 'The map', text: 'This is the Ogun River catchment. It is split into four sub-basins (Z1–Z4) from the headwaters down to the floodplain, plus the lagoon zone the river drains into (Z5). Drag to pan and scroll to zoom.' },
         { target: '.layer-switch', tab: 'overview', title: 'Choose what the map shows', text: 'Switch between floodplain inundation, rainfall, lagoon turbidity and riparian vegetation. Darker blue means a higher value.' },
         { target: '#legend', tab: 'overview', title: 'Read the legend', text: 'The colour scale gives the range for the current layer. Units drawn hatched with a dashed outline have no reliable value for that layer, so they are left out of the colour scale.' },
+        { target: '#timeline', tab: 'overview', title: 'Step through the months', text: 'Switch to "By month" and drag the slider, or press play, to watch rainfall and flooding change across 2019–2024. The colour scale stays fixed, so months are comparable.' },
         { target: '#unit-chips', tab: 'overview', title: 'Pick a unit', text: 'Select a sub-basin here or click it on the map to open its details. "Whole system" goes back to the full catchment.' },
         { target: '#intro', tab: 'overview', title: 'Start with the overview', text: 'The study in plain terms and the short answer. Below it are the headline numbers and each finding with a verdict: Significant, Not robust, or No link.' },
-        { target: '#multiples', tab: 'series', title: 'Explore 72 months of data', text: 'Four aligned charts share one time axis: rainfall, the radar flood index, the optical flood check and lagoon turbidity. Hover over (or tap) any chart to read the same month in all four.' },
-        { target: '#panel-stats .controls', tab: 'stats', title: 'Check the statistics', text: 'Pick a relationship to see the full audit: sample sizes, correlations with confidence intervals and adjusted p-values, plus a robustness check.' },
-        { target: '.appbar-actions', tab: 'overview', title: 'Download, methods and theme', text: 'Download every dataset, read exactly how each value was measured and its limitations, or switch to dark mode. The address bar always keeps your current view, so you can share it.' }
+        { target: '#multiples', tab: 'series', title: 'Explore 72 months of data', text: 'Four aligned charts share one time axis: rainfall, the radar flood index, the optical flood check and lagoon turbidity. Hover over (or tap) any chart to read the same month in all four. "Seasonal cycle" shows the average year, and you can download the charts as an image.' },
+        { target: '#panel-stats .controls', tab: 'stats', title: 'Check the statistics', text: 'Pick a relationship to see the full audit: sample sizes, correlations with confidence intervals and adjusted p-values, plus a robustness check. Underlined terms explain themselves when you hover or tap them.' },
+        { target: '.appbar-actions', tab: 'overview', title: 'Share, download and read the methods', text: 'Copy a link to exactly this view or print it, download every dataset, read how each value was measured and its limitations, or switch to dark mode.' }
     ];
     let tourIdx = 0;
     let tourReturnFocus = null;
@@ -1636,6 +1970,16 @@
     const charts = {};
 
     function seriesRows() {
+        const rows = monthlyRows();
+        if (STATE.seriesMode !== 'seasonal') return rows;
+        return MONTHS.map((name, mi) => {
+            const sel = rows.filter(r => Number(r.ym.slice(5, 7)) === mi + 1);
+            const mean = k => { const v = sel.map(r => r[k]).filter(isNum); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+            return { ym: name, rain: mean('rain'), sar: mean('sar'), dw: mean('dw'), ndti: mean('ndti') };
+        });
+    }
+
+    function monthlyRows() {
         const zone = STATE.zone;
         const unit = zone !== 'ALL' && zone !== 'Z5' ? STATE.unitSeries[zone] : null;
         const byMonth = {};
@@ -1659,6 +2003,7 @@
         $('series-scope').textContent = hasUnit
             ? `Rainfall and flooding for ${zone} · ${f ? f.properties.zone_name : ''}${SAR_UNRELIABLE.has(zone) ? ' (radar index hidden: not reliable in this unit)' : ''}. Turbidity is always the Z5 lagoon.`
             : 'Catchment-wide: rainfall averaged over Z1–Z4, flooding over the Z3–Z4 floodplain, turbidity over the Z5 lagoon. Pick a unit to see its own series.';
+        if (STATE.seriesMode === 'seasonal') $('series-scope').textContent += ' Seasonal cycle: the 2019–2024 average for each calendar month.';
 
         const n = STATE.series.length;
         const count = k => STATE.series.filter(r => isNum(r[k])).length;
@@ -1669,6 +2014,8 @@
             ['Wet-season turbidity', `${wet.filter(r => isNum(r.estuary_ndti)).length}/${wet.length}`]
         ].map(([k, v]) => `<span class="pill">${k} <strong>${v}</strong></span>`).join('');
 
+        $('series-table-first').textContent = STATE.seriesMode === 'seasonal' ? 'Calendar month (mean)' : 'Month';
+        $('series-table-summary').textContent = STATE.seriesMode === 'seasonal' ? 'View the monthly averages as a table' : 'View the monthly values as a table';
         $('series-table').innerHTML = seriesRows().map(r => `<tr><td>${r.ym}</td><td>${fmt(r.rain, 1)}</td><td>${fmt(r.sar, 2)}</td><td>${fmt(r.dw, 1)}</td><td>${fmt(r.ndti, 3)}</td></tr>`).join('');
         buildCharts();
     }
@@ -1758,7 +2105,7 @@
                             padding: 8,
                             caretSize: 0,
                             callbacks: {
-                                title: items => items.length ? monthName(items[0].label) : '',
+                                title: items => items.length ? (STATE.seriesMode === 'seasonal' ? `${items[0].label} · 2019–2024 mean` : monthName(items[0].label)) : '',
                                 label: item => isNum(item.raw) ? `${Number(item.raw).toFixed(s.digits)}${s.unit}` : 'No data'
                             }
                         }
@@ -1773,7 +2120,7 @@
                                 font: { family: 'Satoshi, system-ui', size: 11 },
                                 autoSkip: false,
                                 maxRotation: 0,
-                                callback: (val, idx) => labels[idx] && labels[idx].endsWith('-01') ? labels[idx].slice(0, 4) : ''
+                                callback: (val, idx) => STATE.seriesMode === 'seasonal' ? labels[idx] : (labels[idx] && labels[idx].endsWith('-01') ? labels[idx].slice(0, 4) : '')
                             }
                         },
                         y: {
@@ -1790,6 +2137,128 @@
             $(s.id).onmouseleave = () => syncHover(null);
         });
     }
+
+    document.querySelectorAll('[data-series-mode]').forEach(b => b.addEventListener('click', () => {
+        STATE.seriesMode = b.dataset.seriesMode;
+        document.querySelectorAll('[data-series-mode]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+        renderSeries();
+    }));
+
+    // ================= Figure downloads (PNG) =================
+    const FIG_CREDIT = 'David Oloyede · Ogun Catchment-to-Coast Observatory · CC BY 4.0 · github.com/oloyededavid/Ogun-Catchment-Coast-Observatory';
+
+    function saveCanvas(canvas, filename) {
+        canvas.toBlob(blob => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        }, 'image/png');
+    }
+
+    function figureFrame(width, height, title, subtitle) {
+        const scale = 2;
+        const c = document.createElement('canvas');
+        c.width = width * scale; c.height = height * scale;
+        const ctx = c.getContext('2d');
+        ctx.scale(scale, scale);
+        ctx.fillStyle = css('--surface-raised'); ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = css('--ink'); ctx.font = '900 24px Satoshi, system-ui, sans-serif'; ctx.textBaseline = 'top';
+        ctx.fillText(title, 32, 26);
+        ctx.fillStyle = css('--ink-2'); ctx.font = '500 15px Satoshi, system-ui, sans-serif';
+        ctx.fillText(subtitle, 32, 58);
+        ctx.fillStyle = css('--ink-3'); ctx.font = '500 12px Satoshi, system-ui, sans-serif';
+        ctx.fillText(FIG_CREDIT, 32, height - 28);
+        return { c, ctx };
+    }
+
+    $('btn-chart-png').addEventListener('click', () => {
+        const ids = ['chart-rain', 'chart-sar', 'chart-dw', 'chart-ndti'];
+        const titles = ['Rainfall (mm / month)', 'Radar inundation index (km²)', 'Optical flooding check, Dynamic World (km²)', 'Lagoon turbidity, Z5 (NDTI)'];
+        const W = 1200, inner = W - 64, top = 96;
+        const heights = ids.map(id => { const cv = charts[id].canvas; return Math.round(inner * cv.height / cv.width); });
+        const H = top + heights.reduce((a, h) => a + h + 34, 0) + 50;
+        const zone = STATE.zone === 'ALL' ? 'Whole system' : `${STATE.zone} · ${shortName(featureById(STATE.zone).properties)}`;
+        const mode = STATE.seriesMode === 'seasonal' ? 'seasonal cycle (calendar-month means)' : 'monthly, 2019–2024';
+        const { c, ctx } = figureFrame(W, H, 'Ogun Catchment-to-Coast Observatory', `${zone} · ${mode}`);
+        let y = top;
+        ids.forEach((id, i) => {
+            ctx.fillStyle = css('--ink'); ctx.font = '900 15px Satoshi, system-ui, sans-serif';
+            ctx.fillText(titles[i], 32, y);
+            ctx.drawImage(charts[id].canvas, 32, y + 24, inner, heights[i]);
+            y += heights[i] + 34;
+        });
+        saveCanvas(c, `ogun-observatory-${STATE.seriesMode}-${STATE.zone.toLowerCase()}.png`);
+    });
+
+    $('btn-map-png').addEventListener('click', () => {
+        if (!LAST_MAP) return;
+        const W = 1200, H = 1240, top = 100, bottom = 150, pad = 40;
+        const { c, ctx } = figureFrame(W, H, 'Ogun Catchment-to-Coast Observatory', LAST_MAP.title);
+        let minLon = 180, maxLon = -180, minLat = 90, maxLat = -90;
+        const rings = f => (f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates);
+        STATE.features.forEach(f => rings(f).forEach(poly => poly[0].forEach(([x, y]) => {
+            minLon = Math.min(minLon, x); maxLon = Math.max(maxLon, x); minLat = Math.min(minLat, y); maxLat = Math.max(maxLat, y);
+        })));
+        const k0 = Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
+        const k = Math.min((W - 2 * pad) / ((maxLon - minLon) * k0), (H - top - bottom - pad) / (maxLat - minLat));
+        const ox = (W - (maxLon - minLon) * k0 * k) / 2, oy = top + 10;
+        const proj = ([x, y]) => [ox + (x - minLon) * k0 * k, oy + (maxLat - y) * k];
+        const hatch = (() => {
+            const t = document.createElement('canvas'); t.width = t.height = 8;
+            const g = t.getContext('2d'); g.strokeStyle = css('--unreliable'); g.lineWidth = 2;
+            g.beginPath(); g.moveTo(0, 8); g.lineTo(8, 0); g.stroke();
+            return ctx.createPattern(t, 'repeat');
+        })();
+        const tracePoly = poly => { poly.forEach(ring => ring.forEach((pt, i) => { const [x, y] = proj(pt); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); })); };
+        STATE.features.forEach(f => {
+            const cl = LAST_MAP.cells.get(f.properties.zone_id);
+            rings(f).forEach(poly => {
+                ctx.beginPath(); tracePoly(poly); ctx.closePath();
+                ctx.fillStyle = cl.unrel ? hatch : colorFor(cl.v, LAST_MAP.min, LAST_MAP.max);
+                ctx.fill('evenodd');
+                ctx.setLineDash(cl.unrel ? [7, 5] : []);
+                ctx.strokeStyle = css('--ink'); ctx.lineWidth = STATE.zone === f.properties.zone_id ? 3 : 1.4;
+                ctx.stroke();
+            });
+        });
+        ctx.setLineDash([]);
+        if (EXTRAS.rivers) EXTRAS.rivers.features.forEach(f => {
+            const lines = f.geometry.type === 'LineString' ? [f.geometry.coordinates] : f.geometry.type === 'MultiLineString' ? f.geometry.coordinates : [];
+            ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.2;
+            lines.forEach(l => { ctx.beginPath(); l.forEach((pt, i) => { const [x, y] = proj(pt); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); });
+        });
+        ctx.font = '700 13px Satoshi, system-ui, sans-serif'; ctx.textBaseline = 'middle';
+        STATE.features.forEach(f => {
+            const p = f.properties, cl = LAST_MAP.cells.get(p.zone_id);
+            const [x, y] = proj([p._center.lng, p._center.lat]);
+            const text = `${p.zone_id}  ${cl.unrel ? cl.missing : cl.fmt(cl.v)}`;
+            const w = ctx.measureText(text).width + 14;
+            ctx.fillStyle = css('--surface-raised'); ctx.strokeStyle = css('--border-strong'); ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.roundRect(x - w / 2, y - 11, w, 22, 5); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = css('--ink'); ctx.fillText(text, x - w / 2 + 7, y);
+        });
+        PLACES.forEach(pl => {
+            const [x, y] = proj([pl.lon, pl.lat]);
+            ctx.fillStyle = css('--ink'); ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.font = '700 12px Satoshi, system-ui, sans-serif'; ctx.fillText(pl.name, x + 8, y);
+        });
+        // Legend
+        const ly = H - bottom + 10;
+        ctx.textBaseline = 'top';
+        const grad = ctx.createLinearGradient(32, 0, 432, 0);
+        ramp().forEach((col, i, a) => grad.addColorStop(i / (a.length - 1), col));
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(32, ly, 400, 12, 6); ctx.fill();
+        ctx.fillStyle = css('--ink-2'); ctx.font = '500 13px Satoshi, system-ui, sans-serif';
+        ctx.fillText(LAST_MAP.fmtL(LAST_MAP.min), 32, ly + 18);
+        const maxT = LAST_MAP.fmtL(LAST_MAP.max); ctx.fillText(maxT, 432 - ctx.measureText(maxT).width, ly + 18);
+        if (!$('legend-note').hidden) {
+            ctx.fillStyle = hatch; ctx.fillRect(32, ly + 46, 18, 12);
+            ctx.fillStyle = css('--ink-2'); ctx.fillText($('legend-note-text').textContent, 58, ly + 45);
+        }
+        saveCanvas(c, `ogun-observatory-map-${STATE.layer}${STATE.period === 'month' ? '-' + currentYm() : ''}.png`);
+    });
 
     // ================= Statistics =================
     const EXPLAIN = {
@@ -1906,7 +2375,67 @@
         const ver = prov && prov.gee_script_version ? ` v${prov.gee_script_version}` : '';
         $('data-chip-text').textContent = demo ? 'Demonstration data' : `Earth Engine export${ver}`;
         chip.title = prov && prov.gee_export_utc ? `Exported ${prov.gee_export_utc}` : '';
+        const exported = prov && prov.gee_export_utc ? new Date(prov.gee_export_utc) : null;
+        const when = exported && !isNaN(exported) ? `, exported ${exported.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}` : '';
+        $('footer-data').textContent = demo ? 'Data: demonstration values, not a verified export.' : `Data: Google Earth Engine export${ver}${when} · covering 2019–2024.`;
     }
+
+    // ================= Glossary =================
+    const GLOSSARY = {
+        subbasin: ['Sub-basin', 'The land area that drains to one point on the river. Z1–Z4 are built from HydroBASINS level-9 units.'],
+        floodplain: ['Floodplain', 'Low, flat land beside a river that goes under water when the river overflows. Here, mainly Z3–Z4.'],
+        sar: ['Radar (SAR)', 'Sentinel-1 synthetic aperture radar sends microwaves that pass through cloud. Smooth open water reflects little back and looks dark, which is how flooding is detected.'],
+        dw: ['Dynamic World', 'A Google land-cover map made from every Sentinel-2 image. Used as an independent optical check on the radar flooding; it cannot see through cloud.'],
+        ndti: ['NDTI', 'Normalized Difference Turbidity Index, (red − green) / (red + green) from Sentinel-2. Higher means murkier water; below 0 means relatively clear. A relative index, not a lab measurement.'],
+        ndvi: ['NDVI', 'Normalized Difference Vegetation Index from Sentinel-2. Higher means denser, greener vegetation (about 0.2 is sparse, 0.6 or more is dense).'],
+        hand: ['Height above drainage', 'How high a point sits above the nearest river channel (MERIT Hydro). Flooding is only counted below 15 m.'],
+        chirps: ['CHIRPS', 'A rainfall dataset combining satellite estimates and rain gauges, at about 5 km resolution.'],
+        era5: ['ERA5-Land', 'A weather-model reconstruction of past conditions; here, the water held in the top 7 cm of soil.'],
+        anomaly: ['Deseasonalized', 'Each month minus the average for that calendar month, so the normal wet and dry seasons do not create false correlations.'],
+        lag: ['Lag', 'Compares rain in one month with flooding in the same month (+0), one month later (+1) or two months later (+2).'],
+        rho: ['Spearman ρ', 'A rank correlation from −1 to 1: do higher values of one go with higher values of the other? Not swayed much by a single extreme month.'],
+        r: ['Pearson r', 'A linear correlation from −1 to 1. One extreme month can pull it strongly, so compare it with ρ.'],
+        p: ['p-value', 'How surprising the association would be if there were really no link. Below 0.05 counts as significant here, after adjusting for autocorrelation and for testing several lags (FDR).'],
+        neff: ['Effective n', 'The number of independent months the test really has. Neighbouring months are similar, so it can be smaller than the number of months.'],
+        robust: ['Robust', 'The result still holds when any single month is left out.']
+    };
+
+    function initGlossary() {
+        document.querySelectorAll('[data-term]').forEach(el => {
+            const g = GLOSSARY[el.dataset.term];
+            if (g) { el.dataset.tip = `${g[0]}: ${g[1]}`; el.setAttribute('aria-label', `${el.textContent.trim()}: ${g[1]}`); }
+        });
+        $('glossary-list').innerHTML = Object.values(GLOSSARY).map(([t, d]) => `<dt>${escHtml(t)}</dt><dd>${escHtml(d)}</dd>`).join('');
+    }
+    initGlossary();
+
+    // ================= Share & print =================
+    function snack(msg) {
+        const el = document.createElement('div');
+        el.className = 'snack'; el.setAttribute('role', 'status'); el.textContent = msg;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 2200);
+    }
+
+    $('share-copy').addEventListener('click', e => {
+        e.preventDefault();
+        $('share-menu').open = false;
+        const done = () => snack('Link copied');
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(location.href).then(done, () => window.prompt('Copy this link:', location.href));
+        else window.prompt('Copy this link:', location.href);
+    });
+    if (navigator.share) $('share-native').hidden = false;
+    $('share-native').addEventListener('click', e => {
+        e.preventDefault();
+        $('share-menu').open = false;
+        navigator.share({ title: document.title, url: location.href }).catch(() => {});
+    });
+    $('share-print').addEventListener('click', e => {
+        e.preventDefault();
+        $('share-menu').open = false;
+        setTimeout(() => window.print(), 50);
+    });
+    window.addEventListener('beforeprint', () => map.invalidateSize());
 
     // ================= Dialogs & tips =================
     const openDialog = id => { const d = $(id); if (d && !d.open) d.showModal(); };
@@ -1921,12 +2450,14 @@
         if (e.target.tagName === 'DIALOG') e.target.close();
         const menu = $('download-menu');
         if (menu.open && !e.target.closest('#download-menu')) menu.open = false;
-        const info = e.target.closest('.info');
+        const info = e.target.closest('.info, .term');
         if (info) { tipEl.hidden ? showTip(info) : hideTip(); }
+        const share = $('share-menu');
+        if (share.open && !e.target.closest('#share-menu')) share.open = false;
     });
 
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') { $('download-menu').open = false; hideTip(); }
+        if (e.key === 'Escape') { $('download-menu').open = false; $('share-menu').open = false; hideTip(); }
     });
 
     const tipEl = $('floating-tip');
@@ -1939,10 +2470,11 @@
         tipEl.style.top = `${r.top - h - 8 < 8 ? r.bottom + 8 : r.top - h - 8}px`;
     }
     function hideTip() { tipEl.hidden = true; }
-    document.addEventListener('mouseover', e => { const b = e.target.closest('.info'); if (b) showTip(b); });
-    document.addEventListener('mouseout', e => { if (e.target.closest('.info')) hideTip(); });
-    document.addEventListener('focusin', e => { const b = e.target.closest('.info'); if (b) showTip(b); });
-    document.addEventListener('focusout', e => { if (e.target.closest('.info')) hideTip(); });
+    const TIP_SEL = '.info, .term';
+    document.addEventListener('mouseover', e => { const b = e.target.closest(TIP_SEL); if (b) showTip(b); });
+    document.addEventListener('mouseout', e => { if (e.target.closest(TIP_SEL)) hideTip(); });
+    document.addEventListener('focusin', e => { const b = e.target.closest(TIP_SEL); if (b) showTip(b); });
+    document.addEventListener('focusout', e => { if (e.target.closest(TIP_SEL)) hideTip(); });
     $('tab-panels').addEventListener('scroll', hideTip, { passive: true });
 
     // ================= Shareable links =================
@@ -1980,8 +2512,10 @@
         fetch('data/ogun_subbasins.geojson').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
         fetch('data/ogun_monthly_timeseries.csv').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); }),
         fetch('data/cascade_diagnostics.json').then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch('data/ogun_unit_monthly_timeseries.csv').then(r => r.ok ? r.text() : '').catch(() => '')
-    ]).then(([geojson, csvText, diagnostics, unitCsv]) => {
+        fetch('data/ogun_unit_monthly_timeseries.csv').then(r => r.ok ? r.text() : '').catch(() => ''),
+        fetch('data/ogun_rivers.geojson').then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch('data/oyan_reservoir.geojson').then(r => r.ok ? r.json() : null).catch(() => null)
+    ]).then(([geojson, csvText, diagnostics, unitCsv, rivers, reservoir]) => {
         if (!geojson || !Array.isArray(geojson.features) || !geojson.features.length) return fail('Unit boundaries missing', 'docs/data/ogun_subbasins.geojson contains no features.');
         const series = parseCsv(csvText);
         if (!series.length) return fail('Time series missing', 'docs/data/ogun_monthly_timeseries.csv could not be parsed.');
@@ -1996,6 +2530,15 @@
         STATE.diagnostics = diagnostics;
         STATE.unitSeries = {};
         if (unitCsv) parseCsv(unitCsv).forEach(r => { if (r.zone_id) (STATE.unitSeries[r.zone_id] = STATE.unitSeries[r.zone_id] || []).push(r); });
+        STATE.unitByMonth = {};
+        Object.entries(STATE.unitSeries).forEach(([z, rows]) => { STATE.unitByMonth[z] = Object.fromEntries(rows.map(r => [r.year_month, r])); });
+        computeMonthlyRanges();
+        STATE.month = Math.max(0, series.findIndex(r => r.year_month === (diagnostics && diagnostics.extremes && diagnostics.extremes.peak_sar_inundation_month)));
+        $('tl-range').max = series.length - 1;
+        $('tl-range').value = STATE.month;
+        if (!Object.keys(STATE.unitSeries).length) $('timeline').hidden = true;
+        EXTRAS.rivers = rivers && Array.isArray(rivers.features) ? rivers : null;
+        EXTRAS.reservoir = reservoir && Array.isArray(reservoir.features) ? reservoir : null;
 
         readHash();
         const opts = STATE.features.map(f => `<option value="${escHtml(f.properties.zone_id)}">${escHtml(f.properties.zone_id)} · ${escHtml(shortName(f.properties))}</option>`).join('');
@@ -2005,6 +2548,7 @@
         $('comp-b').value = STATE.compB;
 
         buildMap();
+        drawExtras();
         renderChips();
         renderUnitList();
         renderProvenance();

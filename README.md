@@ -1,6 +1,7 @@
 # Ogun River Catchment-to-Coast Environmental Observatory (2019–2024)
 
 **Repository:** `https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory`  
+**Author:** David Oloyede  
 **Live Interface:** `https://oloyededavid.github.io/Ogun-Catchment-Coast-Observatory/`
 
 An integrated Earth Observation and hydrological research observatory investigating how monthly rainfall variability and shallow surface soil-moisture conditions across the Ogun River catchment relate to seasonal SAR floodplain inundation indicators and downstream estuarine spectral turbidity dynamics (`NDTI`) in the northwest Lagos Lagoon.
