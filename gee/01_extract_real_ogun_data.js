@@ -1,75 +1,69 @@
-var hybas7 = ee.FeatureCollection('WWF/HydroSHEDS/v1/Basins/hybas_7');
+var hybas9 = ee.FeatureCollection('WWF/HydroSHEDS/v1/Basins/hybas_9');
 var rivers = ee.FeatureCollection('WWF/HydroSHEDS/v1/FreeFlowingRivers');
 var jrc = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('occurrence').unmask(0);
 
 
 // ---------------------------------------------------------------------------
-// Sub-basin delineation by HydroBASINS topology (NEXT_DOWN upstream tracing).
-// Each zone is defined by a POUR POINT (outlet). A zone is the hybas_7 unit that
-// contains its pour point plus every unit draining into it, minus any upstream
-// zone already assigned. No latitude/longitude slicing is used.
+// Sub-basin delineation by HydroBASINS level-9 topology (NEXT_DOWN tracing).
 //
-// VERIFY BEFORE EXPORT: check each pour point on the map (layers are added
-// below) and move it if it does not sit on the intended outlet reach.
+// A zone is everything upstream of an OUTLET unit, minus zones further upstream.
+// Outlets are fixed HydroBASINS v1 level-9 HYBAS_IDs, checked against UP_AREA:
+//   1090960280  Ogun River outlet to the Lagos Lagoon   (UP_AREA 22,165.7 km2)
+//   1090950490  Lower Ogun mainstem at ~6.9 N            (UP_AREA 21,322.2 km2)
+//   1090928900  Upper Ogun, above the Oyan confluence    (UP_AREA  9,574.5 km2)
+//   1090931470  Oyan Dam outlet (Oyan-Ofiki tributary)   (UP_AREA  9,334.5 km2)
+// The Ogun's MAIN_BAS (1090023020) is the whole 48,394 km2 Lagos Lagoon system,
+// including the Osun basin, so it must NOT be used as the catchment.
 // ---------------------------------------------------------------------------
-var POUR_POINTS = {
-  // Oyan Dam outlet: everything upstream = Oyan-Ofiki regulated tributary (Z2)
-  oyanDam: ee.Geometry.Point([3.26, 7.25]),
-  // Upper Ogun mainstem outlet (above the Oyan confluence): upstream = Z1
-  upperOgunOutlet: ee.Geometry.Point([3.45, 7.75]),
-  // Ogun mainstem at Abeokuta: upstream minus Z1, Z2 = Middle Ogun (Z3)
-  abeokuta: ee.Geometry.Point([3.35, 7.15])
+var OUTLETS = {
+  ogunMouth: 1090960280,
+  lowerMainstem: 1090950490,
+  upperOgun: 1090928900,
+  oyanDam: 1090931470
 };
 
-var mainBasId = hybas7.filterBounds(POUR_POINTS.abeokuta).first().get('MAIN_BAS');
-var ogunHybas7 = hybas7.filter(ee.Filter.eq('MAIN_BAS', mainBasId));
+var lagosSystem = hybas9.filter(ee.Filter.eq('MAIN_BAS', 1090023020));
 
-// Returns the HYBAS_IDs of the unit containing `pt` and all units upstream of it.
-function upstreamIds(pt) {
-  var outletId = ogunHybas7.filterBounds(pt).first().get('HYBAS_ID');
-  var seed = ee.List([outletId]);
-  // 80 iterations exceeds the longest hybas_7 flow path in the Ogun basin.
-  return ee.List(ee.List.sequence(1, 80).iterate(function(_, acc) {
+// HYBAS_IDs of `outletId` and every unit draining into it.
+function upstreamIds(outletId) {
+  // 150 passes exceeds the longest level-9 flow path in the basin.
+  return ee.List(ee.List.sequence(1, 150).iterate(function(_, acc) {
     acc = ee.List(acc);
-    var newIds = ogunHybas7.filter(ee.Filter.inList('NEXT_DOWN', acc))
-      .aggregate_array('HYBAS_ID');
+    var newIds = lagosSystem.filter(ee.Filter.inList('NEXT_DOWN', acc)).aggregate_array('HYBAS_ID');
     return acc.cat(newIds).distinct();
-  }, seed));
+  }, ee.List([outletId])));
 }
 
-var idsZ2 = upstreamIds(POUR_POINTS.oyanDam);
-var idsZ1 = upstreamIds(POUR_POINTS.upperOgunOutlet).removeAll(idsZ2);
-var idsZ3 = upstreamIds(POUR_POINTS.abeokuta).removeAll(idsZ1).removeAll(idsZ2);
-var idsAssigned = idsZ1.cat(idsZ2).cat(idsZ3);
-var idsZ4 = ogunHybas7.filter(ee.Filter.inList('HYBAS_ID', idsAssigned).not())
-  .aggregate_array('HYBAS_ID');
+var idsCatchment = upstreamIds(OUTLETS.ogunMouth);
+var idsAboveLower = upstreamIds(OUTLETS.lowerMainstem);
+var idsZ1 = upstreamIds(OUTLETS.upperOgun);
+var idsZ2 = upstreamIds(OUTLETS.oyanDam);
+var idsZ3 = idsAboveLower.removeAll(idsZ1).removeAll(idsZ2);
+var idsZ4 = idsCatchment.removeAll(idsAboveLower);
 
 function zoneGeom(ids) {
-  return ogunHybas7.filter(ee.Filter.inList('HYBAS_ID', ids)).geometry().dissolve();
+  return lagosSystem.filter(ee.Filter.inList('HYBAS_ID', ids)).geometry().dissolve();
 }
 
 var z1Geom = zoneGeom(idsZ1);
 var z2Geom = zoneGeom(idsZ2);
 var z3Geom = zoneGeom(idsZ3);
 var z4Geom = zoneGeom(idsZ4);
-var catchmentGeom = ogunHybas7.geometry().dissolve();
+var catchmentGeom = zoneGeom(idsCatchment);
 
-// Sanity check: every basin unit assigned exactly once.
-print('hybas_7 units per zone (Z1, Z2, Z3, Z4):',
+// Sanity check: every catchment unit assigned exactly once.
+print('Level-9 units per zone (Z1, Z2, Z3, Z4):',
   idsZ1.size(), idsZ2.size(), idsZ3.size(), idsZ4.size());
-print('Total Ogun hybas_7 units (must equal the sum above):', ogunHybas7.size());
-Map.addLayer(ee.FeatureCollection([
-  ee.Feature(POUR_POINTS.oyanDam, {name: 'Oyan Dam'}),
-  ee.Feature(POUR_POINTS.upperOgunOutlet, {name: 'Upper Ogun outlet'}),
-  ee.Feature(POUR_POINTS.abeokuta, {name: 'Abeokuta'})
-]), {color: 'red'}, 'Pour points (verify)');
+print('Total Ogun catchment units (must equal the sum above):', idsCatchment.size());
+print('Catchment upstream area km2 (expect 22,165.7):',
+  lagosSystem.filter(ee.Filter.eq('HYBAS_ID', OUTLETS.ogunMouth)).first().get('UP_AREA'));
 
 var estuaryRawBox = ee.Geometry.Polygon([
   [[3.32, 6.45], [3.51, 6.45], [3.51, 6.58], [3.32, 6.58], [3.32, 6.45]]
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.0.1';
+var SCRIPT_VERSION = '2.1.0';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
@@ -93,27 +87,27 @@ function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary
 
 var analyticalUnits = ee.FeatureCollection([
   makeUnitFeature(
-    z1Geom, 'Z1', 1, 'Upper Ogun Headwaters Sub-Basin', 'Hydrological Sub-Basin (hybas_7)',
+    z1Geom, 'Z1', 1, 'Upper Ogun Headwaters Sub-Basin', 'Hydrological Sub-Basin (hybas_9)',
     'Basement Runoff Core', '#0284C7',
-    'Precambrian basement headwaters in northern Oyo State delineated from intact WWF HydroBASINS L7 units. Shallow saprolite soils and steeper slopes generate seasonal infiltration-excess overland flow.',
+    'Upper Ogun mainstem and headwaters upstream of the Oyan confluence (HydroBASINS L9 upstream tracing). Basement-complex terrain where shallow soils and steeper slopes generate seasonal infiltration-excess overland flow.',
     'Maintain upland gallery forest buffers and contour soil-conservation practices along headwater tributaries.'
   ),
   makeUnitFeature(
-    z2Geom, 'Z2', 2, 'Oyan-Ofiki Tributary Sub-Basin', 'Hydrological Sub-Basin (hybas_7)',
+    z2Geom, 'Z2', 2, 'Oyan-Ofiki Tributary Sub-Basin', 'Hydrological Sub-Basin (hybas_9)',
     'Regulated Tributary Sub-Basin', '#0D9488',
-    'Western crystalline tributary sub-basin draining the Ofiki and Oyan rivers into the Oyan Reservoir upstream of Abeokuta.',
+    'Oyan and Ofiki tributary basin upstream of the Oyan Dam outlet, regulated by the Oyan Reservoir.',
     'Integrate telemetric stage monitoring with reservoir operating records where gauge data are available.'
   ),
   makeUnitFeature(
-    z3Geom, 'Z3', 3, 'Middle Ogun Mainstem Sub-Basin', 'Hydrological Sub-Basin (hybas_7)',
+    z3Geom, 'Z3', 3, 'Middle Ogun Mainstem Sub-Basin', 'Hydrological Sub-Basin (hybas_9)',
     'Mainstem Fluvial Corridor', '#D97706',
-    'Confluence sub-basin below the Oyan tributary junction spanning Abeokuta, Papalanto, Ewekoro, and Ifo across the basement-to-sedimentary transition.',
+    'Mainstem reach from the Oyan confluence past Abeokuta to about 6.9 N, across the basement-to-sedimentary transition.',
     'Preserve non-buildable fluvial setback corridors and monitor bank stability along braided mainstem reaches.'
   ),
   makeUnitFeature(
-    z4Geom, 'Z4', 4, 'Lower Ogun Alluvial Corridor', 'Hydrological Sub-Basin (hybas_7)',
+    z4Geom, 'Z4', 4, 'Lower Ogun Alluvial Corridor', 'Hydrological Sub-Basin (hybas_9)',
     'Low-Gradient Alluvial Floodplain', '#DC2626',
-    'Low-gradient alluvial floodplain sub-basin spanning Mowe, Kara, Isheri, Akute, and Ikorodu West where low terrain slope (< 1 deg) promotes seasonal ponding.',
+    'Lowest Ogun reaches and side tributaries between about 6.9 N and the Lagos Lagoon, a low-gradient alluvial floodplain prone to seasonal ponding.',
     'Restrict wetland reclamation in low-lying alluvial floodplains to preserve natural flood storage capacity.'
   ),
   makeUnitFeature(
@@ -150,7 +144,8 @@ var openEstuaryWaterMask = jrc.gte(50);
 // VERIFY the box covers the whole reservoir and nothing else.
 var jrcMaxExtent = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('max_extent');
 var oyanBox = ee.Geometry.Rectangle([3.10, 7.22, 3.40, 7.50]);
-var oyanReservoirMask = jrcMaxExtent.eq(1).clip(oyanBox);
+// Limited to the Oyan-Ofiki zone (Z2) so the Ogun mainstem channel is excluded.
+var oyanReservoirMask = jrcMaxExtent.eq(1).clip(oyanBox.intersection(z2Geom, 30));
 Map.addLayer(oyanReservoirMask.selfMask(), {palette: ['#7C3AED']}, 'Oyan Reservoir domain (verify)');
 
 function preprocessS2(img) {
