@@ -669,6 +669,79 @@
             box-shadow: var(--shadow-float);
         }
 
+        /* Plain-language intro */
+        .intro {
+            padding: 16px;
+            border-radius: var(--radius);
+            background: var(--accent-soft);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .intro h2 { font-size: 17px; font-weight: 900; letter-spacing: -0.01em; }
+        .intro ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .intro li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 13.5px; color: var(--ink-2); }
+        .intro li strong { color: var(--ink); }
+        .intro .ico { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; background: var(--surface-raised); color: var(--accent-ink); }
+        .intro-short { padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); font-size: 13.5px; }
+        .intro-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+        .btn-primary:hover { background: var(--accent-ink); }
+
+        /* Guided tour */
+        .tour-blocker { position: fixed; inset: 0; z-index: 2400; }
+        .tour-spot {
+            position: fixed;
+            z-index: 2450;
+            border-radius: 12px;
+            box-shadow: 0 0 0 3px var(--accent), 0 0 0 9999px rgba(11, 11, 11, 0.55);
+            pointer-events: none;
+            transition: top 0.25s, left 0.25s, width 0.25s, height 0.25s;
+        }
+
+        .tour-card {
+            position: fixed;
+            z-index: 2500;
+            width: min(360px, calc(100vw - 24px));
+            padding: 16px 18px 14px;
+            border-radius: var(--radius);
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-float);
+            transition: top 0.25s, left 0.25s;
+        }
+
+        .tour-progress { height: 4px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-bottom: 12px; }
+        .tour-progress span { display: block; height: 100%; background: var(--accent); transition: width 0.25s; }
+        .tour-step { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-ink); }
+        .tour-card h3 { font-size: 16px; font-weight: 900; margin: 2px 0 6px; letter-spacing: -0.01em; }
+        .tour-card p { font-size: 13.5px; color: var(--ink-2); }
+        .tour-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 14px; }
+        .tour-foot .btn { height: 32px; }
+        .tour-skip { border: 0; background: none; font-size: 12.5px; font-weight: 700; color: var(--ink-3); cursor: pointer; }
+
+        .toast {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 2300;
+            width: min(340px, calc(100vw - 32px));
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-float);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast p { font-size: 13.5px; color: var(--ink-2); }
+        .toast strong { color: var(--ink); }
+        .toast-actions { display: flex; gap: 8px; }
+
         /* ================= Responsive ================= */
         @media (max-width: 1100px) {
             .app { height: auto; min-height: 100vh; }
@@ -805,6 +878,22 @@
             <div class="tab-panels" id="tab-panels">
                 <!-- Overview -->
                 <div class="tab-panel" role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
+                    <section class="intro" id="intro" aria-labelledby="intro-title">
+                        <h2 id="intro-title">The study in plain terms</h2>
+                        <ul>
+                            <li><span class="ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"/></svg></span><span><strong>The place.</strong> The Ogun River drains about 22,000 km² of southwest Nigeria, past Abeokuta, into the Lagos Lagoon.</span></li>
+                            <li><span class="ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"/><path d="M12 17h.01"/></svg></span><span><strong>The question.</strong> When it rains more than usual, does more of the river's floodplain go under water, and does that muddier water reach the lagoon?</span></li>
+                            <li><span class="ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4 15 4-4 4 4 4-4 4 4"/><path d="M4 20h16"/></svg></span><span><strong>How.</strong> Free satellite data, every month from 2019 to 2024: rainfall, soil wetness, radar images of flooded ground, and how cloudy the lagoon water looks.</span></li>
+                        </ul>
+                        <p class="intro-short" id="intro-short"><strong>Short answer:</strong> loading…</p>
+                        <div class="intro-actions">
+                            <button type="button" class="btn btn-primary" data-tour-start>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 4 14 8-14 8z"/></svg>
+                                Take the 1-minute tour
+                            </button>
+                            <button type="button" class="btn" data-open="methods-dialog">How it was measured</button>
+                        </div>
+                    </section>
                     <div>
                         <h2 class="panel-title">What the 2019–2024 data shows</h2>
                         <p class="lede" style="margin-top: 6px;">Does rainfall and soil moisture across the Ogun River catchment drive floodplain inundation, and does that flooding reach the northwest Lagos Lagoon as turbidity?</p>
@@ -971,6 +1060,7 @@
     </div>
     <div class="dialog-body">
         <p>This observatory tests whether rainfall and shallow soil moisture across the roughly 22,200 km² Ogun River catchment relate to floodplain inundation, and whether that flooding reaches the northwest Lagos Lagoon as turbidity. All data come from one Google Earth Engine export (2019–2024) and are recomputed by the repository's own scripts.</p>
+        <p><button type="button" class="btn btn-primary" data-tour-start>Take the guided tour</button></p>
         <h4>Using the site</h4>
         <ol>
             <li><strong>Overview</strong> gives the headline numbers and the findings, each with a verdict.</li>
@@ -985,6 +1075,32 @@
 </dialog>
 
 <div class="floating-tip" id="floating-tip" role="tooltip" hidden></div>
+
+<div id="tour" hidden>
+    <div class="tour-blocker"></div>
+    <div class="tour-spot" id="tour-spot"></div>
+    <div class="tour-card" id="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-text">
+        <div class="tour-progress"><span id="tour-bar"></span></div>
+        <div class="tour-step" id="tour-step">Step 1</div>
+        <h3 id="tour-title">—</h3>
+        <p id="tour-text">—</p>
+        <div class="tour-foot">
+            <button type="button" class="tour-skip" id="tour-skip">Skip tour</button>
+            <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn" id="tour-back">Back</button>
+                <button type="button" class="btn btn-primary" id="tour-next">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="tour-toast" role="region" aria-label="Guided tour" hidden>
+    <p><strong>New here?</strong> A 1-minute guided tour shows you how to read the map, the findings and the charts.</p>
+    <div class="toast-actions">
+        <button type="button" class="btn btn-primary" data-tour-start>Start the tour</button>
+        <button type="button" class="btn" id="toast-dismiss">Not now</button>
+    </div>
+</div>
 
 <script>
 (function () {
@@ -1148,7 +1264,7 @@
         },
         ndti: {
             title: 'Open-water turbidity (NDTI)',
-            source: 'Sentinel-2 cloud-free open water; higher = more turbid',
+            source: 'Sentinel-2 open water; higher = more turbid, below 0 = clearer',
             value: p => p.ndti, raw: p => p.ndti,
             fmt: v => fmt(v, 3),
             unreliable: () => false
@@ -1283,7 +1399,9 @@
         if (id === 'ALL') {
             fitAll(true);
         } else {
-            unitsLayer.eachLayer(l => { if (l.feature.properties.zone_id === id) map.flyToBounds(l.getBounds(), { padding: [60, 60], duration: 0.5, maxZoom: 10 }); });
+            const small = window.innerWidth <= 640;
+            // Leave room for the layer switcher (top) and the legend (bottom left).
+            unitsLayer.eachLayer(l => { if (l.feature.properties.zone_id === id) map.flyToBounds(l.getBounds(), { paddingTopLeft: [small ? 20 : 60, small ? 70 : 80], paddingBottomRight: [small ? 20 : 60, small ? 160 : 170], duration: 0.5, maxZoom: 10 }); });
         }
     }
 
@@ -1372,6 +1490,117 @@
         }).join('');
     }
 
+    function renderShortAnswer() {
+        const d = STATE.diagnostics || {};
+        const f = Array.isArray(d.key_findings) ? d.key_findings[0] : null;
+        const v = d.sar_validation_against_dynamic_world;
+        let text;
+        if (!f || f.status !== 'VALID') text = 'the statistics are not available yet.';
+        else if (f.significant && f.robust_to_single_month === false) text = `only one big flood (${monthName(f.most_influential_month)}) stands out. Month to month, rainfall and flooding are only weakly linked, and soil wetness and lagoon cloudiness show no clear link.`;
+        else if (f.significant) text = 'months with more rain than usual do show more floodplain flooding.';
+        else text = 'there is no clear month-to-month link between rainfall and floodplain flooding.';
+        if (v && v.status === 'VALID' && v.deseasonalized && !(v.deseasonalized.p_value_autocorr_adj < 0.05)) text += ' The radar flood measurements also could not be confirmed with a second, optical satellite source, so treat them as indicative.';
+        $('intro-short').innerHTML = `<strong>Short answer:</strong> ${escHtml(text)}`;
+    }
+
+    // ================= Guided tour =================
+    const TOUR = [
+        { target: '.map-pane', tab: 'overview', title: 'The map', text: 'This is the Ogun River catchment. It is split into four sub-basins (Z1–Z4) from the headwaters down to the floodplain, plus the lagoon zone the river drains into (Z5). Drag to pan and scroll to zoom.' },
+        { target: '.layer-switch', tab: 'overview', title: 'Choose what the map shows', text: 'Switch between floodplain inundation, rainfall, lagoon turbidity and riparian vegetation. Darker blue means a higher value.' },
+        { target: '#legend', tab: 'overview', title: 'Read the legend', text: 'The colour scale gives the range for the current layer. Units drawn hatched with a dashed outline have no reliable value for that layer, so they are left out of the colour scale.' },
+        { target: '#unit-chips', tab: 'overview', title: 'Pick a unit', text: 'Select a sub-basin here or click it on the map to open its details. "Whole system" goes back to the full catchment.' },
+        { target: '#intro', tab: 'overview', title: 'Start with the overview', text: 'The study in plain terms and the short answer. Below it are the headline numbers and each finding with a verdict: Significant, Not robust, or No link.' },
+        { target: '#multiples', tab: 'series', title: 'Explore 72 months of data', text: 'Four aligned charts share one time axis: rainfall, the radar flood index, the optical flood check and lagoon turbidity. Hover over (or tap) any chart to read the same month in all four.' },
+        { target: '#panel-stats .controls', tab: 'stats', title: 'Check the statistics', text: 'Pick a relationship to see the full audit: sample sizes, correlations with confidence intervals and adjusted p-values, plus a robustness check.' },
+        { target: '.appbar-actions', tab: 'overview', title: 'Download, methods and theme', text: 'Download every dataset, read exactly how each value was measured and its limitations, or switch to dark mode. The address bar always keeps your current view, so you can share it.' }
+    ];
+    let tourIdx = 0;
+    let tourReturnFocus = null;
+
+    function placeTour() {
+        const step = TOUR[tourIdx];
+        const el = document.querySelector(step.target);
+        if (!el) return;
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        const r = el.getBoundingClientRect();
+        const pad = 6;
+        const spot = $('tour-spot');
+        const top = Math.max(4, r.top - pad), left = Math.max(4, r.left - pad);
+        const width = Math.min(window.innerWidth - left - 4, r.width + pad * 2);
+        const height = Math.min(window.innerHeight - top - 4, r.height + pad * 2);
+        Object.assign(spot.style, { top: `${top}px`, left: `${left}px`, width: `${width}px`, height: `${height}px` });
+
+        const card = $('tour-card');
+        const cw = card.offsetWidth, ch = card.offsetHeight, gap = 14, vw = window.innerWidth, vh = window.innerHeight;
+        let ct, cl;
+        if (vw <= 640) { ct = vh - ch - 12; cl = (vw - cw) / 2; if (top + height > ct - 8 && top > ch + 20) ct = 12; }
+        else if (top + height + gap + ch <= vh - 8) { ct = top + height + gap; cl = left; }
+        else if (top - gap - ch >= 8) { ct = top - gap - ch; cl = left; }
+        else if (left + width + gap + cw <= vw - 8) { ct = top + 16; cl = left + width + gap; }
+        else if (left - gap - cw >= 8) { ct = top + 16; cl = left - gap - cw; }
+        else { ct = (vh - ch) / 2; cl = (vw - cw) / 2; }
+        card.style.top = `${Math.max(8, Math.min(vh - ch - 8, ct))}px`;
+        card.style.left = `${Math.max(8, Math.min(vw - cw - 8, cl))}px`;
+    }
+
+    function showTourStep(i) {
+        tourIdx = Math.max(0, Math.min(TOUR.length - 1, i));
+        const step = TOUR[tourIdx];
+        if (step.tab && STATE.tab !== step.tab) setTab(step.tab);
+        $('tour-step').textContent = `Step ${tourIdx + 1} of ${TOUR.length}`;
+        $('tour-title').textContent = step.title;
+        $('tour-text').textContent = step.text;
+        $('tour-bar').style.width = `${((tourIdx + 1) / TOUR.length) * 100}%`;
+        $('tour-back').disabled = tourIdx === 0;
+        $('tour-back').style.visibility = tourIdx === 0 ? 'hidden' : 'visible';
+        $('tour-next').textContent = tourIdx === TOUR.length - 1 ? 'Finish' : 'Next';
+        requestAnimationFrame(() => { placeTour(); $('tour-next').focus(); });
+    }
+
+    function startTour() {
+        document.querySelectorAll('dialog[open]').forEach(d => d.close());
+        $('tour-toast').hidden = true;
+        $('download-menu').open = false;
+        tourReturnFocus = document.activeElement;
+        $('tour').hidden = false;
+        showTourStep(0);
+    }
+
+    function endTour() {
+        $('tour').hidden = true;
+        setTab('overview');
+        try { localStorage.setItem('ogun_tour_seen', '1'); } catch (e) {}
+        if (tourReturnFocus && tourReturnFocus.focus) tourReturnFocus.focus();
+    }
+
+    document.addEventListener('click', e => { if (e.target.closest('[data-tour-start]')) startTour(); });
+    $('tour-next').addEventListener('click', () => tourIdx === TOUR.length - 1 ? endTour() : showTourStep(tourIdx + 1));
+    $('tour-back').addEventListener('click', () => showTourStep(tourIdx - 1));
+    $('tour-skip').addEventListener('click', endTour);
+    $('toast-dismiss').addEventListener('click', () => {
+        $('tour-toast').hidden = true;
+        try { localStorage.setItem('ogun_tour_seen', '1'); } catch (e) {}
+    });
+    window.addEventListener('resize', () => { if (!$('tour').hidden) placeTour(); });
+    document.addEventListener('keydown', e => {
+        if ($('tour').hidden) return;
+        if (e.key === 'Escape') { e.preventDefault(); endTour(); }
+        else if (e.key === 'ArrowRight') showTourStep(tourIdx + 1);
+        else if (e.key === 'ArrowLeft') showTourStep(tourIdx - 1);
+        else if (e.key === 'Tab') {
+            const f = [...$('tour-card').querySelectorAll('button:not([disabled])')].filter(b => b.style.visibility !== 'hidden');
+            const i = f.indexOf(document.activeElement);
+            e.preventDefault();
+            f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+        }
+    });
+
+    function offerTour() {
+        let seen = false;
+        try { seen = localStorage.getItem('ogun_tour_seen') === '1'; } catch (e) {}
+        if (!seen) setTimeout(() => { if ($('tour').hidden) $('tour-toast').hidden = false; }, 1200);
+    }
+
     // ================= Unit =================
     function renderUnitList() {
         $('unit-list').innerHTML = STATE.features.map(f => {
@@ -1396,10 +1625,10 @@
         $('unit-tiles').innerHTML = [
             tile('Mean annual rainfall', `${fmtInt(p.rain_mm)} <small>mm</small>`, 'CHIRPS v2.0, 2019–2024', 'Mean annual precipitation from CHIRPS v2.0 pentadal totals.'),
             tile('Floodplain inundation', `${fmt(p.sar_inundation_km2, 1)} <small>km²</small>`, unrel ? 'Not reliable here: dry-season radar artefacts' : `Sep–Oct 2022 · permanent water ${fmt(p.perm_water_km2, 1)} km²`, 'Mean flooded area across Sentinel-1 passes in Sep–Oct 2022: dark, at least 3 dB below the dry-season reference, slope under 5°, under 15 m above drainage, outside permanent water.', unrel),
-            tile('Open-water turbidity', fmt(p.ndti, 3), p.zone_id === 'Z5' ? 'NDTI, lagoon open water' : 'NDTI, river-channel water', 'Sentinel-2 NDTI = (B4 − B3) / (B4 + B3) over cloud-free open water. A relative index, not NTU or mg/L.'),
+            tile('Open-water turbidity', fmt(p.ndti, 3), p.zone_id === 'Z5' ? 'NDTI, lagoon open water' : 'NDTI, river-channel water', 'Sentinel-2 NDTI = (B4 − B3) / (B4 + B3) over cloud-free open water. Higher means more turbid; negative values mean relatively clear water. A relative index, not NTU or mg/L.'),
             tile('Shallow soil water', `${fmt(p.shallow_sm_m3m3, 3)} <small>m³/m³</small>`, 'ERA5-Land, top 7 cm', 'ERA5-Land volumetric soil water in the top 7 cm. Not root-zone moisture.'),
             tile('Riparian vegetation', fmt(p.ndvi, 2), 'NDVI within 2 km of rivers', 'Sentinel-2 NDVI on cloud-free land pixels within 2 km of Strahler order 3+ rivers.'),
-            tile('Mean terrain slope', `${fmt(p.slope_deg, 1)}<small>°</small>`, 'Copernicus GLO-30 DEM', 'Mean slope in degrees from the 30 m Copernicus DEM.')
+            tile('Mean terrain slope', `${fmt(p.slope_deg, 1)}°`, 'Copernicus GLO-30 DEM', 'Mean slope in degrees from the 30 m Copernicus DEM.')
         ].join('');
     }
 
@@ -1780,7 +2009,9 @@
         renderUnitList();
         renderProvenance();
         renderOverview();
+        renderShortAnswer();
         renderDiagnostics();
+        offerTour();
         setTab(STATE.tab);
         selectZone(STATE.zone, { fly: false });
         requestAnimationFrame(() => { if (STATE.zone === 'ALL') fitAll(false); else selectZone(STATE.zone); });
