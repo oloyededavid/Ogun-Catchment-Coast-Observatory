@@ -1689,7 +1689,10 @@
             const est = f => `ρ = ${fmtNum(f.spearman_rho, 2)}, r = ${fmtNum(f.pearson_r, 2)}, ${escHtml(f.p_value_type)} p = ${fmtP(f.p_value)}`;
             const items = d.key_findings.map(f => f.status !== 'VALID'
                 ? `<li><strong>${escHtml(f.relationship)}:</strong> not enough observations.</li>`
-                : `<li class="${f.significant ? 'is-significant' : ''}"><strong>${escHtml(f.relationship)}:</strong> ${f.significant ? 'significant association' : 'no significant association'} (${est(f)}, n = ${f.n_pairs}).</li>`);
+                : `<li class="${f.significant && f.robust_to_single_month !== false ? 'is-significant' : ''}"><strong>${escHtml(f.relationship)}:</strong> ${
+                    !f.significant ? 'no significant association'
+                    : f.robust_to_single_month === false ? `significant, but <strong>not robust</strong>: it depends on ${escHtml(f.most_influential_month)}`
+                    : 'significant association'} (${est(f)}, n = ${f.n_pairs}).</li>`);
             const rb = d.robustness && d.robustness.rain_to_sar_lag_0_deseasonalized;
             if (rb && rb.status === 'VALID') {
                 const w = rb.without_most_influential_month || {};
@@ -1868,7 +1871,7 @@
             });
 
             const meta = {
-                flood: ['SAR Low-Backscatter Inundation Proxy (km²)', 'Sentinel-1 IW VV ascending, dry-season change detection (Slope < 5°, HAND < 15 m)', v => `${v.toFixed(0)} km²`],
+                flood: ['SAR Low-Backscatter Inundation Proxy (km²)', 'Sentinel-1 IW VV ascending, dry-season change detection (Slope < 5°, HAND < 15 m)', v => `${v.toFixed(vMax < 10 ? 1 : 0)} km²`],
                 rain: ['Mean Annual Precipitation (mm/yr)', 'CHIRPS v2.0 Pentadal (5.5 km)', v => `${v.toFixed(0)} mm`],
                 ndti: ['Open-Water Spectral Turbidity Indicator (NDTI)', 'Sentinel-2 L2A (SCL=6, MNDWI > 0, JRC >= 50%)', v => v.toFixed(3)],
                 ndvi: ['2 km Riparian Buffer Canopy (NDVI)', 'Sentinel-2 L2A Cloud-Free Land Pixels', v => v.toFixed(2)]

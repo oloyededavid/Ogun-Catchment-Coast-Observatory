@@ -201,6 +201,14 @@ def _finding(label: str, res: dict[str, Any], p_key: str = "p_value_bh_fdr") -> 
     }
 
 
+def _is_robust(rb: dict[str, Any]) -> bool | None:
+    """True if the association stays significant (p < FDR_ALPHA) without its most influential month."""
+    if rb.get("status") != "VALID":
+        return None
+    p = rb["without_most_influential_month"].get("p_value_autocorr_adj")
+    return bool(p is not None and p < FDR_ALPHA)
+
+
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -351,7 +359,9 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
         "sar_validation_against_dynamic_world": validation_block,
         "robustness": robustness,
         "key_findings": [
-            _finding("Rain -> floodplain SAR inundation (same month, deseasonalized)", anom_lags["lag_0_month"]),
+            {**_finding("Rain -> floodplain SAR inundation (same month, deseasonalized)", anom_lags["lag_0_month"]),
+             "robust_to_single_month": _is_robust(robustness["rain_to_sar_lag_0_deseasonalized"]),
+             "most_influential_month": robustness["rain_to_sar_lag_0_deseasonalized"].get("most_influential_month")},
             _finding("Rain -> floodplain SAR inundation (1-month lag, deseasonalized)", anom_lags["lag_1_month"]),
             _finding("Soil moisture -> floodplain SAR inundation (same month, deseasonalized)", sm_anom_lags["lag_0_month"]),
             _finding("Floodplain SAR inundation -> estuary NDTI (deseasonalized)", turb_anom, p_key="p_value_autocorr_adj"),

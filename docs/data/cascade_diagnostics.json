@@ -5,9 +5,9 @@
     "warning": "Verified Google Earth Engine multi-sensor export.",
     "generated_by": "src/02_compile_observatory.py",
     "input_csv": "ogun_monthly_timeseries.csv",
-    "input_csv_sha256": "684d2a465cc93d2e2ad6d9907b0807930e928dfdbd1078703f4a769ad73a1434",
-    "gee_script_version": "2.3.0",
-    "gee_export_utc": "2026-11-05T00:51:47Z"
+    "input_csv_sha256": "71cef1a8a96ae8dba50ace2662392d9118a263f778fbf03d72aa0fc7063a8b35",
+    "gee_script_version": "2.4.0",
+    "gee_export_utc": "2026-11-05T01:14:21Z"
   },
   "coverage": {
     "n_total_months": 72,
@@ -17,6 +17,8 @@
     "valid_sm_months": 72,
     "valid_sar_months": 72,
     "valid_reservoir_months": 72,
+    "valid_dynamic_world_months": 67,
+    "valid_dam_release_months": 0,
     "valid_ndti_months": 62,
     "missing_ndti_months": 10,
     "ndti_valid_wet_season_months": 32,
@@ -24,63 +26,63 @@
     "wet_season_definition": "April-October"
   },
   "extremes": {
-    "peak_sar_inundation_km2": 2.7,
+    "peak_sar_inundation_km2": 3.6,
     "peak_sar_inundation_month": "2024-10"
   },
   "rain_to_sar_inundation_lags_seasonal": {
     "lag_0_month": {
       "n_pairs": 72,
-      "n_effective": 64.5,
+      "n_effective": 54.2,
       "shapiro_p_x": 0.0004,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.212,
+      "pearson_r": 0.102,
       "pearson_ci95": [
-        -0.034,
-        0.433
+        -0.171,
+        0.36
       ],
-      "p_value_raw": 0.074173,
-      "p_value_autocorr_adj": 0.09161,
-      "spearman_rho": -0.223,
-      "spearman_p_raw": 0.059371,
+      "p_value_raw": 0.394874,
+      "p_value_autocorr_adj": 0.462962,
+      "spearman_rho": -0.233,
+      "spearman_p_raw": 0.048487,
       "status": "VALID",
-      "p_value_bh_fdr": 0.245229
+      "p_value_bh_fdr": 0.552948
     },
     "lag_1_month": {
       "n_pairs": 71,
-      "n_effective": 63.7,
+      "n_effective": 53.7,
       "shapiro_p_x": 0.0006,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.011,
+      "pearson_r": -0.083,
       "pearson_ci95": [
-        -0.256,
-        0.236
+        -0.343,
+        0.189
       ],
-      "p_value_raw": 0.927948,
-      "p_value_autocorr_adj": 0.931889,
-      "spearman_rho": -0.213,
-      "spearman_p_raw": 0.074033,
+      "p_value_raw": 0.492604,
+      "p_value_autocorr_adj": 0.552948,
+      "spearman_rho": -0.289,
+      "spearman_p_raw": 0.014559,
       "status": "VALID",
-      "p_value_bh_fdr": 0.931889
+      "p_value_bh_fdr": 0.552948
     },
     "lag_2_month": {
       "n_pairs": 70,
-      "n_effective": 61.1,
+      "n_effective": 49.5,
       "shapiro_p_x": 0.001,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.181,
+      "pearson_r": -0.318,
       "pearson_ci95": [
-        -0.414,
-        0.075
+        -0.548,
+        -0.044
       ],
-      "p_value_raw": 0.134695,
-      "p_value_autocorr_adj": 0.163486,
-      "spearman_rho": -0.265,
-      "spearman_p_raw": 0.026467,
+      "p_value_raw": 0.007271,
+      "p_value_autocorr_adj": 0.025078,
+      "spearman_rho": -0.426,
+      "spearman_p_raw": 0.000238,
       "status": "VALID",
-      "p_value_bh_fdr": 0.245229
+      "p_value_bh_fdr": 0.075234
     }
   },
   "rain_to_sar_inundation_lags_deseasonalized": {
@@ -90,17 +92,17 @@
       "shapiro_p_x": 0.0,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.511,
+      "pearson_r": 0.383,
       "pearson_ci95": [
-        0.316,
-        0.664
+        0.166,
+        0.565
       ],
-      "p_value_raw": 5e-06,
-      "p_value_autocorr_adj": 5e-06,
-      "spearman_rho": 0.187,
-      "spearman_p_raw": 0.116405,
+      "p_value_raw": 0.000893,
+      "p_value_autocorr_adj": 0.000893,
+      "spearman_rho": 0.111,
+      "spearman_p_raw": 0.352978,
       "status": "VALID",
-      "p_value_bh_fdr": 1.5e-05
+      "p_value_bh_fdr": 0.002679
     },
     "lag_1_month": {
       "n_pairs": 71,
@@ -108,17 +110,17 @@
       "shapiro_p_x": 0.0,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.025,
+      "pearson_r": 0.078,
       "pearson_ci95": [
-        -0.209,
-        0.257
+        -0.159,
+        0.305
       ],
-      "p_value_raw": 0.83348,
-      "p_value_autocorr_adj": 0.83348,
-      "spearman_rho": 0.096,
-      "spearman_p_raw": 0.42592,
+      "p_value_raw": 0.519837,
+      "p_value_autocorr_adj": 0.519837,
+      "spearman_rho": 0.153,
+      "spearman_p_raw": 0.20337,
       "status": "VALID",
-      "p_value_bh_fdr": 0.83348
+      "p_value_bh_fdr": 0.519837
     },
     "lag_2_month": {
       "n_pairs": 70,
@@ -126,129 +128,129 @@
       "shapiro_p_x": 0.0,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.149,
+      "pearson_r": -0.166,
       "pearson_ci95": [
-        -0.371,
-        0.089
+        -0.386,
+        0.072
       ],
-      "p_value_raw": 0.217657,
-      "p_value_autocorr_adj": 0.217657,
-      "spearman_rho": -0.135,
-      "spearman_p_raw": 0.263851,
+      "p_value_raw": 0.170621,
+      "p_value_autocorr_adj": 0.170621,
+      "spearman_rho": -0.109,
+      "spearman_p_raw": 0.368674,
       "status": "VALID",
-      "p_value_bh_fdr": 0.326485
+      "p_value_bh_fdr": 0.255931
     }
   },
   "soil_moisture_to_sar_inundation_lags_seasonal": {
     "lag_0_month": {
       "n_pairs": 72,
-      "n_effective": 59.0,
+      "n_effective": 42.8,
       "shapiro_p_x": 0.0,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.071,
+      "pearson_r": -0.172,
       "pearson_ci95": [
-        -0.322,
-        0.188
+        -0.449,
+        0.135
       ],
-      "p_value_raw": 0.550793,
-      "p_value_autocorr_adj": 0.590521,
-      "spearman_rho": -0.293,
-      "spearman_p_raw": 0.012375,
+      "p_value_raw": 0.147932,
+      "p_value_autocorr_adj": 0.270832,
+      "spearman_rho": -0.379,
+      "spearman_p_raw": 0.001017,
       "status": "VALID",
-      "p_value_bh_fdr": 0.845148
+      "p_value_bh_fdr": 0.270832
     },
     "lag_1_month": {
       "n_pairs": 71,
-      "n_effective": 58.0,
+      "n_effective": 41.9,
       "shapiro_p_x": 0.0001,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.081,
+      "pearson_r": -0.222,
       "pearson_ci95": [
-        -0.332,
-        0.181
+        -0.493,
+        0.088
       ],
-      "p_value_raw": 0.504101,
-      "p_value_autocorr_adj": 0.547696,
-      "spearman_rho": -0.169,
-      "spearman_p_raw": 0.157909,
+      "p_value_raw": 0.062496,
+      "p_value_autocorr_adj": 0.157773,
+      "spearman_rho": -0.272,
+      "spearman_p_raw": 0.021938,
       "status": "VALID",
-      "p_value_bh_fdr": 0.845148
+      "p_value_bh_fdr": 0.270832
     },
     "lag_2_month": {
       "n_pairs": 70,
-      "n_effective": 56.6,
+      "n_effective": 40.6,
       "shapiro_p_x": 0.0001,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.027,
+      "pearson_r": -0.191,
       "pearson_ci95": [
-        -0.285,
-        0.236
+        -0.471,
+        0.124
       ],
-      "p_value_raw": 0.827336,
-      "p_value_autocorr_adj": 0.845148,
-      "spearman_rho": -0.018,
-      "spearman_p_raw": 0.88013,
+      "p_value_raw": 0.113517,
+      "p_value_autocorr_adj": 0.234499,
+      "spearman_rho": -0.154,
+      "spearman_p_raw": 0.204361,
       "status": "VALID",
-      "p_value_bh_fdr": 0.845148
+      "p_value_bh_fdr": 0.270832
     }
   },
   "soil_moisture_to_sar_inundation_lags_deseasonalized": {
     "lag_0_month": {
       "n_pairs": 72,
-      "n_effective": 63.6,
+      "n_effective": 47.0,
       "shapiro_p_x": 0.5753,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.035,
+      "pearson_r": -0.047,
       "pearson_ci95": [
-        -0.212,
-        0.279
+        -0.33,
+        0.243
       ],
-      "p_value_raw": 0.767783,
-      "p_value_autocorr_adj": 0.78182,
-      "spearman_rho": 0.009,
-      "spearman_p_raw": 0.941657,
+      "p_value_raw": 0.695212,
+      "p_value_autocorr_adj": 0.753898,
+      "spearman_rho": -0.069,
+      "spearman_p_raw": 0.565169,
       "status": "VALID",
-      "p_value_bh_fdr": 0.78182
+      "p_value_bh_fdr": 0.753898
     },
     "lag_1_month": {
       "n_pairs": 71,
-      "n_effective": 62.8,
+      "n_effective": 46.5,
       "shapiro_p_x": 0.5977,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.101,
+      "pearson_r": -0.114,
       "pearson_ci95": [
-        -0.341,
-        0.15
+        -0.391,
+        0.183
       ],
-      "p_value_raw": 0.400215,
-      "p_value_autocorr_adj": 0.429877,
-      "spearman_rho": -0.051,
-      "spearman_p_raw": 0.67129,
+      "p_value_raw": 0.344932,
+      "p_value_autocorr_adj": 0.449314,
+      "spearman_rho": -0.065,
+      "spearman_p_raw": 0.587377,
       "status": "VALID",
-      "p_value_bh_fdr": 0.644815
+      "p_value_bh_fdr": 0.673971
     },
     "lag_2_month": {
       "n_pairs": 70,
-      "n_effective": 62.1,
+      "n_effective": 45.5,
       "shapiro_p_x": 0.6064,
       "shapiro_p_y": 0.0,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": -0.155,
+      "pearson_r": -0.152,
       "pearson_ci95": [
-        -0.39,
-        0.098
+        -0.426,
+        0.148
       ],
-      "p_value_raw": 0.199142,
-      "p_value_autocorr_adj": 0.227708,
-      "spearman_rho": -0.161,
-      "spearman_p_raw": 0.183659,
+      "p_value_raw": 0.209547,
+      "p_value_autocorr_adj": 0.316587,
+      "spearman_rho": -0.165,
+      "spearman_p_raw": 0.172785,
       "status": "VALID",
-      "p_value_bh_fdr": 0.644815
+      "p_value_bh_fdr": 0.673971
     }
   },
   "rain_to_sar_inundation_controlling_for_oyan_reservoir": {
@@ -257,57 +259,57 @@
     "seasonal": {
       "lag_0_month": {
         "n_pairs": 72,
-        "n_effective": 65.3,
+        "n_effective": 55.5,
         "shapiro_p_x": 0.0009,
         "shapiro_p_y": 0.0,
         "recommended_estimator": "spearman_rho",
-        "pearson_r": 0.23,
+        "pearson_r": 0.139,
         "pearson_ci95": [
-          -0.014,
-          0.449
+          -0.131,
+          0.39
         ],
-        "p_value_raw": 0.051438,
-        "p_value_autocorr_adj": 0.064131,
-        "spearman_rho": -0.182,
-        "spearman_p_raw": 0.126252,
+        "p_value_raw": 0.244087,
+        "p_value_autocorr_adj": 0.309129,
+        "spearman_rho": -0.138,
+        "spearman_p_raw": 0.247733,
         "status": "VALID",
-        "p_value_bh_fdr": 0.192393
+        "p_value_bh_fdr": 0.463693
       },
       "lag_1_month": {
         "n_pairs": 71,
-        "n_effective": 64.1,
+        "n_effective": 54.1,
         "shapiro_p_x": 0.0012,
         "shapiro_p_y": 0.0,
         "recommended_estimator": "spearman_rho",
-        "pearson_r": -0.015,
+        "pearson_r": -0.094,
         "pearson_ci95": [
-          -0.26,
-          0.232
+          -0.353,
+          0.178
         ],
-        "p_value_raw": 0.902732,
-        "p_value_autocorr_adj": 0.90777,
-        "spearman_rho": -0.184,
-        "spearman_p_raw": 0.124102,
+        "p_value_raw": 0.435814,
+        "p_value_autocorr_adj": 0.498939,
+        "spearman_rho": -0.205,
+        "spearman_p_raw": 0.085885,
         "status": "VALID",
-        "p_value_bh_fdr": 0.90777
+        "p_value_bh_fdr": 0.498939
       },
       "lag_2_month": {
         "n_pairs": 70,
-        "n_effective": 62.1,
+        "n_effective": 51.3,
         "shapiro_p_x": 0.0012,
         "shapiro_p_y": 0.0,
         "recommended_estimator": "spearman_rho",
-        "pearson_r": -0.187,
+        "pearson_r": -0.338,
         "pearson_ci95": [
-          -0.417,
-          0.066
+          -0.562,
+          -0.069
         ],
-        "p_value_raw": 0.120731,
-        "p_value_autocorr_adj": 0.14492,
-        "spearman_rho": -0.248,
-        "spearman_p_raw": 0.038698,
+        "p_value_raw": 0.004156,
+        "p_value_autocorr_adj": 0.014783,
+        "spearman_rho": -0.427,
+        "spearman_p_raw": 0.000227,
         "status": "VALID",
-        "p_value_bh_fdr": 0.21738
+        "p_value_bh_fdr": 0.044349
       }
     },
     "deseasonalized": {
@@ -317,17 +319,17 @@
         "shapiro_p_x": 0.0,
         "shapiro_p_y": 0.0,
         "recommended_estimator": "spearman_rho",
-        "pearson_r": 0.53,
+        "pearson_r": 0.386,
         "pearson_ci95": [
-          0.34,
-          0.678
+          0.17,
+          0.567
         ],
-        "p_value_raw": 2e-06,
-        "p_value_autocorr_adj": 2e-06,
-        "spearman_rho": 0.223,
-        "spearman_p_raw": 0.059259,
+        "p_value_raw": 0.000801,
+        "p_value_autocorr_adj": 0.000801,
+        "spearman_rho": 0.121,
+        "spearman_p_raw": 0.30974,
         "status": "VALID",
-        "p_value_bh_fdr": 6e-06
+        "p_value_bh_fdr": 0.002403
       },
       "lag_1_month": {
         "n_pairs": 71,
@@ -335,17 +337,17 @@
         "shapiro_p_x": 0.0,
         "shapiro_p_y": 0.0,
         "recommended_estimator": "spearman_rho",
-        "pearson_r": 0.083,
+        "pearson_r": 0.098,
         "pearson_ci95": [
-          -0.153,
-          0.31
+          -0.139,
+          0.324
         ],
-        "p_value_raw": 0.492084,
-        "p_value_autocorr_adj": 0.492084,
-        "spearman_rho": 0.136,
-        "spearman_p_raw": 0.257575,
+        "p_value_raw": 0.416493,
+        "p_value_autocorr_adj": 0.416493,
+        "spearman_rho": 0.164,
+        "spearman_p_raw": 0.170808,
         "status": "VALID",
-        "p_value_bh_fdr": 0.492084
+        "p_value_bh_fdr": 0.416493
       },
       "lag_2_month": {
         "n_pairs": 70,
@@ -353,56 +355,205 @@
         "shapiro_p_x": 0.0,
         "shapiro_p_y": 0.0,
         "recommended_estimator": "spearman_rho",
-        "pearson_r": -0.151,
+        "pearson_r": -0.165,
         "pearson_ci95": [
-          -0.372,
-          0.087
+          -0.385,
+          0.072
         ],
-        "p_value_raw": 0.21305,
-        "p_value_autocorr_adj": 0.21305,
-        "spearman_rho": -0.059,
-        "spearman_p_raw": 0.627881,
+        "p_value_raw": 0.171312,
+        "p_value_autocorr_adj": 0.171312,
+        "spearman_rho": -0.103,
+        "spearman_p_raw": 0.394705,
         "status": "VALID",
-        "p_value_bh_fdr": 0.319575
+        "p_value_bh_fdr": 0.256968
       }
     }
+  },
+  "rain_to_sar_inundation_controlling_for_oyan_dam_releases": {
+    "status": "NOT_AVAILABLE",
+    "reason": "No Oyan Dam release records supplied. Add them with src/01_ingest_gee_exports.py --dam-releases."
   },
   "sar_inundation_to_estuary_ndti": {
     "seasonal": {
       "n_pairs": 62,
-      "n_effective": 56.4,
+      "n_effective": 48.0,
       "shapiro_p_x": 0.0,
       "shapiro_p_y": 0.6244,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.183,
+      "pearson_r": 0.084,
       "pearson_ci95": [
-        -0.084,
-        0.425
+        -0.205,
+        0.359
       ],
-      "p_value_raw": 0.155302,
-      "p_value_autocorr_adj": 0.176312,
-      "spearman_rho": 0.176,
-      "spearman_p_raw": 0.171965,
+      "p_value_raw": 0.517067,
+      "p_value_autocorr_adj": 0.570951,
+      "spearman_rho": 0.021,
+      "spearman_p_raw": 0.870831,
       "status": "VALID"
     },
     "deseasonalized": {
       "n_pairs": 62,
-      "n_effective": 55.6,
+      "n_effective": 44.9,
       "shapiro_p_x": 0.0,
       "shapiro_p_y": 0.0007,
       "recommended_estimator": "spearman_rho",
-      "pearson_r": 0.224,
+      "pearson_r": 0.289,
       "pearson_ci95": [
-        -0.042,
-        0.459
+        -0.005,
+        0.537
       ],
-      "p_value_raw": 0.080702,
-      "p_value_autocorr_adj": 0.09891,
-      "spearman_rho": 0.35,
-      "spearman_p_raw": 0.005279,
+      "p_value_raw": 0.02283,
+      "p_value_autocorr_adj": 0.054739,
+      "spearman_rho": 0.324,
+      "spearman_p_raw": 0.010209,
       "status": "VALID"
     }
   },
+  "sar_validation_against_dynamic_world": {
+    "status": "VALID",
+    "reference": "Google Dynamic World V1 (Sentinel-2): water or flooded vegetation, same floodplain domain",
+    "months_with_dynamic_world": 67,
+    "seasonal": {
+      "n_pairs": 67,
+      "n_effective": 63.3,
+      "shapiro_p_x": 0.0,
+      "shapiro_p_y": 0.0,
+      "recommended_estimator": "spearman_rho",
+      "pearson_r": 0.102,
+      "pearson_ci95": [
+        -0.149,
+        0.341
+      ],
+      "p_value_raw": 0.410727,
+      "p_value_autocorr_adj": 0.424538,
+      "spearman_rho": 0.424,
+      "spearman_p_raw": 0.000346,
+      "status": "VALID"
+    },
+    "deseasonalized": {
+      "n_pairs": 67,
+      "n_effective": 67.0,
+      "shapiro_p_x": 0.0,
+      "shapiro_p_y": 0.0,
+      "recommended_estimator": "spearman_rho",
+      "pearson_r": 0.082,
+      "pearson_ci95": [
+        -0.162,
+        0.316
+      ],
+      "p_value_raw": 0.51166,
+      "p_value_autocorr_adj": 0.51166,
+      "spearman_rho": 0.138,
+      "spearman_p_raw": 0.265792,
+      "status": "VALID"
+    }
+  },
+  "robustness": {
+    "rain_to_sar_lag_0_deseasonalized": {
+      "status": "VALID",
+      "n_pairs": 72,
+      "pearson_r_full": 0.383,
+      "leave_one_out_pearson_r_min": 0.19,
+      "leave_one_out_pearson_r_max": 0.425,
+      "most_influential_month": "2024-10",
+      "without_most_influential_month": {
+        "n_pairs": 71,
+        "n_effective": 71.0,
+        "shapiro_p_x": 0.0008,
+        "shapiro_p_y": 0.0,
+        "recommended_estimator": "spearman_rho",
+        "pearson_r": 0.19,
+        "pearson_ci95": [
+          -0.045,
+          0.405
+        ],
+        "p_value_raw": 0.112633,
+        "p_value_autocorr_adj": 0.112633,
+        "spearman_rho": 0.073,
+        "spearman_p_raw": 0.545339,
+        "status": "VALID"
+      }
+    },
+    "rain_to_sar_lag_0_seasonal": {
+      "status": "VALID",
+      "n_pairs": 72,
+      "pearson_r_full": 0.102,
+      "leave_one_out_pearson_r_min": -0.129,
+      "leave_one_out_pearson_r_max": 0.138,
+      "most_influential_month": "2024-10",
+      "without_most_influential_month": {
+        "n_pairs": 71,
+        "n_effective": 48.3,
+        "shapiro_p_x": 0.0006,
+        "shapiro_p_y": 0.0,
+        "recommended_estimator": "spearman_rho",
+        "pearson_r": -0.129,
+        "pearson_ci95": [
+          -0.399,
+          0.161
+        ],
+        "p_value_raw": 0.282748,
+        "p_value_autocorr_adj": 0.379494,
+        "spearman_rho": -0.286,
+        "spearman_p_raw": 0.015518,
+        "status": "VALID"
+      }
+    }
+  },
+  "key_findings": [
+    {
+      "relationship": "Rain -> floodplain SAR inundation (same month, deseasonalized)",
+      "status": "VALID",
+      "n_pairs": 72,
+      "spearman_rho": 0.111,
+      "pearson_r": 0.383,
+      "p_value": 0.002679,
+      "p_value_type": "BH FDR",
+      "significant": true,
+      "robust_to_single_month": false,
+      "most_influential_month": "2024-10"
+    },
+    {
+      "relationship": "Rain -> floodplain SAR inundation (1-month lag, deseasonalized)",
+      "status": "VALID",
+      "n_pairs": 71,
+      "spearman_rho": 0.153,
+      "pearson_r": 0.078,
+      "p_value": 0.519837,
+      "p_value_type": "BH FDR",
+      "significant": false
+    },
+    {
+      "relationship": "Soil moisture -> floodplain SAR inundation (same month, deseasonalized)",
+      "status": "VALID",
+      "n_pairs": 72,
+      "spearman_rho": -0.069,
+      "pearson_r": -0.047,
+      "p_value": 0.753898,
+      "p_value_type": "BH FDR",
+      "significant": false
+    },
+    {
+      "relationship": "Floodplain SAR inundation -> estuary NDTI (deseasonalized)",
+      "status": "VALID",
+      "n_pairs": 62,
+      "spearman_rho": 0.324,
+      "pearson_r": 0.289,
+      "p_value": 0.054739,
+      "p_value_type": "autocorrelation-adjusted",
+      "significant": false
+    },
+    {
+      "relationship": "SAR inundation vs Dynamic World flooding (deseasonalized)",
+      "status": "VALID",
+      "n_pairs": 67,
+      "spearman_rho": 0.138,
+      "pearson_r": 0.082,
+      "p_value": 0.51166,
+      "p_value_type": "autocorrelation-adjusted",
+      "significant": false
+    }
+  ],
   "methodological_notes": [
     "Missing observations (e.g., cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
     "NDTI gaps are concentrated in the cloudy wet season (see coverage.ndti_valid_wet_season_months), so SAR-NDTI associations are weighted towards dry-season conditions and are not missing at random.",
