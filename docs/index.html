@@ -1106,7 +1106,7 @@
                     <div class="legend-dock-top">
                         <div class="legend-title-wrap">
                             <strong id="legend-title">SAR Seasonal Inundation Proxy (km²)</strong>
-                            <span id="legend-tag" class="legend-source-pill">Sentinel-1 IW VV DESCENDING (Slope &lt; 5°, JRC &lt; 80%)</span>
+                            <span id="legend-tag" class="legend-source-pill">Sentinel-1 IW VV ASCENDING (Slope &lt; 5°, JRC &lt; 80%)</span>
                         </div>
                         <div id="legend-classes" class="legend-classes"></div>
                     </div>
@@ -1353,7 +1353,7 @@
                 <p>Units Z1–Z4 represent topographic sub-basins delineated from <span class="mono">WWF/HydroSHEDS/v1/Basins/hybas_7</span> within the Ogun River drainage system. Each sub-basin is traced upstream through the HydroBASINS <span class="mono">NEXT_DOWN</span> network from a pour point (Oyan Dam for Z2, the upper Ogun outlet for Z1, Abeokuta for Z3), with the remaining downstream units forming Z4. Unit Z5 (<span class="mono">Northwest Lagos Lagoon Estuary</span>) is an estuarine receiving water domain where open-water pixels (<span class="mono">JRC occurrence &ge; 50%</span>) are analysed for spectral turbidity (<span class="mono">NDTI</span>). Catchment and estuarine units are not interchangeable.</p>
 
                 <h4>2. Sentinel-1 SAR Inundation Proxy &amp; Permanent Water Exclusion</h4>
-                <p>Sentinel-1 C-band GRD (<span class="mono">IW, VV, DESCENDING pass</span>) scenes are filtered with a <span class="mono">50 m focal-median</span> kernel. Pixels with <span class="mono">VV &lt; -16.5 dB</span> on terrain with Copernicus GLO-30 <span class="mono">Slope &lt; 5.0°</span> and JRC water <span class="mono">Occurrence &lt; 80%</span> are summed as the seasonal inundation proxy. Because C-band radar cannot penetrate dense swamp canopy and no independent aerial/field flood polygons were available for confusion-matrix validation, this layer is reported as an uncalibrated SAR inundation proxy rather than an accuracy-validated flood map.</p>
+                <p>Sentinel-1 C-band GRD (<span class="mono">IW, VV, ASCENDING pass</span>; the descending track covers only ~5% of the catchment) scenes are filtered with a <span class="mono">50 m focal-median</span> kernel. Pixels with <span class="mono">VV &lt; -16.5 dB</span> on terrain with Copernicus GLO-30 <span class="mono">Slope &lt; 5.0°</span> and JRC water <span class="mono">Occurrence &lt; 80%</span> are summed as the seasonal inundation proxy. Because C-band radar cannot penetrate dense swamp canopy and no independent aerial/field flood polygons were available for confusion-matrix validation, this layer is reported as an uncalibrated SAR inundation proxy rather than an accuracy-validated flood map.</p>
 
                 <h4>3. Sentinel-2 Spectral Turbidity Indicator (NDTI) &amp; Missing Monsoon Months</h4>
                 <p>Sentinel-2 L2A scenes are masked using the Scene Classification Layer (<span class="mono">SCL</span>) to remove clouds, cirrus, and shadows, and restricted to open water (<span class="mono">MNDWI &gt; 0</span> and <span class="mono">SCL == 6</span>). <span class="mono">NDTI = (B4 &minus; B3)/(B4 + B3)</span> is a relative spectral proxy for water optical properties and is not calibrated to NTU or gravimetric Total Suspended Solids (<span class="mono">mg/L</span>). Months with fewer than 100 valid cloud-free water pixels in the estuary are preserved as <span class="mono">null</span> (<span class="mono">NaN</span>) and never replaced with zero or interpolated prior to statistical testing.</p>
@@ -1808,7 +1808,7 @@
             });
 
             const meta = {
-                flood: ['SAR Low-Backscatter Inundation Proxy (km²)', 'Sentinel-1 IW VV DESCENDING (Slope < 5°, JRC < 80%)', v => `${v.toFixed(0)} km²`],
+                flood: ['SAR Low-Backscatter Inundation Proxy (km²)', 'Sentinel-1 IW VV ASCENDING (Slope < 5°, JRC < 80%)', v => `${v.toFixed(0)} km²`],
                 rain: ['Mean Annual Precipitation (mm/yr)', 'CHIRPS v2.0 Pentadal (5.5 km)', v => `${v.toFixed(0)} mm`],
                 ndti: ['Open-Water Spectral Turbidity Indicator (NDTI)', 'Sentinel-2 L2A (SCL=6, MNDWI > 0, JRC >= 50%)', v => v.toFixed(3)],
                 ndvi: ['2 km Riparian Buffer Canopy (NDVI)', 'Sentinel-2 L2A Cloud-Free Land Pixels', v => v.toFixed(2)]

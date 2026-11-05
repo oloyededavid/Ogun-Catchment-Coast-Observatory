@@ -44,7 +44,7 @@ An integrated Earth Observation and hydrological research observatory investigat
 | **Surface Water** | `JRC/GSW1_4/GlobalSurfaceWater` | `30 m` | `occurrence >= 80%` separated as permanent water; `occurrence >= 50%` masks estuarine water. |
 | **Rainfall** | `UCSB-CHG/CHIRPS/PENTAD` | `0.05° (~5.5 km)` | Monthly total (`mm/month`) when $\ge 5$ pentads exist; otherwise preserved as `null`. |
 | **Shallow Soil Water** | `ECMWF/ERA5_LAND/MONTHLY_AGGR` | `0.1° (~9 km)` | `volumetric_soil_water_layer_1` (`0–7 cm` surface skin layer, $\text{m}^3/\text{m}^3$). |
-| **SAR Inundation Proxy** | `COPERNICUS/S1_GRD` | `10 m` (`60–120 m` zonal) | `IW`, `VV`, `DESCENDING` pass; `50 m` focal-median filter; `VV < -16.5 dB`, `slope < 5°`, `JRC < 80%`. Preserves `null` if `s1_scenes == 0`. |
+| **SAR Inundation Proxy** | `COPERNICUS/S1_GRD` | `10 m` (`60–120 m` zonal) | `IW`, `VV`, `ASCENDING` pass (the descending track covers only ~5% of the catchment); `50 m` focal-median filter; `VV < -16.5 dB`, `slope < 5°`, `JRC < 80%`. Preserves `null` if `s1_scenes == 0`. |
 | **Spectral Turbidity** | `COPERNICUS/S2_SR_HARMONIZED` | `10–30 m` | `SCL` cloud/shadow masked; restricted to open water (`SCL == 6` & `MNDWI > 0`). $\text{NDTI} = (B4 - B3)/(B4 + B3)$. Preserves `null` if `< 100` valid water pixels exist. |
 
 ---

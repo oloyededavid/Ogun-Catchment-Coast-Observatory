@@ -63,7 +63,7 @@ var estuaryRawBox = ee.Geometry.Polygon([
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.1.1';
+var SCRIPT_VERSION = '2.2.0';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
@@ -183,7 +183,9 @@ var s1Collection = ee.ImageCollection('COPERNICUS/S1_GRD')
   .filterDate(startDateStr, endDateStr)
   .filter(ee.Filter.eq('instrumentMode', 'IW'))
   .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
-  .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+  // ASCENDING: the descending track covers only ~5% of the Ogun catchment
+  // (0% of Z1 and Z2); the ascending track covers all units every month.
+  .filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'))
   .select('VV');
 
 
