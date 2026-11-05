@@ -63,7 +63,7 @@ var estuaryRawBox = ee.Geometry.Polygon([
 ]);
 var estuaryGeom = estuaryRawBox.difference(catchmentGeom, 30);
 
-var SCRIPT_VERSION = '2.1.0';
+var SCRIPT_VERSION = '2.1.1';
 var EXPORT_UTC = ee.Date(Date.now()).format('YYYY-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
 
 function makeUnitFeature(geom, id, order, name, unitType, regime, color, summary, management) {
@@ -132,7 +132,13 @@ Map.addLayer(ogunRivers, {color: '#0284C7'}, 'HydroSHEDS River Network (Order >=
 var startDateStr = '2019-01-01';
 // filterDate end is exclusive: use the first day after the study period.
 var endDateStr = '2025-01-01';
-var dem = ee.ImageCollection('COPERNICUS/DEM/GLO30').select('DEM').mosaic().clip(fullStudyGeom);
+var glo30 = ee.ImageCollection('COPERNICUS/DEM/GLO30').select('DEM');
+// mosaic() drops the native 30 m projection (it defaults to a 1-degree grid), which
+// made ee.Terrain.slope return no data and silently zeroed the slope mask and the
+// SAR inundation proxy. Restore the native projection before computing slope.
+var dem = glo30.filterBounds(fullStudyGeom).mosaic()
+  .setDefaultProjection(glo30.first().projection())
+  .clip(fullStudyGeom);
 var slope = ee.Terrain.slope(dem).rename('slope_deg');
 var lowSlopeMask = slope.lt(5.0);
 var seasonalDomainMask = jrc.lt(80);
