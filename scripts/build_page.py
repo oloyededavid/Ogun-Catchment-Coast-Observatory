@@ -354,8 +354,20 @@ TEMPLATE = """<!DOCTYPE html>
 """
 
 
+def _size(rel: str) -> tuple[int, int]:
+    from PIL import Image
+    with Image.open(ROOT / "docs" / rel) as im:
+        return im.size
+
+
 def main() -> None:
     v = values()
+    import re as _re
+    def _fix_img(m):
+        w, h = _size(m.group(1))
+        return f'<img src="{m.group(1)}" width="{w}" height="{h}"'
+    TEMPLATE_FIG = _re.sub(r'<img src="(assets/figures/[^"]+)" width="\d+" height="\d+"', _fix_img, TEMPLATE)
+    globals()["TEMPLATE"] = TEMPLATE_FIG
     v["ISO_DATE"] = date.today().isoformat()
     if v.get("NSIG_ANOM") != "0":
         raise SystemExit("A headline relationship is now significant: the abstract and section 4.3 wording must be revised first.")

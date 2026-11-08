@@ -29,7 +29,7 @@ OUT = ROOT / "docs" / "assets" / "figures"
 INK, INK2, RULE = "#111111", "#4a4a4a", "#d7d6d0"
 DATE = "8 November 2026"
 AUTHOR = "D. O. Oloyede"
-plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9, "axes.linewidth": 0.6,
+plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10.5, "axes.linewidth": 0.6,
                      "axes.spines.top": False, "axes.spines.right": False})
 C_RAIN, C_SOIL, C_SAR, C_DW, C_NDTI = "#2d6cb0", "#3c8d6e", "#c0501a", "#7a5aa6", "#8a6d1f"
 
@@ -42,11 +42,13 @@ def _compiler():
 
 
 def _source(fig, text):
-    fig.text(0.02, 0.015, f"{text}  ·  {AUTHOR}, {DATE}", fontsize=7, color=INK2)
+    import textwrap
+    lines = textwrap.wrap(f"{text}  ·  {AUTHOR}, {DATE}", width=105)
+    fig.text(0.02, 0.012, "\n".join(lines), fontsize=6.5, color=INK2, va="bottom", linespacing=1.3)
 
 
 def fig1_study_area(gj):
-    fig, ax = plt.subplots(figsize=(7.2, 5.4), dpi=200)
+    fig, ax = plt.subplots(figsize=(6.0, 5.0), dpi=200)
     for f in sorted(gj["features"], key=lambda f: -f["properties"]["area_km2"]):
         p = f["properties"]
         for ring in (f["geometry"]["coordinates"] if f["geometry"]["type"] == "MultiPolygon" else [f["geometry"]["coordinates"]]):
@@ -63,14 +65,14 @@ def fig1_study_area(gj):
     ax.grid(color=RULE, lw=0.4)
     handles = [plt.Rectangle((0, 0), 1, 1, color=f["properties"]["role_color"], alpha=0.5) for f in gj["features"]]
     labels = [f"{f['properties']['zone_id']} {f['properties']['zone_name']} ({f['properties']['area_km2']:,.0f} km²)" for f in gj["features"]]
-    ax.legend(handles, labels, fontsize=7, frameon=False, loc="upper left", bbox_to_anchor=(1.01, 1))
-    fig.subplots_adjust(right=0.62, bottom=0.12, top=0.95, left=0.1)
+    ax.legend(handles, labels, fontsize=8, frameon=False, loc="upper left", bbox_to_anchor=(1.01, 1))
+    fig.subplots_adjust(right=0.6, bottom=0.12, top=0.96, left=0.12)
     _source(fig, "Units: WWF HydroBASINS level 9 (Z1–Z4); Z5 is a rectangular lagoon zone, not a watershed")
     return fig
 
 
 def fig2_series(df):
-    fig, axes = plt.subplots(5, 1, figsize=(7.2, 7.6), sharex=True, dpi=200, gridspec_kw={"hspace": 0.25})
+    fig, axes = plt.subplots(5, 1, figsize=(6.0, 7.4), sharex=True, dpi=200, gridspec_kw={"hspace": 0.25})
     t = pd.to_datetime(df["year_month"], format="%Y-%m")
     spec = [("rain_mm", "Rain (mm/month)", C_RAIN), ("shallow_sm_m3m3", "Soil moisture (m³/m³)", C_SOIL),
             ("sar_flood_km2", "Radar index (km²)", C_SAR), ("dw_flood_km2", "Dynamic World (km²)", C_DW),
@@ -85,7 +87,7 @@ def fig2_series(df):
 
 
 def fig3_lags(diag):
-    fig, ax = plt.subplots(figsize=(7.2, 3.6), dpi=200)
+    fig, ax = plt.subplots(figsize=(6.0, 3.6), dpi=200)
     seas, deseas = diag["rain_to_sar_inundation_lags_seasonal"], diag["rain_to_sar_inundation_lags_deseasonalized"]
     lags = ["lag_0_month", "lag_1_month", "lag_2_month"]
     x = np.arange(3)
@@ -107,7 +109,7 @@ def fig3_lags(diag):
 
 
 def fig4_relationships(diag):
-    fig, ax = plt.subplots(figsize=(7.2, 3.4), dpi=200)
+    fig, ax = plt.subplots(figsize=(6.0, 3.6), dpi=200)
     rows = diag["key_findings"]
     short = {
         "Rain -> floodplain SAR inundation (same month, deseasonalized)": "Rain → inundation, same month",
@@ -126,17 +128,17 @@ def fig4_relationships(diag):
         ax.plot([0, r], [yi, yi], color=colour, lw=1.2)
         ax.plot(r, yi, "o", color=colour, ms=5)
         ax.text(0.64, yi, f"q = {qi:.2f}", va="center", fontsize=7.5, color=INK2)
-    ax.set_yticks(y, labels, fontsize=8)
+    ax.set_yticks(y, labels, fontsize=9)
     ax.set_xlim(-0.2, 0.75)
     ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=8)
     ax.grid(axis="x", color=RULE, lw=0.4)
-    fig.subplots_adjust(left=0.36, right=0.97, bottom=0.22, top=0.96)
+    fig.subplots_adjust(left=0.5, right=0.97, bottom=0.2, top=0.96)
     _source(fig, "cascade_diagnostics.json, key_findings; q = BH-adjusted p; grey = q ≥ 0.05")
     return fig
 
 
 def fig5_reservoir(diag):
-    fig, ax = plt.subplots(figsize=(7.2, 3.4), dpi=200)
+    fig, ax = plt.subplots(figsize=(6.0, 3.6), dpi=200)
     base = diag["rain_to_sar_inundation_lags_deseasonalized"]
     ctl = diag["rain_to_sar_inundation_controlling_for_oyan_reservoir"]["deseasonalized"]
     lags = ["lag_0_month", "lag_1_month", "lag_2_month"]
