@@ -1,0 +1,85 @@
+{
+ "script": "scripts/make_terrain_landcover.py",
+ "bounds": {
+  "west": 2.633335420251513,
+  "south": 6.474998072695389,
+  "east": 4.204165395920106,
+  "north": 9.004164787517402
+ },
+ "grid": {
+  "width_px": 900,
+  "height_px": 1449,
+  "crs": "EPSG:4326"
+ },
+ "clip": "union of units Z1 to Z4 (catchment)",
+ "terrain": {
+  "source": "Copernicus DEM GLO-30 via Microsoft Planetary Computer (cop-dem-glo-30)",
+  "resolution_m": 30,
+  "display": "hillshade (azimuth 315°, altitude 45°) with elevation tint",
+  "elevation_min_m": 0.0,
+  "elevation_max_m": 579.1,
+  "note": "The Copernicus DEM gives 0 m over water; the minimum may be a lagoon or river cell, not land."
+ },
+ "landcover": {
+  "source": "ESA WorldCover 2021 v200 via Microsoft Planetary Computer (esa-worldcover)",
+  "resolution_m": 10,
+  "accuracy_africa_pct": 76.5,
+  "citation": "Zanaga et al. (2022), doi:10.5281/zenodo.7254221",
+  "legend": [
+   {
+    "code": 10,
+    "label": "Tree cover",
+    "colour": "#006400",
+    "share_pct": 39.1
+   },
+   {
+    "code": 20,
+    "label": "Shrubland",
+    "colour": "#ffbb22",
+    "share_pct": 25.6
+   },
+   {
+    "code": 30,
+    "label": "Grassland",
+    "colour": "#ffff4c",
+    "share_pct": 13.6
+   },
+   {
+    "code": 40,
+    "label": "Cropland",
+    "colour": "#f096ff",
+    "share_pct": 18.7
+   },
+   {
+    "code": 50,
+    "label": "Built-up",
+    "colour": "#fa0000",
+    "share_pct": 2.6
+   },
+   {
+    "code": 60,
+    "label": "Bare or sparse vegetation",
+    "colour": "#b4b4b4",
+    "share_pct": 0.1
+   },
+   {
+    "code": 80,
+    "label": "Permanent water",
+    "colour": "#0064c8",
+    "share_pct": 0.3
+   },
+   {
+    "code": 90,
+    "label": "Herbaceous wetland",
+    "colour": "#0096a0",
+    "share_pct": 0.1
+   },
+   {
+    "code": 95,
+    "label": "Mangroves",
+    "colour": "#00cf75",
+    "share_pct": 0.1
+   }
+  ]
+ }
+}
