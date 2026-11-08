@@ -15,7 +15,9 @@
     <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
     <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&amp;display=swap">
     <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=zodiak@500,700&amp;display=swap">
+    <link rel="stylesheet" href="vendor/leaflet-1.9.4/leaflet.css">
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/study.css">
 </head>
 <body>
 <a class="skip" href="#abstract">Skip to the abstract</a>
@@ -44,134 +46,144 @@
 
     <section id="abstract" data-reveal class="abstract" aria-labelledby="h-abstract">
         <h2 id="h-abstract">Abstract</h2>
-        <p><strong>Background.</strong> The Ogun River drains about 22,165 km² of south-west Nigeria into the Lagos Lagoon. Rainfall and soil wetness control how much of the floodplain floods and how much sediment reaches the lagoon, but few studies have tested their month-to-month coupling with satellite data in this basin.</p>
-        <p><strong>Aim.</strong> To assemble a monthly satellite record of rainfall, shallow soil moisture, radar-derived floodplain inundation and lagoon turbidity for 72 months (January 2019 to December 2024), and to test whether rainfall and soil moisture are associated with inundation, and inundation with turbidity.</p>
-        <p><strong>Methods.</strong> Monthly series were built from CHIRPS rainfall, ERA5-Land soil moisture (0–7 cm), Sentinel-1 radar inundation, Sentinel-2 turbidity (NDTI) and Dynamic World flooding as an optical reference, averaged over four upland sub-basins (Z1–Z4) and the estuarine zone (Z5). Associations were tested at lags of 0 to 2 months, on raw and seasonal-cycle-removed series, using Spearman's rho with autocorrelation-adjusted p-values, as the diagnostics recommend. Five headline relationships were corrected once for multiple testing (Benjamini–Hochberg).</p>
-        <p><strong>Results.</strong> On raw monthly values, rainfall and inundation are associated at a two-month lag (−0.43, q = 0.006), and soil moisture and inundation in the same month (−0.38, q = 0.037). Both are seasonal co-variations that vanish once the seasonal cycle is removed. None of the 5 headline relationships on the anomalies is significant after correction; the largest is between inundation and lagoon turbidity (ρ = +0.32, q = 0.15). The radar index ranks months like the optical Dynamic World product in the seasonal cycle (ρ = +0.42) but not in anomalies (ρ = +0.14), and its values are far smaller (maximum 3.58 km² against 283 km²).</p>
-        <p><strong>Conclusions.</strong> Over six years, rainfall, soil moisture and radar inundation share a seasonal cycle but show no robust month-to-month coupling. The radar inundation index is uncalibrated and should be treated as relative. Its flood extent should not be cited until it is validated against gauge or optical data.</p>
+        <p>The Ogun River drains about 22,165 km² of south-west Nigeria into the Lagos Lagoon, and rainfall and soil wetness are the first controls on how much of its floodplain floods. We assembled a monthly satellite record for January 2019 to December 2024 of rainfall (CHIRPS), shallow soil moisture (ERA5-Land), radar floodplain inundation (Sentinel-1), an optical flooding reference (Dynamic World) and lagoon turbidity (Sentinel-2), averaged over four upland sub-basins and a lagoon zone, and tested whether rainfall and soil moisture are associated with inundation, and inundation with turbidity, at lags of up to two months. Associations were measured with Spearman's rho and autocorrelation-adjusted p-values, and the five headline relationships on month-to-month anomalies were corrected once for multiple testing. On raw monthly values, rainfall and inundation are negatively associated two months apart (ρ = −0.43, q = 0.006), and soil moisture and inundation in the same month (ρ = −0.38, q = 0.037); both reflect the shared wet-season cycle. Once that cycle is removed, none of the 5 relationships is significant (the largest, between inundation and lagoon turbidity, is ρ = +0.32, q = 0.15). The radar index ranks months like the optical reference over the seasonal cycle (ρ = +0.42) but not in anomalies (ρ = +0.14), and its values are far smaller than the optical extent. Over six years, rainfall, soil moisture and radar inundation share a seasonal cycle but show no robust month-to-month coupling. The radar index is uncalibrated and should be treated as a relative measure until it is validated.</p>
         <p class="keywords"><strong>Keywords:</strong> Ogun River; floodplain inundation; Sentinel-1; CHIRPS; ERA5-Land; lagoon turbidity; time series; Nigeria</p>
     </section>
 
     <section id="introduction" aria-labelledby="h-intro">
-        <h2 id="h-intro"><span class="n">1</span>Introduction</h2>
-        <p>Floodplains store water and sediment between a river and its estuary. How much of a floodplain goes under water in a given month depends on rainfall, on how wet the soil already is, and on any reservoir upstream. Radar satellites can map inundation through cloud. The Sentinel-1 processing chain developed for automated flood mapping <span class="cite">(Twele et al., 2016)</span> is one such approach, and Google's Dynamic World product provides an optical land cover record that includes flooded vegetation and open water <span class="cite">(Brown et al., 2022)</span>.</p>
+        <h2 id="h-intro">Introduction</h2>
+        <p>Floodplains store water and sediment between a river and its estuary. How much of a floodplain goes under water in a given month depends on rainfall, on how wet the soil already is, and on any reservoir upstream. Radar satellites can map inundation through cloud. The Sentinel-1 processing chain developed for automated flood mapping (Twele et al., 2016) is one such approach, and Dynamic World provides an optical land-cover record that includes open water and flooded vegetation (Brown et al., 2022).</p>
         <p>Gauge-based studies of the Ogun basin and its rainfall–flood behaviour exist, but in our review limited evidence was found for a single satellite record that combines rainfall, soil moisture, floodplain inundation and lagoon turbidity at monthly resolution. This study asks whether such a record can show how rainfall and soil moisture relate to floodplain inundation, and whether inundation relates to turbidity in the lagoon, over 2019 to 2024.</p>
     </section>
 
     <section id="study-area" aria-labelledby="h-area">
-        <h2 id="h-area"><span class="n">2</span>Study area</h2>
-        <p>The Ogun River drains about 22,165 km² of south-west Nigeria, from the Oyo Basement Complex in the north to the Lagos Lagoon in the south. The catchment is divided into four hydrological sub-basins derived from HydroBASINS level 9 <span class="cite">(Lehner &amp; Grill, 2013)</span>. The fifth unit, Z5, is a rectangular lagoon zone at the river's outlet; it is not a watershed and is used only for turbidity (Figure 1).</p>
+        <h2 id="h-area">Study area</h2>
+        <p>The Ogun River drains about 22,165 km² of south-west Nigeria. The catchment is divided into four hydrological sub-basins, Z1 to Z4, derived from HydroBASINS level 9 (Lehner &amp; Grill, 2013). They run from the upland headwaters in the north, through the Oyan tributary and the mainstem, to an alluvial corridor on the lower floodplain. The fifth unit, Z5, is a rectangular lagoon zone at the river's outlet. It is not a watershed, and it is used only for turbidity. Figure 2 shows the order of the units from headwaters to lagoon.</p>
+        <p>Figure 1 is an interactive map. Choose a variable, then click a unit for its values. Table 2 gives the same values as text.</p>
     </section>
-    <figure class="wide reveal" id="fig-1">
-        <img src="assets/figures/fig1_study_area.png" width="1200" height="1000" loading="lazy" alt="Map of the five analytical units of the Ogun catchment, Z1 to Z4 sub-basins and the lagoon zone Z5">
-        <figcaption><b>Figure 1.</b> The five analytical units. Z1 to Z4 are hydrological sub-basins from HydroBASINS level 9; Z5 is the lagoon zone (areas in the legend).</figcaption>
+
+    <figure class="wide reveal" id="fig-map">
+        <div class="map-tools" role="group" aria-label="Choose the variable shown on the map">
+            <button type="button" class="map-btn" data-var="rain" aria-pressed="true">Mean rainfall</button>
+            <button type="button" class="map-btn" data-var="wet" aria-pressed="false">Wet-season rainfall</button>
+            <button type="button" class="map-btn" data-var="soil" aria-pressed="false">Soil moisture</button>
+            <button type="button" class="map-btn" data-var="sar" aria-pressed="false">Radar index</button>
+            <button type="button" class="map-btn" data-var="dw" aria-pressed="false">Dynamic World</button>
+            <button type="button" class="map-btn" data-var="ndti" aria-pressed="false">Lagoon turbidity</button>
+        </div>
+        <div class="study-map" id="study-map" data-state="loading" role="region" aria-label="Interactive map of the Ogun units"></div>
+        <p class="map-status" id="study-map-status" role="status" aria-live="polite">Loading map…</p>
+        <div class="map-legend" id="study-map-legend" aria-live="polite"></div>
+        <figcaption><b>Figure 1.</b> The five analytical units of the Ogun catchment, January 2019 to December 2024. Colour shows the period mean of the selected variable. Unit boundaries are WWF HydroBASINS level 9 (Z1–Z4) and a rectangular lagoon zone (Z5, dashed). Radar values are not shown for the upland units Z1 and Z2, where dry-season radar artefacts make them unreliable. Lagoon turbidity is an uncalibrated index, not NTU or mg/L. Sources: Google Earth Engine export v2.4.0; basemap © Esri.</figcaption>
+    </figure>
+
+    <figure class="tablefig" id="tab-2">
+        <figcaption id="cap-t2"><b>Table 2.</b> Unit values, January 2019 to December 2024. Radar is not interpreted for Z1 and Z2. Dynamic World and turbidity are unavailable where a unit has no valid observations.</figcaption>
+        <div class="table-wrap">
+            <table aria-labelledby="cap-t2">
+                <thead><tr><th class="text">Unit</th><th>Area (km²)</th><th>Mean rain (mm/month)</th><th>Wet-season rain (mm/month)</th><th>Soil moisture (m³/m³)</th><th>Radar index (km²)</th><th>Dynamic World (km²)</th><th>Turbidity (NDTI)</th></tr></thead>
+                <tbody>
+<tr><td class="text"><strong>Z1</strong> Upper Ogun Headwaters</td><td>9,574</td><td>109</td><td>169</td><td>0.292</td><td>not interpreted</td><td>27.6</td><td>not interpreted</td></tr>
+<tr><td class="text"><strong>Z2</strong> Oyan–Ofiki Tributary</td><td>9,334</td><td>106</td><td>165</td><td>0.303</td><td>not interpreted</td><td>49.5</td><td>not interpreted</td></tr>
+<tr><td class="text"><strong>Z3</strong> Middle Ogun Mainstem</td><td>2,413</td><td>111</td><td>166</td><td>0.307</td><td>0.41</td><td>11.4</td><td>not interpreted</td></tr>
+<tr><td class="text"><strong>Z4</strong> Lower Ogun Alluvial Corridor</td><td>843</td><td>124</td><td>183</td><td>0.314</td><td>0.15</td><td>7.2</td><td>not interpreted</td></tr>
+<tr><td class="text"><strong>Z5</strong> Northwest Lagos Lagoon Estuary</td><td>283</td><td>139</td><td>205</td><td>0.178</td><td>not interpreted</td><td>not interpreted</td><td>-0.037</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </figure>
+
+    <figure class="wide reveal" id="fig-schematic">
+        <div class="schematic-wrap">
+<svg viewBox="0 0 918 156" role="img" aria-labelledby="schem-title schem-desc" class="schematic"><title id="schem-title">Catchment-to-coast chain of the Ogun units</title><desc id="schem-desc">Five units in order: upland headwaters Z1, the Oyan tributary Z2, the mainstem Z3, the alluvial corridor Z4 and the lagoon zone Z5. Each box gives the unit area and mean monthly rainfall.</desc><g class="unit"><rect x="12" y="16" width="150" height="104" rx="10" class="unit-box u1"/><text x="24" y="40" class="u-id">Z1</text><text x="52" y="40" class="u-name">Headwaters</text><text x="24" y="74" class="u-val">9,574 km²</text><text x="24" y="96" class="u-val">109 mm per month</text></g><line x1="168" y1="68.0" x2="192" y2="68.0" class="flow"/><g class="unit"><rect x="198" y="16" width="150" height="104" rx="10" class="unit-box u2"/><text x="210" y="40" class="u-id">Z2</text><text x="238" y="40" class="u-name">Oyan–Ofiki</text><text x="210" y="74" class="u-val">9,334 km²</text><text x="210" y="96" class="u-val">106 mm per month</text></g><line x1="354" y1="68.0" x2="378" y2="68.0" class="flow"/><g class="unit"><rect x="384" y="16" width="150" height="104" rx="10" class="unit-box u3"/><text x="396" y="40" class="u-id">Z3</text><text x="424" y="40" class="u-name">Mainstem</text><text x="396" y="74" class="u-val">2,413 km²</text><text x="396" y="96" class="u-val">111 mm per month</text></g><line x1="540" y1="68.0" x2="564" y2="68.0" class="flow"/><g class="unit"><rect x="570" y="16" width="150" height="104" rx="10" class="unit-box u4"/><text x="582" y="40" class="u-id">Z4</text><text x="610" y="40" class="u-name">Alluvial corridor</text><text x="582" y="74" class="u-val">843 km²</text><text x="582" y="96" class="u-val">124 mm per month</text></g><line x1="726" y1="68.0" x2="750" y2="68.0" class="flow"/><g class="unit"><rect x="756" y="16" width="150" height="104" rx="10" class="unit-box u5"/><text x="768" y="40" class="u-id">Z5</text><text x="796" y="40" class="u-name">Lagoon zone</text><text x="768" y="74" class="u-val">283 km²</text><text x="768" y="96" class="u-val">139 mm per month</text></g><text x="12" y="146" class="axis-note">Order of the units only. The arrows show how the catchment drains to the lagoon; they are not measured water transfers.</text></svg>
+        </div>
+        <figcaption><b>Figure 2.</b> The catchment-to-coast chain. The units run in order from the upland headwaters to the lagoon zone. The diagram shows their order and area only; it is not a water-balance or routing model.</figcaption>
     </figure>
 
     <section id="methods" aria-labelledby="h-methods">
-        <h2 id="h-methods"><span class="n">3</span>Data and methods</h2>
-        <figure class="tablefig">
-            <figcaption id="cap-t1"><b>Table 1.</b> Data sources. All products are from Google Earth Engine (script v2.4.0), monthly, January 2019 to December 2024.</figcaption>
-            <div class="table-wrap">
-                <table aria-labelledby="cap-t1">
-                    <thead><tr><th class="text">Variable</th><th class="text">Product</th><th class="text">Resolution</th><th class="text">Processing</th></tr></thead>
-                    <tbody>
-                        <tr><td class="text">Rainfall</td><td class="text">CHIRPS pentad <span class="cite">(Funk et al., 2015)</span></td><td class="text">0.05°</td><td class="text">Monthly total; kept when at least five pentads exist</td></tr>
-                        <tr><td class="text">Shallow soil moisture</td><td class="text">ERA5-Land monthly <span class="cite">(Muñoz-Sabater et al., 2021)</span></td><td class="text">0.1°</td><td class="text">Volumetric water, 0–7 cm</td></tr>
-                        <tr><td class="text">Floodplain inundation (index)</td><td class="text">Sentinel-1 GRD, VV, IW, ascending</td><td class="text">10 m, focal 50 m</td><td class="text">Radar water index; uncalibrated</td></tr>
-                        <tr><td class="text">Flooding reference</td><td class="text">Dynamic World V1 <span class="cite">(Brown et al., 2022)</span></td><td class="text">10 m</td><td class="text">Water or flooded vegetation, same domain</td></tr>
-                        <tr><td class="text">Lagoon turbidity</td><td class="text">Sentinel-2 SR</td><td class="text">10 m</td><td class="text">NDTI = (B4 − B3)/(B4 + B3) over open water (MNDWI &gt; 0)</td></tr>
-                        <tr><td class="text">Reservoir</td><td class="text">Sentinel-1 open water, Oyan Reservoir</td><td class="text">10 m</td><td class="text">Area used as a regulation proxy; dam releases not available</td></tr>
-                        <tr><td class="text">Catchment and units</td><td class="text">HydroBASINS level 9 <span class="cite">(Lehner &amp; Grill, 2013)</span></td><td class="text">Vector</td><td class="text">Upstream units traced from the Ogun mouth</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </figure>
-        <p>Each variable is averaged over its unit and reported as a monthly series (Figure 2). Missing months are kept as missing and excluded pairwise. Dynamic World has 67 valid months; turbidity has 62, and 10 months are missing, mostly in the cloudy wet season.</p>
-        <p>Two series are tested in two forms. The raw series show the seasonal co-variation. The anomaly series subtract each calendar month's six-year mean, so only month-to-month departures remain:</p>
-        <div class="eq" role="group" aria-label="Equation 1">
-            <div><span><var>a</var><sub><var>t</var></sub> = <var>x</var><sub><var>t</var></sub> − <var>x̄</var><sub>month(<var>t</var>)</sub></span><span>(1)</span></div>
-        </div>
-        <p>Association is measured with Spearman's rho, the estimator the diagnostics recommend when either series is not normally distributed. Its p-value is adjusted for autocorrelation with an effective sample size. Lags of 0, 1 and 2 months are tested. The five headline relationships on anomalies form one family, corrected once with Benjamini–Hochberg false discovery rate control <span class="cite">(Benjamini &amp; Hochberg, 1995)</span>; the result is reported as q. The Pearson correlation and its interval are given for transparency, but they are not used to decide significance. The reservoir control removes the linear effect of reservoir area before testing rainfall and flooding.</p>
-        <p class="small">Full method, code and tests: <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">repository</a>. The diagnostics file is <span class="mono">docs/data/cascade_diagnostics.json</span>.</p>
+        <h2 id="h-methods">Methods</h2>
+
+        <h3 id="h-data">Satellite data</h3>
+        <p>All series come from Google Earth Engine (export v2.4.0), monthly from January 2019 to December 2024, giving 72 months. Rainfall is the Climate Hazards Group InfraRed Precipitation with Stations product (CHIRPS; Funk et al., 2015) at 0.05°, summed to monthly totals, and a month is kept only where at least five pentads are available. Shallow soil moisture is the volumetric water content of the 0–7 cm layer from ERA5-Land (Muñoz-Sabater et al., 2021) at 0.1°. The radar inundation index uses Sentinel-1 GRD backscatter in VV polarisation, ascending IW passes, with a focal filter of 50 m. The processing is related to the automated approach of Twele et al. (2016) but is not the same chain, and the index is not calibrated against gauge or optical water extent. Dynamic World V1 (Brown et al., 2022) gives an independent optical flooding reference over the same floodplain domain, available in 67 months. Lagoon turbidity is the normalised difference turbidity index (NDTI) from Sentinel-2 surface reflectance over open water (modified NDWI above zero), which is available in 62 months. NDTI is an uncalibrated spectral indicator; it is not in NTU or mg/L. The 10 missing months fall mostly in the cloudy wet season.</p>
+        <p>The upstream reservoir is represented by the Sentinel-1 open-water area of Oyan Reservoir. This is a proxy for regulation, not a release record: no dam-release data were available.</p>
+
+        <h3 id="h-units">Spatial aggregation</h3>
+        <p>Each variable is averaged over the pixels of its unit. Radar values are not used for Z1 and Z2, the upland units, following the rule applied in the explorer. Dynamic World and turbidity are available only where those units have valid observations, and the number of valid months is kept with every mean.</p>
+
+        <h3 id="h-anom">Seasonal cycle and anomalies</h3>
+        <p>Two forms of each series are analysed. The raw monthly series show any seasonal co-variation. The anomaly series remove the seasonal cycle by subtracting, from each month, the mean for that calendar month across the six years. An anomaly therefore measures how much wetter, drier, more or less flooded than usual a given month was. With six years, each calendar month has only six values, so the climatology is itself uncertain.</p>
+
+        <h3 id="h-assoc">Association and correction for multiple testing</h3>
+        <p>Association is measured with Spearman's rank correlation (rho). Rho is used because the series are not normally distributed, and the diagnostics record that choice. Pearson's r and its confidence interval are reported for transparency, but they do not decide significance, because a single extreme month can dominate Pearson's r. Each p-value is adjusted for autocorrelation with an effective sample size. Pairs are tested at lags of zero, one and two months, so that a response within the same or the next two months can be seen.</p>
+        <p>The five headline relationships on anomalies form one family, and their p-values are corrected together with the Benjamini–Hochberg false discovery rate (Benjamini &amp; Hochberg, 1995). The corrected value is reported as q. A relationship is called significant only if q is below 0.05.</p>
+
+        <h3 id="h-robust">Robustness</h3>
+        <p>Robustness was tested by leaving out each month in turn, and by removing the single month that most affects the result. The reservoir control was tested by removing the linear effect of reservoir area before testing rainfall against inundation.</p>
+
+        <h3 id="h-scope">What the data can and cannot show</h3>
+        <p>The analysis uses satellite proxies, not measurements. Rainfall is not groundwater recharge, and soil wetness in the top 7 cm is not groundwater availability. The study has no discharge observations, so it makes no claim about river flow. It has no groundwater observations, so it makes no claim about aquifers. Coastal position is not evidence of coastal vulnerability. The results are associations at monthly resolution, not causes.</p>
     </section>
 
     <section id="results" aria-labelledby="h-results">
-        <h2 id="h-results"><span class="n">4</span>Results</h2>
-        <h3 id="h-series"><span class="n">4.1</span>Seasonal pattern</h3>
-        <p>Averaged by calendar month, rainfall peaks in October, soil moisture in September and the radar inundation index in October. The largest radar value is 3.58 km², in October 2024. The optical Dynamic World series reaches 283 km² in its largest month, so the two are on very different scales (Figure 2).</p>
+        <h2 id="h-results">Results</h2>
+
+        <h3 id="h-series">Seasonal pattern</h3>
+        <p>Averaged by calendar month, rainfall peaks in October, soil moisture in September and the radar inundation index in October. The largest radar value is 3.58 km², in October 2024. The optical Dynamic World series reaches 283 km² in its largest month, so the two are on very different scales (Figure 3).</p>
     </section>
-    <figure class="wide reveal" id="fig-2">
-        <img src="assets/figures/fig2_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity">
-        <figcaption><b>Figure 2.</b> Monthly catchment series, 2019 to 2024. Gaps are months without a valid observation.</figcaption>
+    <figure class="wide reveal" id="fig-series">
+        <img src="assets/figures/fig2_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity">
+        <figcaption><b>Figure 3.</b> Monthly catchment series, 2019 to 2024. Gaps are months without a valid observation.</figcaption>
     </figure>
 
-    <section aria-labelledby="h-lags">
-        <h3 id="h-lags"><span class="n">4.2</span>Raw monthly values</h3>
-        <p>On raw values, rainfall and radar inundation are negatively associated at a lag: rain two months earlier goes with less flooding now (−0.43, q = 0.006). Soil moisture and flooding in the same month show a similar negative association (−0.38, q = 0.037). These are the seasonal co-variations the data would show in any two series that share an annual cycle. Their sign is not explained by a mechanism here, and the seasonal test below removes them (Figure 3).</p>
+    <section aria-labelledby="h-assoc-r">
+        <h3 id="h-assoc-r">Associations on raw values and on anomalies</h3>
+        <p>On raw monthly values, rainfall and radar inundation are negatively associated two months apart: rain two months earlier goes with less flooding now (ρ = −0.43, q = 0.006). A one-month lag is borderline (ρ = −0.29, q = 0.052). Soil moisture and flooding in the same month show a negative association too (ρ = −0.38, q = 0.037). These are the co-variations two series would show if both followed the same annual cycle. Once the cycle is removed, none of them is significant (Figure 4). The seasonal relationships are therefore best read as a shared wet-season pattern, not as evidence that rainfall drives flooding.</p>
     </section>
-    <figure class="wide reveal" id="fig-3">
-        <img src="assets/figures/fig3_lags.png" width="1200" height="720" loading="lazy" alt="Bars of Spearman correlation between rainfall and inundation at lags of 0, 1 and 2 months, raw and with the seasonal cycle removed">
-        <figcaption><b>Figure 3.</b> Spearman ρ between rainfall and radar inundation at lags of 0 to 2 months, on raw values and with the seasonal cycle removed. Raw values show a significant association only at two months (q = 0.006).</figcaption>
+    <figure class="wide reveal" id="fig-assoc">
+        <img src="assets/figures/fig3_association.png" width="1200" height="880" loading="lazy" alt="Dot plot of Spearman correlation between rainfall, soil moisture and inundation, on raw values and on anomalies, with q values">
+        <figcaption><b>Figure 4.</b> Spearman ρ between rainfall or soil moisture and radar inundation, on raw values (filled, coloured if significant) and on anomalies with the seasonal cycle removed. q is the Benjamini–Hochberg adjusted p-value.</figcaption>
     </figure>
 
-    <section aria-labelledby="h-anom">
-        <h3 id="h-anom"><span class="n">4.3</span>Month-to-month anomalies</h3>
-        <p>With the seasonal cycle removed, rainfall and flooding in the same month show a positive association (ρ = +0.11, q = 0.44) that is not significant after correction. A one-month lag gives ρ = +0.15 (q = 0.44). The Pearson correlation for the same month is +0.38 (95% interval +0.17 to +0.56), but Pearson is sensitive to a single extreme month. Leaving out October 2024 alone gives r = +0.19 (95% interval −0.04 to +0.41). Soil moisture and flooding give ρ = −0.07 (q = 0.65). Of the 5 headline relationships, 0 is significant after correction (Figure 4).</p>
+    <section aria-labelledby="h-anom-r">
+        <h3 id="h-anom-r">Month-to-month anomalies</h3>
+        <p>With the seasonal cycle removed, rainfall and flooding in the same month are positively associated (ρ = +0.11, q = 0.44), and one month later (ρ = +0.15, q = 0.44). Neither is significant after correction. The Pearson correlation for the same month is +0.38, with a 95% interval of +0.17 to +0.56, but it depends on one month: leaving out October 2024 gives r = +0.19 (95% interval −0.04 to +0.41). Soil moisture and flooding give ρ = −0.07 (q = 0.65). Of the 5 headline relationships, 0 is significant after correction.</p>
+        <p>The Oyan Reservoir control leaves the same-month anomaly association almost unchanged (ρ = +0.12, against +0.11 without the control). The reservoir proxy does not explain the absence of a month-to-month link. Because no release records were available, the regulation effect is only partly tested.</p>
     </section>
-    <figure class="wide reveal" id="fig-4">
-        <img src="assets/figures/fig4_relationships.png" width="1200" height="720" loading="lazy" alt="Dot plot of Spearman correlation for the headline relationships, all with q above 0.05">
-        <figcaption><b>Figure 4.</b> Spearman ρ for the headline relationships on anomalies. q is the Benjamini–Hochberg adjusted p-value across the family. Grey: not significant.</figcaption>
-    </figure>
-
-    <section aria-labelledby="h-res">
-        <h3 id="h-res"><span class="n">4.4</span>Reservoir</h3>
-        <p>Controlling for the open-water area of Oyan Reservoir leaves the same-month anomaly association almost unchanged (ρ = +0.12, against +0.11 without the control). The reservoir is therefore not the explanation for the absence of a month-to-month link. Dam release records are not available, so the regulation effect is only partly tested (Figure 5).</p>
-    </section>
-    <figure class="wide reveal" id="fig-5">
-        <img src="assets/figures/fig5_reservoir.png" width="1200" height="720" loading="lazy" alt="Bars comparing rainfall and inundation correlations with and without a reservoir control">
-        <figcaption><b>Figure 5.</b> Spearman ρ between rainfall and inundation anomalies, with and without controlling for the Oyan Reservoir area.</figcaption>
-    </figure>
 
     <section aria-labelledby="h-turb">
-        <h3 id="h-turb"><span class="n">4.5</span>Flooding and lagoon turbidity</h3>
-        <p>Lagoon turbidity (NDTI) and radar inundation anomalies are positively associated (ρ = +0.32, q = 0.15), the largest association among the headline relationships, but it is not significant after correction. The NDTI is an uncalibrated indicator, not NTU or mg/L (Figure 6).</p>
+        <h3 id="h-turb">Flooding, lagoon turbidity and the optical reference</h3>
+        <p>Lagoon turbidity and radar inundation anomalies are positively associated (ρ = +0.32, q = 0.15), the largest association among the headline relationships, but not significant after correction. The radar index ranks months like Dynamic World over the seasonal cycle (ρ = +0.42), but not in anomalies (ρ = +0.14, q = 0.44). Its values are far smaller than the optical extent, so it should be read as a relative measure, not as an area (Figure 5).</p>
     </section>
-    <figure class="narrow reveal" id="fig-6">
-        <img src="assets/figures/fig6_turbidity.png" width="920" height="720" loading="lazy" alt="Scatter of lagoon turbidity anomaly against radar inundation anomaly">
-        <figcaption><b>Figure 6.</b> Monthly anomalies of radar inundation and lagoon turbidity.</figcaption>
-    </figure>
-
-    <section aria-labelledby="h-val">
-        <h3 id="h-val"><span class="n">4.6</span>Agreement with the optical reference</h3>
-        <p>The radar index and the Dynamic World flooding series rank months alike in the seasonal cycle (ρ = +0.42), but not in the anomalies (ρ = +0.14, q = 0.44). Its magnitude is far below the optical extent, so the index should be read as a relative measure of wet-season flooding, not an area (Figure 7).</p>
-    </section>
-    <figure class="narrow reveal" id="fig-7">
-        <img src="assets/figures/fig7_dynamic_world.png" width="920" height="720" loading="lazy" alt="Scatter of radar inundation anomaly against Dynamic World flooding anomaly">
-        <figcaption><b>Figure 7.</b> Monthly anomalies of the radar index and Dynamic World flooding.</figcaption>
+    <figure class="wide reveal" id="fig-scatter">
+        <img src="assets/figures/fig4_scatter.png" width="1200" height="660" loading="lazy" alt="Two scatter plots of monthly anomalies: radar inundation against lagoon turbidity, and radar inundation against Dynamic World flooding">
+        <figcaption><b>Figure 5.</b> Monthly anomalies. Left: radar inundation against lagoon turbidity. Right: radar inundation against the Dynamic World flooding reference. Each point is one month with both values.</figcaption>
     </figure>
 
     <section id="discussion" data-reveal aria-labelledby="h-disc">
-        <h2 id="h-disc"><span class="n">5</span>Discussion</h2>
-        <p>Rainfall, soil moisture and radar inundation share a seasonal cycle in this catchment, and that shared cycle is what the raw correlations show. Once it is removed, no headline relationship survives correction. A link between rainfall and flooding is therefore plausible from the seasonal pattern, but this six-year record cannot show that it operates from month to month. Longer records, which would give more years to estimate the climatology from, are the first requirement.</p>
-        <p>The inundation index is the weakest part of the chain. It ranks months like the optical reference in the seasonal cycle, but its magnitude is far smaller, and it does not agree in anomalies. Until it is calibrated against gauge or optical water extent, the conclusions about flooding should be read as indicative.</p>
+        <h2 id="h-disc">Discussion</h2>
+        <p>Rainfall, soil moisture and radar inundation share a seasonal cycle in this catchment, and that shared cycle is what the raw correlations show. Once it is removed, no headline relationship survives correction. A link between rainfall and flooding is plausible from the seasonal pattern, but six years cannot show that it operates from month to month. Longer records are the first requirement, because they would give more years from which to estimate the seasonal cycle.</p>
+        <p>The radar index is the weakest part of the chain. It ranks months like the optical reference over the seasonal cycle, but its magnitude is much smaller, and it does not agree in anomalies. Until it is calibrated against gauge or optical water extent, conclusions about flooding should be read as indicative.</p>
+        <p><strong>Relevance to WAVES.</strong> The study is about water processes: how rainfall, soil moisture, floodplain inundation and turbidity change together across a catchment, measured from satellites and tested with stated uncertainty. It does not meet the programme's requirement for independent field observations, because the study has no gauge, discharge or water-use records, and the radar index is not yet validated. A future version would need gauge or reservoir-release data to test the water balance directly.</p>
+        <p><strong>Relevance to GroundwatCH.</strong> The study is not about groundwater. It has no borehole, water-level, pumping or hydrochemical data, and soil moisture in the top 7 cm is not an aquifer measure. The study does not support groundwater conclusions.</p>
     </section>
 
     <section id="limitations" data-reveal aria-labelledby="h-lim">
-        <h2 id="h-lim"><span class="n">6</span>Limitations</h2>
+        <h2 id="h-lim">Limitations</h2>
         <ul>
             <li>Six years give only six values per calendar month, so the anomalies depend on the six-year climatology and on individual years.</li>
             <li>Monthly resolution is coarser than the travel time of water across the upland catchment. Lagged results may reflect storage in soil and floodplain rather than flood routing.</li>
-            <li>The radar inundation index is uncalibrated and far smaller than the optical reference.</li>
+            <li>The radar inundation index is uncalibrated and far smaller than the optical reference. It is not interpreted for the upland units.</li>
             <li>NDTI is an uncalibrated indicator and is missing mostly in the wet season, so turbidity results lean towards the dry season.</li>
-            <li>Dam release records are not available; only the reservoir's open-water area is used.</li>
-            <li>CHIRPS (about 5 km) and ERA5-Land (about 9 km) are coarse relative to the sub-basins' floodplain.</li>
+            <li>No dam-release records were available; the reservoir control uses only the open-water area of the reservoir.</li>
+            <li>CHIRPS (about 5 km) and ERA5-Land (about 9 km) are coarse relative to the floodplain of the sub-basins.</li>
             <li>The autocorrelation adjustment is an approximation based on an effective sample size.</li>
+            <li>The study has no discharge, groundwater or coastal-impact observations, and its results are not evidence for them.</li>
         </ul>
     </section>
 
     <section id="conclusion" data-reveal aria-labelledby="h-concl">
-        <h2 id="h-concl"><span class="n">7</span>Conclusion</h2>
-        <p>Over 2019 to 2024, rainfall, soil moisture and radar floodplain inundation in the Ogun catchment share a seasonal cycle, but they show no robust month-to-month coupling, and the lagoon turbidity link is not significant after correction. The radar inundation index needs calibration before its flood extent can be cited.</p>
+        <h2 id="h-concl">Conclusion</h2>
+        <p>Over 2019 to 2024, rainfall, soil moisture and radar floodplain inundation in the Ogun catchment share a seasonal cycle, but they show no robust month-to-month coupling, and the lagoon turbidity link is not significant after correction. The radar index needs calibration before its flood extent can be cited.</p>
     </section>
 
     <section id="explorer" class="explore-cta" data-reveal aria-labelledby="h-explorer">
@@ -191,6 +203,7 @@
             <li><a href="data/ogun_monthly_timeseries.csv" download>ogun_monthly_timeseries.csv</a><span>Catchment-wide monthly series, 72 months</span></li>
             <li><a href="data/ogun_unit_monthly_timeseries.csv" download>ogun_unit_monthly_timeseries.csv</a><span>Per-unit monthly series</span></li>
             <li><a href="data/ogun_subbasins.geojson" download>ogun_subbasins.geojson</a><span>Analytical units</span></li>
+            <li><a href="data/unit_summary.json" download>unit_summary.json</a><span>Unit means shown on the map and in Table 2</span></li>
             <li><a href="data/cascade_diagnostics.json" download>cascade_diagnostics.json</a><span>All statistics on this page</span></li>
             <li><a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">Repository</a><span>Earth Engine script, pipeline, tests</span></li>
         </ul>
@@ -221,10 +234,11 @@
         <p>Other studies: <a href="https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/">Ouémé–Ogun water balance</a> · <a href="https://oloyededavid.github.io/Lagos-Urban-Heat-Analytics/">Lagos Urban Heat and Exposure Analytics</a></p>
     </div>
 </footer>
+<script src="vendor/leaflet-1.9.4/leaflet.js"></script>
+<script src="assets/study-map.js"></script>
 <script>
 (() => {
     const bar = document.getElementById('progress');
-    const top = document.getElementById('top');
     const onScroll = () => { const max = document.documentElement.scrollHeight - innerHeight; bar.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%'; };
     addEventListener('scroll', onScroll, { passive: true }); onScroll();
     const copy = document.getElementById('copy-cite');
