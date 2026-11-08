@@ -65,3 +65,40 @@ def test_robustness_finds_single_outlier(compiler):
     assert res["most_influential_month"] == "m17"
     assert res["pearson_r_full"] > 0.5
     assert abs(res["without_most_influential_month"]["pearson_r"]) < 0.4
+
+
+def test_significance_follows_the_recommended_estimator(compiler):
+    """A rank-based relationship with a Pearson-only signal must not be called significant.
+
+    Heavy-tailed data with one extreme pair: Pearson is large, Spearman is near zero.
+    The decision must use the recommended estimator (Spearman here), not the Pearson p-value.
+    """
+    rng = np.random.default_rng(11)
+    x = pd.Series(rng.normal(size=70))
+    y = pd.Series(rng.normal(size=70))
+    x[0], y[0] = 30.0, 30.0
+    res = compiler._bivariate_test(x, y)
+    assert res["recommended_estimator"] == "spearman_rho"
+    assert res["pearson_r"] > 0.3
+    assert res["p_value_recommended"] == res["spearman_p_autocorr_adj"]
+    assert res["p_value_recommended"] > 0.05
+
+
+def test_key_findings_use_one_correction_across_the_family(compiler):
+    rows = [
+        {"status": "VALID", "n_pairs": 70, "recommended_estimator": "spearman_rho", "spearman_rho": 0.1,
+         "pearson_r": 0.4, "p_value_recommended": 0.01},
+        {"status": "VALID", "n_pairs": 70, "recommended_estimator": "spearman_rho", "spearman_rho": 0.2,
+         "pearson_r": 0.2, "p_value_recommended": 0.03},
+    ]
+    findings = compiler._key_findings(
+        {"lag_0_month": rows[0], "lag_1_month": rows[1]},
+        {"lag_0_month": rows[1]},
+        rows[0],
+        {"deseasonalized": rows[0]},
+        False,
+        {"rain_to_sar_lag_0_deseasonalized": {"status": "INSUFFICIENT_OBSERVATIONS"}},
+    )
+    assert all(f["p_value_type"].startswith("BH FDR across") for f in findings)
+    assert all(f["p_value"] >= f["p_value_unadjusted"] for f in findings)
+    assert all(f["significant"] == (f["p_value"] < 0.05) for f in findings)

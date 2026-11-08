@@ -72,6 +72,7 @@ def _bivariate_test(x: pd.Series, y: pd.Series) -> dict[str, Any]:
             "pearson_ci95": [None, None],
             "p_value_raw": None,
             "p_value_autocorr_adj": None,
+            "p_value_recommended": None,
             "n_effective": None,
             "spearman_rho": None,
             "spearman_p_raw": None,
@@ -89,6 +90,12 @@ def _bivariate_test(x: pd.Series, y: pd.Series) -> dict[str, Any]:
     df_eff = max(2.0, n_eff - 2.0)
     t_eff = abs(r_val) * np.sqrt(df_eff / max(1e-12, 1.0 - r_val**2))
     p_adj_autocorr = float(2.0 * (1.0 - stats.t.cdf(t_eff, df=df_eff)))
+    # Spearman rho with the same effective-sample t approximation (rank correlation, autocorrelation-adjusted)
+    rho_c = float(np.clip(rho_val, -0.999999, 0.999999))
+    t_rho = abs(rho_c) * np.sqrt(df_eff / max(1e-12, 1.0 - rho_c**2))
+    p_adj_spearman = float(2.0 * (1.0 - stats.t.cdf(t_rho, df=df_eff)))
+    prefer_spearman_flag = bool(shapiro_px < 0.05 or shapiro_py < 0.05)
+    p_recommended = p_adj_spearman if prefer_spearman_flag else p_adj_autocorr
 
     return {
         "n_pairs": int(n),
@@ -102,6 +109,8 @@ def _bivariate_test(x: pd.Series, y: pd.Series) -> dict[str, Any]:
         "p_value_autocorr_adj": round(float(p_adj_autocorr), 6),
         "spearman_rho": round(float(rho_val), 3),
         "spearman_p_raw": round(float(rho_p), 6),
+        "spearman_p_autocorr_adj": round(p_adj_spearman, 6),
+        "p_value_recommended": round(p_recommended, 6),
         "status": "VALID"
     }
 
@@ -132,7 +141,8 @@ FDR_ALPHA = 0.05
 
 
 def _p_or_one(res: dict[str, Any]) -> float:
-    p = res.get("p_value_autocorr_adj")
+    """p-value of the estimator the diagnostics recommend (Spearman when either series is non-normal)."""
+    p = res.get("p_value_recommended")
     return float(p) if p is not None else 1.0
 
 
@@ -193,19 +203,41 @@ def _finding(label: str, res: dict[str, Any], p_key: str = "p_value_bh_fdr") -> 
         "relationship": label,
         "status": res.get("status"),
         "n_pairs": res.get("n_pairs"),
+        "estimator": res.get("recommended_estimator"),
         "spearman_rho": res.get("spearman_rho"),
         "pearson_r": res.get("pearson_r"),
         "p_value": p,
-        "p_value_type": "BH FDR" if p_key == "p_value_bh_fdr" else "autocorrelation-adjusted",
+        "p_value_unadjusted": res.get("p_value_recommended"),
+        "p_value_type": "BH FDR" if p_key == "p_value_bh_fdr" else "autocorrelation-adjusted, recommended estimator",
         "significant": bool(p is not None and p < FDR_ALPHA),
     }
+
+
+def _key_findings(anom_lags, sm_anom_lags, turb_anom, validation_block, has_dw, robustness) -> list[dict[str, Any]]:
+    """The headline relationships. Each uses the recommended estimator; p-values are then corrected once across this family (BH FDR)."""
+    rows = [
+        {**_finding("Rain -> floodplain SAR inundation (same month, deseasonalized)", anom_lags["lag_0_month"]),
+         "robust_to_single_month": _is_robust(robustness["rain_to_sar_lag_0_deseasonalized"]),
+         "most_influential_month": robustness["rain_to_sar_lag_0_deseasonalized"].get("most_influential_month")},
+        _finding("Rain -> floodplain SAR inundation (1-month lag, deseasonalized)", anom_lags["lag_1_month"]),
+        _finding("Soil moisture -> floodplain SAR inundation (same month, deseasonalized)", sm_anom_lags["lag_0_month"]),
+        _finding("Floodplain SAR inundation -> estuary NDTI (deseasonalized)", turb_anom),
+    ]
+    if has_dw:
+        rows.append(_finding("SAR inundation vs Dynamic World flooding (deseasonalized)", validation_block["deseasonalized"]))
+    raw = [r["p_value_unadjusted"] if r["p_value_unadjusted"] is not None else 1.0 for r in rows]
+    for r, q in zip(rows, _benjamini_hochberg(raw)):
+        r["p_value"] = round(q, 6)
+        r["p_value_type"] = "BH FDR across the key relationships, recommended estimator"
+        r["significant"] = bool(q < FDR_ALPHA)
+    return rows
 
 
 def _is_robust(rb: dict[str, Any]) -> bool | None:
     """True if the association stays significant (p < FDR_ALPHA) without its most influential month."""
     if rb.get("status") != "VALID":
         return None
-    p = rb["without_most_influential_month"].get("p_value_autocorr_adj")
+    p = rb["without_most_influential_month"].get("p_value_recommended")
     return bool(p is not None and p < FDR_ALPHA)
 
 
@@ -358,15 +390,7 @@ def evaluate_cascade_coupling(csv_path: str, output_json: str) -> dict[str, Any]
         },
         "sar_validation_against_dynamic_world": validation_block,
         "robustness": robustness,
-        "key_findings": [
-            {**_finding("Rain -> floodplain SAR inundation (same month, deseasonalized)", anom_lags["lag_0_month"]),
-             "robust_to_single_month": _is_robust(robustness["rain_to_sar_lag_0_deseasonalized"]),
-             "most_influential_month": robustness["rain_to_sar_lag_0_deseasonalized"].get("most_influential_month")},
-            _finding("Rain -> floodplain SAR inundation (1-month lag, deseasonalized)", anom_lags["lag_1_month"]),
-            _finding("Soil moisture -> floodplain SAR inundation (same month, deseasonalized)", sm_anom_lags["lag_0_month"]),
-            _finding("Floodplain SAR inundation -> estuary NDTI (deseasonalized)", turb_anom, p_key="p_value_autocorr_adj"),
-        ] + ([_finding("SAR inundation vs Dynamic World flooding (deseasonalized)",
-                       validation_block["deseasonalized"], p_key="p_value_autocorr_adj")] if has_dw else []),
+        "key_findings": _key_findings(anom_lags, sm_anom_lags, turb_anom, validation_block, has_dw, robustness),
         "methodological_notes": [
             "Missing observations (e.g., cloud-obscured Sentinel-2 monsoon months) are preserved as NaN and excluded pairwise.",
             "NDTI gaps are concentrated in the cloudy wet season (see coverage.ndti_valid_wet_season_months), so SAR-NDTI associations are weighted towards dry-season conditions and are not missing at random.",
