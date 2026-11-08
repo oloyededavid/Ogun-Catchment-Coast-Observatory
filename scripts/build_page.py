@@ -132,6 +132,7 @@ def values() -> dict[str, str]:
     sig_seasonal = [(lag, seas[lag]) for lag in ("lag_0_month", "lag_1_month", "lag_2_month") if seas[lag]["p_value_bh_fdr"] < 0.05]
     v = {
         "CATCH": f"{catch:,.0f}",
+        "CATCH_NUM": f"{catch:.0f}",
         "NMONTHS": str(cov["n_total_months"]),
         "NDW": str(cov["valid_dynamic_world_months"]),
         "NNDTI": str(cov["valid_ndti_months"]),

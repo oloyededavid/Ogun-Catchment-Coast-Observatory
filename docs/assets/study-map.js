@@ -13,9 +13,6 @@
     const buttons = Array.from(document.querySelectorAll('[data-var]'));
     const ctxTerrain = document.getElementById('ctx-terrain');
     const ctxLand = document.getElementById('ctx-landcover');
-    const ctxRivers = document.getElementById('ctx-rivers');
-    const ctxRiversNote = document.getElementById('ctx-rivers-note');
-    const basemapSel = document.getElementById('basemap-select');
     const shareBtn = document.getElementById('share-view');
     const shareStatus = document.getElementById('share-status');
     const setState = (state, msg) => {
@@ -54,7 +51,6 @@
         if (BASEMAPS[kind]) tiles = L.tileLayer(BASEMAPS[kind], { maxZoom: 12, attribution: 'Basemap © Esri' }).addTo(map);
     }
     setBasemap(basemap);
-    if (basemapSel) basemapSel.value = basemap;
     L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
     const north = L.control({ position: 'topright' });
     north.onAdd = () => {
@@ -64,12 +60,12 @@
     };
     north.addTo(map);
 
-    let geo = null, units = null, layer = null, rasters = null, terrainLayer = null, landLayer = null, riverLayer = null, rivers = null;
+    let geo = null, units = null, layer = null, rasters = null, terrainLayer = null, landLayer = null;
     const ramp = (t, [a, b]) => {
         const pa = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), pb = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16));
         return `rgb(${pa.map((x, i) => Math.round(x + (pb[i] - x) * t)).join(',')})`;
     };
-    const ctxOn = () => (ctxTerrain && ctxTerrain.checked) || (ctxLand && ctxLand.checked) || (ctxRivers && ctxRivers.checked);
+    const ctxOn = () => (ctxTerrain && ctxTerrain.checked) || (ctxLand && ctxLand.checked);
 
     function valuesFor(v) {
         const vals = geo.features.map(f => VARS[v].key(units[f.properties.zone_id] || {})).filter(x => typeof x === 'number');
@@ -121,8 +117,6 @@
     function drawContext() {
         if (terrainLayer) { map.removeLayer(terrainLayer); terrainLayer = null; }
         if (landLayer) { map.removeLayer(landLayer); landLayer = null; }
-        if (riverLayer) { map.removeLayer(riverLayer); riverLayer = null; }
-        if (rivers && ctxRivers && ctxRivers.checked) riverLayer = L.geoJSON(rivers, { pane: 'context', interactive: false, style: f => ({ color: '#1f4e5f', weight: Math.max(1, Math.min(3, (f.properties && f.properties.ORD_STRA ? f.properties.ORD_STRA : 3) - 2)), opacity: 0.9 }) }).addTo(map);
         if (!rasters) return;
         const b = [[rasters.bounds.south, rasters.bounds.west], [rasters.bounds.north, rasters.bounds.east]];
         if (ctxTerrain && ctxTerrain.checked) terrainLayer = L.imageOverlay('data/rasters/terrain.png', b, { pane: 'context', opacity: 0.9, alt: 'Terrain: hillshade of the catchment' }).addTo(map);
@@ -133,7 +127,6 @@
         const p = new URLSearchParams({ var: current, base: basemap });
         if (ctxTerrain && ctxTerrain.checked) p.set('terrain', '1');
         if (ctxLand && ctxLand.checked) p.set('landcover', '1');
-        if (ctxRivers && ctxRivers.checked) p.set('rivers', '1');
         history.replaceState(null, '', '#' + p.toString());
         return location.href;
     }
@@ -178,10 +171,8 @@
         fetch('data/ogun_subbasins.geojson').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
         fetch('data/unit_summary.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
         fetch('data/rasters/rasters.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(() => null),
-        fetch('data/ogun_rivers.geojson').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(() => null),
-    ]).then(([g, s, rs, rv]) => {
-        geo = g; units = s.units; rasters = rs; rivers = rv;
-        if (ctxRivers && rivers) { ctxRivers.disabled = false; if (ctxRiversNote) ctxRiversNote.textContent = ''; ctxRivers.checked = params.get('rivers') === '1'; }
+    ]).then(([g, s, rs]) => {
+        geo = g; units = s.units; rasters = rs;
         if (ctxTerrain) ctxTerrain.checked = wantTerrain && !!rasters;
         if (ctxLand) ctxLand.checked = wantLand && !!rasters;
         if (ctxTerrain && !rasters) ctxTerrain.disabled = true;
@@ -194,12 +185,11 @@
     });
 
     buttons.forEach(b => b.addEventListener('click', () => { if (geo) draw(b.dataset.var); }));
-    [ctxTerrain, ctxLand, ctxRivers].forEach(c => c && c.addEventListener('change', () => { if (geo) { drawContext(); draw(current); } }));
-    if (basemapSel) basemapSel.addEventListener('change', () => { setBasemap(basemapSel.value); share(); });
+    [ctxTerrain, ctxLand].forEach(c => c && c.addEventListener('change', () => { if (geo) { drawContext(); draw(current); } }));
     if (shareBtn) shareBtn.addEventListener('click', () => {
         const url = share();
         const done = () => { if (shareStatus) shareStatus.textContent = 'Link copied.'; };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => { if (shareStatus) shareStatus.textContent = url; });
-        else if (shareStatus) shareStatus.textContent = url;
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => { if (shareStatus) shareStatus.textContent = 'Copy failed. The address bar holds the link.'; });
+        else if (shareStatus) shareStatus.textContent = 'The address bar holds the link.';
     });
 })();

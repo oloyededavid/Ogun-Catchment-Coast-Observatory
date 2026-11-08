@@ -116,3 +116,41 @@
 @media (max-width: 640px) { #tab-2 .name-full { display: none; } }
 .ctx-note { color: #777; }
 .print-link { font-size: 13px; color: #444; margin: 10px 0 0; }
+
+/* ---- Round 2 of the study page: plain, black accents, small motion (all stop for reduced motion) ---- */
+.explore-cta { margin: 56px 0 40px; }
+.cta-black { background: #0b0b0b; color: #f4f4f2; border-radius: 16px; padding: 22px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: center; }
+.cta-preview { position: relative; background: #050505; border-radius: 10px; overflow: hidden; }
+.cta-preview canvas { width: 100%; height: auto; display: block; }
+.preview-month { position: absolute; left: 12px; bottom: 10px; margin: 0; font-size: 12px; color: #b8b8b2; font-variant-numeric: tabular-nums; }
+.cta-kicker { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #9a9a94; margin: 0 0 8px; }
+.cta-h { font-family: "Zodiak", Georgia, serif; font-size: 28px; line-height: 1.15; margin: 0 0 10px; color: #fff; }
+.cta-desc { font-size: 15px; line-height: 1.5; color: #c9c9c3; margin: 0 0 18px; }
+.cta-button { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #0b0b0b; text-decoration: none; padding: 11px 18px; border-radius: 999px; font-weight: 500; transition: transform 180ms ease; }
+.cta-button:hover { transform: translateX(3px); }
+.cta-button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@media (max-width: 720px) { .cta-black { grid-template-columns: minmax(0, 1fr); padding: 16px; } .cta-h { font-size: 24px; } }
+
+.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 22px 0 6px; }
+.stat-row div { border-top: 1px solid #111; padding-top: 10px; }
+.stat-row dt { font-size: 12px; color: #555; margin: 0 0 4px; }
+.stat-row dd { margin: 0; font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; color: #111; }
+@media (max-width: 560px) { .stat-row { grid-template-columns: minmax(0, 1fr); } }
+
+.data-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 12px 0 8px; }
+.btn-primary { display: inline-block; background: #0b0b0b; color: #fff; padding: 11px 20px; border-radius: 999px; text-decoration: none; font-weight: 500; }
+.btn-primary:hover { background: #2a2a2a; }
+.btn-primary:focus-visible { outline: 2px solid #0b0b0b; outline-offset: 3px; }
+.btn-quiet { color: #111; text-decoration: underline; text-underline-offset: 3px; }
+.data-note { color: #555; font-size: 13px; }
+
+/* Unit chain: neutral, not coloured by unit; the arrows move slowly to show direction */
+.chain-unit, .chain-unit.u1, .chain-unit.u2, .chain-unit.u3, .chain-unit.u4, .chain-unit.u5 { background: #fff; border-color: #cfcfca; }
+.chain-unit:not(:last-child)::after { color: #111; animation: nudge 2.6s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translate(-50%, -50%); opacity: .55; } 50% { transform: translate(-30%, -50%); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .chain-unit:not(:last-child)::after { animation: none; } .cta-button { transition: none; } }
+
+/* Map: unit labels are plain codes with no box, so they do not cover the units */
+.unit-label { background: none !important; border: 0 !important; box-shadow: none !important; font-weight: 700; font-size: 12px; color: #111; padding: 0; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
+.share-status:empty { display: none; }
+.article > header.title h1 { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.12; }

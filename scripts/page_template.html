@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="only light">
-    <title>Monthly rainfall, soil moisture and floodplain inundation in the Ogun River catchment, Nigeria, 2019–2024</title>
+    <title>Surface water from headwaters to lagoon: a WAVES study with a groundwater context</title>
     <meta name="description" content="Satellite records of rainfall, soil moisture, radar floodplain inundation and lagoon turbidity for the Ogun River catchment, 2019–2024. Rainfall and flooding share a seasonal cycle; month-to-month coupling is not robust.">
     <meta name="author" content="David Oluwayinka Oloyede">
-    <meta name="citation_title" content="Monthly rainfall, soil moisture and floodplain inundation in the Ogun River catchment, Nigeria, 2019–2024">
+    <meta name="citation_title" content="Surface water from headwaters to lagoon: a WAVES study with a groundwater context">
     <meta name="citation_author" content="Oloyede, David Oluwayinka">
     <meta name="citation_publication_date" content="2026/11/08">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111'/%3E%3Cpath d='M6 20c3 0 3-2 6-2s3 2 6 2 3-2 6-2' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -39,13 +39,18 @@
 
 <main class="article" id="top">
     <header class="title">
-        <h1>Monthly rainfall, soil moisture and floodplain inundation in the Ogun River catchment, Nigeria, 2019–2024</h1>
-        <p class="subtitle">Satellite records for four sub-basins and the Lagos Lagoon estuary</p>
+        <h1>Surface water from headwaters to lagoon: a WAVES study with a groundwater context</h1>
+        <p class="subtitle">Rainfall, soil moisture and radar flooding, 2019–2024</p>
     </header>
 
     <section id="abstract" data-reveal class="abstract" aria-labelledby="h-abstract">
         <h2 id="h-abstract">Abstract</h2>
         <p>The Ogun River drains about {CATCH} km² of south-west Nigeria into the Lagos Lagoon. Rainfall and soil wetness are plausible controls on how much of its floodplain floods. We assembled a monthly satellite record for January 2019 to December 2024 of rainfall (CHIRPS), shallow soil moisture (ERA5-Land), radar floodplain inundation (Sentinel-1), an optical flooding reference (Dynamic World) and lagoon turbidity (Sentinel-2), averaged over four sub-basins and a lagoon zone, and tested whether rainfall and soil moisture are associated with inundation, and inundation with turbidity, at lags of up to two months. Associations were measured with Spearman's rho and autocorrelation-adjusted p-values, and the five headline relationships on month-to-month anomalies were corrected once for multiple testing. On raw monthly values, rainfall and inundation are negatively associated two months apart (ρ = {SEAS2_RHO}, q = {SEAS2_Q}), and soil moisture and inundation in the same month (ρ = {SM_RHO}, q = {SM_Q}); both are seasonal co-variations, and the negative sign and a February–March radar peak suggest that dry-season radar detections may drive them. This is not established. Once the seasonal cycle is removed, none of the headline relationships is significant (the largest, between inundation and lagoon turbidity, is ρ = {NDTI_RHO}, q = {NDTI_Q}). The radar index and the Dynamic World series agree in their seasonal pattern (ρ = {DW_SEAS_RHO}) but not in their anomalies (ρ = {DW_ANOM_RHO}). Dynamic World shows little water in the wet season, so it is not a reliable flood reference here, and the radar values are far smaller than its extent. Over six years, rainfall, soil moisture and radar inundation share a seasonal cycle but show no robust month-to-month coupling. The radar index is uncalibrated and should be treated as a relative measure until it is validated.</p>
+        <dl class="stat-row" aria-label="Key figures">
+            <div><dt>Months of satellite data</dt><dd><span data-count="{NMONTHS}">{NMONTHS}</span></dd></div>
+            <div><dt>Analytical units</dt><dd><span data-count="5">5</span></dd></div>
+            <div><dt>Catchment area, km²</dt><dd><span data-count="{CATCH_NUM}">{CATCH}</span></dd></div>
+        </dl>
         <p class="keywords"><strong>Keywords:</strong> Ogun River; hydrology; water resources (WAVES); groundwater (GroundwatCH); surface water–groundwater interaction; floodplain inundation; soil moisture; Sentinel-1; CHIRPS; ERA5-Land; Dynamic World; lagoon turbidity; Nigeria</p>
     </section>
 
@@ -70,7 +75,6 @@
             <aside class="map-side" aria-label="Map controls and legend">
                 <div class="map-tools" role="group" aria-label="Choose the variable shown on the map">
             <button type="button" class="map-btn" data-var="rain" aria-pressed="true">Mean rainfall</button>
-            <button type="button" class="map-btn" data-var="wet" aria-pressed="false">Wet-season rainfall</button>
             <button type="button" class="map-btn" data-var="soil" aria-pressed="false">Soil moisture</button>
             <button type="button" class="map-btn" data-var="sar" aria-pressed="false">Radar index</button>
             <button type="button" class="map-btn" data-var="dw" aria-pressed="false">Dynamic World</button>
@@ -80,21 +84,14 @@
                     <legend>Context layers</legend>
                     <label><input type="checkbox" id="ctx-terrain"> Terrain (hillshade)</label>
                     <label><input type="checkbox" id="ctx-landcover"> Land cover, 2021</label>
-                    <label class="is-unavailable"><input type="checkbox" id="ctx-rivers" disabled> River network (Strahler order 3 and above)<span class="ctx-note" id="ctx-rivers-note"> not in the repository yet</span></label>
                 </fieldset>
-                <label class="map-basemap">Basemap
-                    <select id="basemap-select">
-                        <option value="light">Light grey (Esri)</option>
-                        <option value="none">None</option>
-                    </select>
-                </label>
                 <button type="button" class="map-btn share-btn" id="share-view">Copy link to this view</button>
-                <p class="share-status" id="share-status" role="status"></p>
+                <p class="share-status" id="share-status" role="status" aria-live="polite"></p>
                 <div class="map-legend" id="study-map-legend" aria-live="polite"></div>
             </aside>
         </div>
         <p class="print-link"><a href="assets/figures/study_map_print.png" download>Download the print version of this map (PNG)</a>. It is a static image with the same units and context layers, not a capture of the live view.</p>
-        <figcaption><b>Figure 1.</b> The five analytical units of the Ogun catchment, January 2019 to December 2024. Colour shows the period mean of the selected variable. Unit boundaries are WWF HydroBASINS level 9 (Z1–Z4) and a lagoon zone outside the catchment (Z5, dashed). Radar values are not shown for the upland units Z1 and Z2, where dry-season radar artefacts make them unreliable. Lagoon turbidity is an uncalibrated index, not NTU or mg/L. Sources: Google Earth Engine export v2.4.0; basemap © Esri.</figcaption>
+        <figcaption><b>Figure 1.</b> The five analytical units of the Ogun catchment, January 2019 to December 2024. Colour shows the period mean of the selected variable. Unit boundaries are WWF HydroBASINS level 9 (Z1–Z4) and a lagoon zone outside the catchment (Z5, dashed). Radar values are not shown for Z1 and Z2, where dry-season radar artefacts make them unreliable. Lagoon turbidity is an uncalibrated index, not NTU or mg/L. Sources: Google Earth Engine export v2.4.0; basemap © Esri.</figcaption>
     </figure>
 
     <figure class="tablefig table-units" id="tab-2">
@@ -234,32 +231,6 @@
         <p><strong>Where to look next for groundwater.</strong> Surface water that persists through the dry season would be the signal most worth testing against groundwater discharge. The present data cannot establish that persistence, because the dry-season Dynamic World signal is not validated. A test needs a validated persistent-water layer and dry-season water-level or spring observations, which this repository does not contain. No unit is ranked here.</p>
     </section>
 
-    <section id="gw-context" aria-labelledby="h-gwc">
-        <h2 id="h-gwc">Groundwater context</h2>
-        <p>The study has no groundwater observations, so it does not measure groundwater. This section records what a groundwater context map needs and what is available. It is a first step, not a vulnerability assessment: contamination vulnerability would need groundwater quality and aquifer data that are not in the repository.</p>
-        <figure class="tablefig table-units" id="tab-4">
-            <figcaption id="cap-t4"><b>Table 4.</b> Groundwater context: what the map needs and its status in this repository.</figcaption>
-            <div class="table-wrap">
-                <table aria-labelledby="cap-t4">
-                    <thead><tr><th class="text">Question</th><th class="text">Layer needed</th><th class="text">Status</th></tr></thead>
-                    <tbody>
-                        <tr><th scope="row" class="text">Where are the aquifers?</th><td class="text">Hydrogeological map</td><td class="text">Not in the repository. The BGR and UNESCO WHYMAP map of Groundwater Resources of Africa (2018, 1:12.5 million) is a regional candidate; it is too coarse for catchment mapping.</td></tr>
-                        <tr><th scope="row" class="text">What geological materials occur there?</th><td class="text">Geological map, lithology</td><td class="text">Not in the repository. A finer-scale source for Lagos and Ogun states is needed. The repository describes the upland unit Z1 as lying on the Oyo Basement Complex; that label has not been checked here against a geological map.</td></tr>
-                        <tr><th scope="row" class="text">Where are groundwater observations?</th><td class="text">Borehole inventory, water levels</td><td class="text">Not in the repository. Not yet searched for in this study.</td></tr>
-                        <tr><th scope="row" class="text">How does the surface network relate to groundwater settings?</th><td class="text">Unit boundaries and river network</td><td class="text">Unit boundaries are present (Figure 1). The river network is not in the repository.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </figure>
-        <p>When these layers are available, they will be drawn on the study-area map as a groundwater context layer. Until then, no groundwater map is shown, because a map without the data would look like a finding.</p>
-    </section>
-
-    <section id="river-reaches" aria-labelledby="h-reach">
-        <h2 id="h-reach">River reaches</h2>
-        <p>The catchment-wide series average over whole units. Reach-scale monitoring would track a few named river reaches, which is where surface water is most directly visible. This is planned but not yet computed. It needs a river network layer, which the Earth Engine script uses for its riparian buffer (HydroSHEDS free-flowing rivers) but which is not exported to this repository.</p>
-        <p>The planned analysis: select reaches in Z3 and Z4, where the floodplain is; measure the monthly water extent on each reach from Sentinel-1 and Dynamic World; and relate it to rainfall and soil moisture. This measures water extent, not discharge. Discharge would need calibration against gauge records, which are not in the repository, so no discharge estimate is made or implied.</p>
-    </section>
-
     <section id="discussion" data-reveal aria-labelledby="h-disc">
         <h2 id="h-disc">Discussion</h2>
         <p>The raw correlations are negative and probably reflect dry-season radar detections rather than a shared cycle. Once the seasonal cycle is removed, no headline relationship survives correction. A link between rainfall and flooding is plausible from the seasonal pattern, but six years cannot show that it operates from month to month. Longer records are the first requirement, because they would give more years from which to estimate the seasonal cycle.</p>
@@ -278,8 +249,7 @@
             <li>No dam-release records were available; the reservoir control uses only the open-water area of the reservoir.</li>
             <li>CHIRPS (about 5 km) and ERA5-Land (about 9 km) are coarse relative to the floodplain of the sub-basins.</li>
             <li>The autocorrelation adjustment is an approximation based on an effective sample size.</li>
-            <li>The study has no discharge, groundwater or coastal-impact observations, and its results are not evidence for them.</li>
-            <li>The river-reach analysis and the groundwater context map are not yet computed, for lack of river-network and geology layers.</li>
+            <li>The study has no groundwater, discharge or coastal-impact observations, so its results are not evidence for them.</li>
         </ul>
     </section>
 
@@ -289,31 +259,39 @@
     </section>
 
     <section id="explorer" class="explore-cta" data-reveal aria-labelledby="h-explorer">
-        <a class="cta-card" href="explore.html">
-            <span class="cta-text">
-                <span class="cta-kicker">Interactive explorer</span>
-                <span class="cta-title" id="h-explorer">Explore the monthly record</span>
-                <span class="cta-body">Switch the map between inundation, rainfall, turbidity and vegetation, play through the months, and read each unit's series.</span>
-                <span class="cta-go">Open the explorer →</span>
-            </span>
-        </a>
-    </section>
+        <div class="cta-black">
+            <div class="cta-preview" aria-hidden="true">
+                <canvas id="preview-canvas" width="640" height="420"></canvas>
+                <p class="preview-month" id="preview-month">2019-01</p>
+            </div>
+            <div class="cta-copy">
+                <p class="cta-kicker">Interactive explorer</p>
+                <h2 class="cta-h" id="h-explorer">Play the catchment month by month</h2>
+                <p class="cta-desc">Every unit's rainfall, soil moisture and flooding, with the map, the series and the statistics behind them.</p>
+                <a class="cta-button" href="explore.html">Open the explorer <span aria-hidden="true">→</span></a>
+            </div>
+        </div>
+    
 
     <section id="data-code" data-reveal aria-labelledby="h-dc">
         <h2 id="h-dc">Data, code and citation</h2>
-        <ul class="downloads">
-            <li><a href="data/ogun_monthly_timeseries.csv" download>ogun_monthly_timeseries.csv</a><span>Catchment-wide monthly series, 72 months</span></li>
-            <li><a href="data/ogun_unit_monthly_timeseries.csv" download>ogun_unit_monthly_timeseries.csv</a><span>Per-unit monthly series</span></li>
-            <li><a href="data/ogun_subbasins.geojson" download>ogun_subbasins.geojson</a><span>Analytical units</span></li>
-            <li><a href="data/unit_summary.json" download>unit_summary.json</a><span>Unit means shown on the map and in Table 1</span></li>
-            <li><a href="data/cascade_diagnostics.json" download>cascade_diagnostics.json</a><span>All statistics on this page</span></li>
-            <li><a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">Repository</a><span>Earth Engine script, pipeline, tests</span></li>
-        </ul>
+        <div class="data-actions">
+            <a class="btn-primary" href="data/ogun_data.zip" download>Download the data (ZIP)</a>
+            <a class="btn-quiet" href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory">Code and repository</a>
+        </div>
+        <p class="small data-note">The ZIP holds the monthly series, the unit series, the unit boundaries, the unit means and the statistics behind every number on this page.</p>
         <h3 id="cite">How to cite</h3>
         <div class="citation">
-            <p id="cite-text">Oloyede, D. O. (2026). <i>Monthly rainfall, soil moisture and floodplain inundation in the Ogun River catchment, Nigeria, 2019–2024</i>. https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory</p>
+            <p id="cite-text">Oloyede, D. O. (2026). <i>Surface water from headwaters to lagoon: a WAVES study with a groundwater context</i>. https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory</p>
             <button type="button" class="button" id="copy-cite">Copy citation</button>
         </div>
+    </section>
+
+    <section id="note" class="note" aria-labelledby="h-note">
+        <h2 id="h-note">A note from me</h2>
+        <p>I wanted to know whether satellites could show how rain, soil and flooding move together across the Ogun catchment, from the headwaters to the lagoon. They show the seasons clearly. Over six years they did not show a month-to-month link that survives testing.</p>
+        <p>The radar index is the weakest part of the work. It is uncalibrated, and the page says so wherever it is used. If you know this catchment and something here does not match what you see on the ground, tell me through the <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory/issues">repository issues</a>.</p>
+        <p class="sign">David</p>
     </section>
 
     <section id="references" aria-labelledby="h-refs">
@@ -342,6 +320,7 @@
 <script src="assets/study-map.js"></script>
 <script src="vendor/chartjs-4.4.1/chart.umd.min.js"></script>
 <script src="assets/study-charts.js"></script>
+<script src="assets/study-preview.js"></script>
 <script>
 (() => {
     const bar = document.getElementById('progress');
