@@ -63,33 +63,33 @@ def fig2_series(df):
 
 
 def fig3_association(diag):
-    """Spearman rho for the same relationships, raw (seasonal) and anomaly (seasonal cycle removed)."""
+    """Spearman rho, raw values and anomalies. Raw rows carry q from the correction across each pair's three lags;
+    anomaly rows carry q from the correction across the five headline relationships (key_findings), as in the text."""
+    fam = {f["relationship"]: f for f in diag["key_findings"]}
+    lag_names = ["same month", "one month later", "two months later"]
     rows = []
-    for lag in ("lag_0_month", "lag_1_month", "lag_2_month"):
+    for i, lag in enumerate(("lag_0_month", "lag_1_month", "lag_2_month")):
         r = diag["rain_to_sar_inundation_lags_seasonal"][lag]
-        rows.append((f"Rain → inundation, {['same month', 'one month later', 'two months later'][int(lag[4])]}", "raw", r))
-    for lag in ("lag_0_month", "lag_1_month", "lag_2_month"):
-        r = diag["rain_to_sar_inundation_lags_deseasonalized"][lag]
-        rows.append((f"Rain → inundation, {['same month', 'one month later', 'two months later'][int(lag[4])]}", "anomaly", r))
-    r = diag["soil_moisture_to_sar_inundation_lags_seasonal"]["lag_0_month"]
-    rows.append(("Soil moisture → inundation, same month", "raw", r))
-    r = diag["soil_moisture_to_sar_inundation_lags_deseasonalized"]["lag_0_month"]
-    rows.append(("Soil moisture → inundation, same month", "anomaly", r))
+        rows.append((f"Rain → inundation, {lag_names[i]}", "raw", r["spearman_rho"], r["p_value_bh_fdr"]))
+    rows.append(("Soil moisture → inundation, same month", "raw", diag["soil_moisture_to_sar_inundation_lags_seasonal"]["lag_0_month"]["spearman_rho"], diag["soil_moisture_to_sar_inundation_lags_seasonal"]["lag_0_month"]["p_value_bh_fdr"]))
+    for label, key in (("Rain → inundation, same month", "Rain -> floodplain SAR inundation (same month, deseasonalized)"),
+                       ("Rain → inundation, one month later", "Rain -> floodplain SAR inundation (1-month lag, deseasonalized)"),
+                       ("Soil moisture → inundation, same month", "Soil moisture -> floodplain SAR inundation (same month, deseasonalized)")):
+        rows.append((label, "anomaly", fam[key]["spearman_rho"], fam[key]["p_value"]))
     fig, ax = plt.subplots(figsize=(6.0, 4.4), dpi=200)
     y = np.arange(len(rows))[::-1]
-    for yi, (lab, kind, r) in zip(y, rows):
-        rho, q = r["spearman_rho"], r["p_value_bh_fdr"]
-        colour = (C_RAIN if kind == "raw" else "#2a6f4f") if q < 0.05 else "#9a9a9a"
+    for yi, (lab, kind, rho, q) in zip(y, rows):
+        colour = C_RAIN if q < 0.05 else "#9a9a9a"
         ax.plot([0, rho], [yi, yi], color=colour, lw=1.4)
-        ax.plot(rho, yi, "o", color=colour, ms=5, mfc=colour if kind == "anomaly" else "white")
+        ax.plot(rho, yi, "o", color=colour, ms=5, mfc="white" if kind == "raw" else colour)
         ax.text(0.62, yi, f"q = {q:.3f}" if q >= 0.001 else "q < 0.001", va="center", fontsize=8, color=INK2)
     ax.axvline(0, color=INK2, lw=0.6)
-    ax.set_yticks(y, [f"{lab}  ({'raw' if k == 'raw' else 'anomaly'})" for lab, k, _ in rows], fontsize=7.5)
+    ax.set_yticks(y, [f"{lab}  ({kind})" for lab, kind, _, _ in rows], fontsize=7.5)
     ax.set_xlim(-0.6, 0.85)
     ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=8)
     ax.grid(axis="x", color=RULE, lw=0.4)
     fig.subplots_adjust(left=0.5, right=0.97, bottom=0.2, top=0.97)
-    _source(fig, "cascade_diagnostics.json. Filled dot: significant after BH correction (q < 0.05), in colour; open or grey: not significant")
+    _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant")
     return fig
 
 

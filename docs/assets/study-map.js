@@ -14,7 +14,7 @@
         if (status) status.textContent = msg || '';
     };
     setState('loading', 'Loading map…');
-    if (typeof L === 'undefined') { setState('failed', 'The map library did not load. The unit values are listed in Table 2.'); return; }
+    if (typeof L === 'undefined') { setState('failed', 'The map library did not load. The unit values are listed in Table 1.'); return; }
 
     const VARS = {
         rain: { label: 'Mean rainfall', unit: 'mm per month', ramp: ['#e3eef9', '#08306b'], key: u => u.rain && u.rain.mean, fmt: v => v.toFixed(0), decimals: 0 },
@@ -91,6 +91,15 @@
                 const shown = typeof x === 'number' ? `${VARS[v].fmt(x)} ${VARS[v].unit.split(',')[0]}` : 'not interpreted for this unit';
                 lyr.bindPopup(`<strong>${id} · ${f.properties.zone_name}</strong><br>${VARS[v].label}: ${shown}<br>Area ${Math.round(f.properties.area_km2).toLocaleString('en-GB')} km²`);
                 lyr.bindTooltip(id, { permanent: true, direction: 'center', className: 'unit-label', interactive: false });
+                lyr.on('add', () => {
+                    const el = lyr.getElement();
+                    if (!el || el.dataset.keyboard) return;
+                    el.dataset.keyboard = '1';
+                    el.setAttribute('tabindex', '0');
+                    el.setAttribute('role', 'button');
+                    el.setAttribute('aria-label', `${id} ${f.properties.zone_name}: ${VARS[v].label}, ${typeof VARS[v].key(u) === 'number' ? VARS[v].fmt(VARS[v].key(u)) + ' ' + VARS[v].unit.split(',')[0] : 'not interpreted'}. Press Enter for details.`);
+                    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lyr.openPopup(); } });
+                });
                 lyr.on('mouseover', () => lyr.setStyle({ weight: 3.5 }));
                 lyr.on('mouseout', () => lyr.setStyle({ weight: 2 }));
             },
@@ -106,9 +115,9 @@
     ]).then(([g, s]) => {
         geo = g; units = s.units;
         draw(current);
-        setState('ready', 'Click a unit for its values. Radar values are not shown for the upland units Z1 and Z2.');
+        setState('ready', 'Click a unit for its values. Radar values are not shown for the units Z1 and Z2.');
     }).catch(() => {
-        setState('failed', 'The map data could not be loaded. The unit values are listed in Table 2.');
+        setState('failed', 'The map data could not be loaded. The unit values are listed in Table 1.');
     });
 
     buttons.forEach(b => b.addEventListener('click', () => { if (geo) draw(b.dataset.var); }));

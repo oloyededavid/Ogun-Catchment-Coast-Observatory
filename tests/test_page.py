@@ -24,5 +24,5 @@ def test_every_image_and_download_exists():
 
 def test_headline_numbers_are_the_corrected_ones():
     text = _page()
-    assert "0 is significant after correction" in text
+    assert "None of the 5 headline relationships is significant after correction." in text
     assert "q = 0.006" in text

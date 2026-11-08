@@ -23,12 +23,18 @@ UNIT_NAMES = {"Z1": "Upper Ogun Headwaters", "Z2": "Oyan–Ofiki Tributary", "Z3
               "Z4": "Lower Ogun Alluvial Corridor", "Z5": "Northwest Lagos Lagoon Estuary"}
 
 
+def _round_half_up(v: float, d: int) -> str:
+    """Round half away from zero, the usual convention (Python's round-half-even gives 0.56 for 0.565)."""
+    from decimal import Decimal, ROUND_HALF_UP
+    return str(Decimal(repr(abs(v))).quantize(Decimal(1).scaleb(-d), rounding=ROUND_HALF_UP))
+
+
 def sign(v: float, d: int = 2) -> str:
-    return ("+" if v > 0 else "−" if v < 0 else "") + f"{abs(v):.{d}f}"
+    return ("+" if v > 0 else "−" if v < 0 else "") + _round_half_up(v, d)
 
 
 def num(v: float, d: int = 2) -> str:
-    return f"{v:.{d}f}".replace("-", "−")
+    return ("−" if v < 0 else "") + _round_half_up(v, d)
 
 
 def q(v: float) -> str:
