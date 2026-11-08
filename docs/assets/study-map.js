@@ -14,7 +14,7 @@
         if (status) status.textContent = msg || '';
     };
     setState('loading', 'Loading map…');
-    if (typeof L === 'undefined') { setState('failed', 'The map library did not load. The unit values are listed in Table 1.'); return; }
+    if (typeof L === 'undefined') { setState('failed', 'The map library did not load. The unit values are listed in Table 2.'); return; }
 
     const VARS = {
         rain: { label: 'Mean rainfall', unit: 'mm per month', ramp: ['#e3eef9', '#08306b'], key: u => u.rain && u.rain.mean, fmt: v => v.toFixed(0), decimals: 0 },
@@ -108,7 +108,7 @@
         draw(current);
         setState('ready', 'Click a unit for its values. Radar values are not shown for the upland units Z1 and Z2.');
     }).catch(() => {
-        setState('failed', 'The map data could not be loaded. The unit values are listed in Table 1.');
+        setState('failed', 'The map data could not be loaded. The unit values are listed in Table 2.');
     });
 
     buttons.forEach(b => b.addEventListener('click', () => { if (geo) draw(b.dataset.var); }));
