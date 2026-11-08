@@ -27,7 +27,27 @@
     "mean": null,
     "months": 0
    },
-   "rain_wet_season_mean": 168.9
+   "rain_wet_season_mean": 168.9,
+   "seasonal": {
+    "soil": {
+     "wet_mean": 0.3514,
+     "wet_months": 42,
+     "dry_mean": 0.2079,
+     "dry_months": 30
+    },
+    "dw": {
+     "wet_mean": 5.0646,
+     "wet_months": 37,
+     "dry_mean": 55.2875,
+     "dry_months": 30
+    },
+    "rain": {
+     "wet_mean": 168.9204,
+     "wet_months": 42,
+     "dry_mean": 26.0396,
+     "dry_months": 30
+    }
+   }
   },
   "Z2": {
    "rain": {
@@ -51,7 +71,27 @@
     "mean": null,
     "months": 0
    },
-   "rain_wet_season_mean": 165.0
+   "rain_wet_season_mean": 165.0,
+   "seasonal": {
+    "soil": {
+     "wet_mean": 0.3612,
+     "wet_months": 42,
+     "dry_mean": 0.2224,
+     "dry_months": 30
+    },
+    "dw": {
+     "wet_mean": 2.2864,
+     "wet_months": 37,
+     "dry_mean": 107.6568,
+     "dry_months": 30
+    },
+    "rain": {
+     "wet_mean": 165.0329,
+     "wet_months": 42,
+     "dry_mean": 23.8069,
+     "dry_months": 30
+    }
+   }
   },
   "Z3": {
    "rain": {
@@ -74,7 +114,33 @@
     "mean": null,
     "months": 0
    },
-   "rain_wet_season_mean": 165.8
+   "rain_wet_season_mean": 165.8,
+   "seasonal": {
+    "soil": {
+     "wet_mean": 0.3671,
+     "wet_months": 42,
+     "dry_mean": 0.2236,
+     "dry_months": 30
+    },
+    "dw": {
+     "wet_mean": 1.2001,
+     "wet_months": 37,
+     "dry_mean": 24.0411,
+     "dry_months": 30
+    },
+    "sar": {
+     "wet_mean": 0.2896,
+     "wet_months": 42,
+     "dry_mean": 0.5755,
+     "dry_months": 30
+    },
+    "rain": {
+     "wet_mean": 165.8099,
+     "wet_months": 42,
+     "dry_mean": 34.3342,
+     "dry_months": 30
+    }
+   }
   },
   "Z4": {
    "rain": {
@@ -97,7 +163,33 @@
     "mean": null,
     "months": 0
    },
-   "rain_wet_season_mean": 182.7
+   "rain_wet_season_mean": 182.7,
+   "seasonal": {
+    "soil": {
+     "wet_mean": 0.367,
+     "wet_months": 42,
+     "dry_mean": 0.2402,
+     "dry_months": 30
+    },
+    "dw": {
+     "wet_mean": 2.8952,
+     "wet_months": 37,
+     "dry_mean": 12.5913,
+     "dry_months": 30
+    },
+    "sar": {
+     "wet_mean": 0.1405,
+     "wet_months": 42,
+     "dry_mean": 0.1516,
+     "dry_months": 30
+    },
+    "rain": {
+     "wet_mean": 182.7491,
+     "wet_months": 42,
+     "dry_mean": 42.0821,
+     "dry_months": 30
+    }
+   }
   },
   "Z5": {
    "rain": {
@@ -120,7 +212,33 @@
     "mean": -0.0372,
     "months": 62
    },
-   "rain_wet_season_mean": 204.8
+   "rain_wet_season_mean": 204.8,
+   "seasonal": {
+    "soil": {
+     "wet_mean": 0.2295,
+     "wet_months": 42,
+     "dry_mean": 0.106,
+     "dry_months": 30
+    },
+    "dw": {
+     "wet_mean": null,
+     "wet_months": 0,
+     "dry_mean": null,
+     "dry_months": 0
+    },
+    "sar": {
+     "wet_mean": null,
+     "wet_months": 0,
+     "dry_mean": null,
+     "dry_months": 0
+    },
+    "rain": {
+     "wet_mean": 204.8089,
+     "wet_months": 42,
+     "dry_mean": 46.7405,
+     "dry_months": 30
+    }
+   }
   }
  }
 }

@@ -26,6 +26,7 @@ def main() -> None:
     rows = list(csv.DictReader((DATA / "ogun_unit_monthly_timeseries.csv").open()))
     acc = defaultdict(lambda: defaultdict(list))
     wet = defaultdict(list)
+    season = defaultdict(lambda: defaultdict(list))  # (zone, variable, "wet"|"dry") -> values
     for r in rows:
         z = r["zone_id"]
         month = int(r["year_month"][5:])
@@ -34,6 +35,10 @@ def main() -> None:
                 acc[z][key].append(float(r[col]))
         if r["rain_mm"] and month in WET:
             wet[z].append(float(r["rain_mm"]))
+        tag = "wet" if month in WET else "dry"
+        for col, key in (("shallow_sm_m3m3", "soil"), ("dw_flood_km2", "dw"), ("sar_flood_km2", "sar"), ("rain_mm", "rain")):
+            if r[col] not in ("", None):
+                season[(z, key)][tag].append(float(r[col]))
     out = {"source": "docs/data/ogun_unit_monthly_timeseries.csv", "script": "scripts/make_unit_summary.py",
            "period": "2019-01 to 2024-12", "wet_season": "April to October", "sar_rule": "radar inundation not interpreted for Z1 and Z2 (as in the explorer)", "units": {}}
     for z in sorted(acc):
@@ -45,6 +50,14 @@ def main() -> None:
                 continue
             u[key] = {"mean": round(sum(vals) / len(vals), 4) if vals else None, "months": len(vals)}
         u["rain_wet_season_mean"] = round(sum(wet[z]) / len(wet[z]), 1) if wet[z] else None
+        u["seasonal"] = {}
+        for key in ("soil", "dw", "sar", "rain"):
+            if key == "sar" and z in SAR_UNRELIABLE:
+                continue
+            w, d = season[(z, key)]["wet"], season[(z, key)]["dry"]
+            u["seasonal"][key] = {
+                "wet_mean": round(sum(w) / len(w), 4) if w else None, "wet_months": len(w),
+                "dry_mean": round(sum(d) / len(d), 4) if d else None, "dry_months": len(d)}
         out["units"][z] = u
     (DATA / "unit_summary.json").write_text(json.dumps(out, indent=1) + "\n")
     print("wrote", DATA / "unit_summary.json")
