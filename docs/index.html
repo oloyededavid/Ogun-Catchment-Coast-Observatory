@@ -76,23 +76,38 @@
             <button type="button" class="map-btn" data-var="dw" aria-pressed="false">Dynamic World</button>
             <button type="button" class="map-btn" data-var="ndti" aria-pressed="false">Lagoon turbidity</button>
         </div>
+                <fieldset class="map-context">
+                    <legend>Context layers</legend>
+                    <label><input type="checkbox" id="ctx-terrain"> Terrain (hillshade)</label>
+                    <label><input type="checkbox" id="ctx-landcover"> Land cover, 2021</label>
+                    <label class="is-unavailable"><input type="checkbox" id="ctx-rivers" disabled> River network (Strahler order 3 and above)<span class="ctx-note" id="ctx-rivers-note"> not in the repository yet</span></label>
+                </fieldset>
+                <label class="map-basemap">Basemap
+                    <select id="basemap-select">
+                        <option value="light">Light grey (Esri)</option>
+                        <option value="none">None</option>
+                    </select>
+                </label>
+                <button type="button" class="map-btn share-btn" id="share-view">Copy link to this view</button>
+                <p class="share-status" id="share-status" role="status"></p>
                 <div class="map-legend" id="study-map-legend" aria-live="polite"></div>
             </aside>
         </div>
+        <p class="print-link"><a href="assets/figures/study_map_print.png" download>Download the print version of this map (PNG)</a>. It is a static image with the same units and context layers, not a capture of the live view.</p>
         <figcaption><b>Figure 1.</b> The five analytical units of the Ogun catchment, January 2019 to December 2024. Colour shows the period mean of the selected variable. Unit boundaries are WWF HydroBASINS level 9 (Z1–Z4) and a lagoon zone outside the catchment (Z5, dashed). Radar values are not shown for the upland units Z1 and Z2, where dry-season radar artefacts make them unreliable. Lagoon turbidity is an uncalibrated index, not NTU or mg/L. Sources: Google Earth Engine export v2.4.0; basemap © Esri.</figcaption>
     </figure>
 
     <figure class="tablefig table-units" id="tab-2">
-        <figcaption id="cap-t2"><b>Table 1.</b> Unit means, January 2019 to December 2024. Radar is not interpreted for Z1 and Z2. The mean of Dynamic World is over the months with a valid observation.</figcaption>
+        <figcaption id="cap-t2"><b>Table 1.</b> Unit means, January 2019 to December 2024. A dash (—) means not interpreted: radar for Z1 and Z2, and values that do not exist for a unit. The mean of Dynamic World is over the months with a valid observation.</figcaption>
         <div class="table-wrap">
             <table aria-labelledby="cap-t2">
                 <thead><tr><th class="text">Unit</th><th>Area (km²)</th><th>Rain (mm/month)</th><th>Soil moisture (m³/m³)</th><th>Radar index (km²)</th><th>Dynamic World (km²)</th></tr></thead>
                 <tbody>
-<tr><th scope="row" class="text"><strong>Z1</strong> Upper Ogun Headwaters</th><td>9,574</td><td>109</td><td>0.29</td><td>not interpreted</td><td>27.6</td></tr>
-<tr><th scope="row" class="text"><strong>Z2</strong> Oyan–Ofiki Tributary</th><td>9,334</td><td>106</td><td>0.30</td><td>not interpreted</td><td>49.5</td></tr>
-<tr><th scope="row" class="text"><strong>Z3</strong> Middle Ogun Mainstem</th><td>2,413</td><td>111</td><td>0.31</td><td>0.41</td><td>11.4</td></tr>
-<tr><th scope="row" class="text"><strong>Z4</strong> Lower Ogun Alluvial Corridor</th><td>843</td><td>124</td><td>0.31</td><td>0.15</td><td>7.2</td></tr>
-<tr><th scope="row" class="text"><strong>Z5</strong> Northwest Lagos Lagoon Estuary</th><td>283</td><td>139</td><td>0.18</td><td>not interpreted</td><td>not interpreted</td></tr>
+<tr><th scope="row" class="text"><strong>Z1</strong> <span class="name-full">Upper Ogun Headwaters</span></th><td>9,574</td><td>109</td><td>0.29</td><td>—</td><td>27.6</td></tr>
+<tr><th scope="row" class="text"><strong>Z2</strong> <span class="name-full">Oyan–Ofiki Tributary</span></th><td>9,334</td><td>106</td><td>0.30</td><td>—</td><td>49.5</td></tr>
+<tr><th scope="row" class="text"><strong>Z3</strong> <span class="name-full">Middle Ogun Mainstem</span></th><td>2,413</td><td>111</td><td>0.31</td><td>0.41</td><td>11.4</td></tr>
+<tr><th scope="row" class="text"><strong>Z4</strong> <span class="name-full">Lower Ogun Alluvial Corridor</span></th><td>843</td><td>124</td><td>0.31</td><td>0.15</td><td>7.2</td></tr>
+<tr><th scope="row" class="text"><strong>Z5</strong> <span class="name-full">Northwest Lagos Lagoon Estuary</span></th><td>283</td><td>139</td><td>0.18</td><td>—</td><td>—</td></tr>
                 </tbody>
             </table>
         </div>
@@ -130,6 +145,10 @@
         <p>All series come from Google Earth Engine (export v2.4.0), monthly from January 2019 to December 2024, giving 72 months. Rainfall is the Climate Hazards Group InfraRed Precipitation with Stations product (CHIRPS; Funk et al., 2015) at 0.05°, summed to monthly totals, and a month is kept only where at least five pentads are available. Shallow soil moisture is the volumetric water content of the 0–7 cm layer from ERA5-Land (Muñoz-Sabater et al., 2021) at 0.1°. The radar inundation index uses Sentinel-1 GRD backscatter in VV polarisation, ascending IW passes, with a focal filter of 50 m. The processing is related to the automated approach of Twele et al. (2016) but is not the same chain, and the index is not calibrated against gauge or optical water extent. Dynamic World V1 (Brown et al., 2022) gives an independent optical flooding reference over the same floodplain domain, available in 67 months. Lagoon turbidity is the normalised difference turbidity index (NDTI) from Sentinel-2 surface reflectance over open water (modified NDWI above zero), which is available in 62 months. NDTI is an uncalibrated spectral indicator; it is not in NTU or mg/L. All 10 missing months fall between June and September, the cloudy wet season.</p>
         <p>The upstream reservoir is represented by the Sentinel-1 open-water area of Oyan Reservoir. This is a proxy for regulation, not a release record: no dam-release data were available.</p>
 
+        <h3 id="h-rules">Detection rules and reduction scales</h3>
+        <p>Radar water is counted only where four conditions hold: VV backscatter is below −16.5 dB; it is at least 3 dB darker than the January–March reference for 2019–2024; the slope is below 5°; and the pixel is outside permanent water (JRC occurrence below 80%) and less than 15 m above the nearest drainage (MERIT Hydro). A fixed threshold alone gives many dry-season false alarms, which is why the reference and the slope and drainage conditions are used. The monthly radar series is summed over the floodplain (Z3 and Z4) at 120 m. Dynamic World water and flooded-vegetation labels use the same permanent-water and drainage masks. Turbidity is the NDTI over open water (JRC occurrence of at least 50%), reduced at 30 m.</p>
+        <p>Two context layers are shown on the map, not used in any statistic. Terrain is the Copernicus DEM GLO-30 at 30 m, shown as a hillshade. Land cover is ESA WorldCover 2021 at 10 m, with an overall accuracy of 76.5% for Africa (Zanaga et al., 2022). Both are read through Microsoft Planetary Computer. Permanent water in the land-cover layer shows the Oyan Reservoir.</p>
+
         <h3 id="h-units">Spatial aggregation</h3>
         <p>Each variable is averaged over the pixels of its unit. Radar values are not used for Z1 and Z2, the upland units, following the rule applied in the explorer. Dynamic World and turbidity are available only where those units have valid observations, and the number of valid months is kept with every mean.</p>
 
@@ -161,7 +180,7 @@
             <div class="chart-box" data-series="dw" aria-label="Dynamic World flooding, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of monthly Dynamic World flooding, 2019 to 2024"></canvas></div>
             <div class="chart-box" data-series="ndti" aria-label="Lagoon turbidity, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of monthly lagoon turbidity, 2019 to 2024"></canvas></div>
         </div>
-        <noscript><img src="assets/figures/fig2_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity"></noscript>
+        <noscript><img src="assets/figures/fig2_series.png" width="1110" height="1339" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity"></noscript>
         <figcaption><b>Figure 3.</b> Monthly catchment series, 2019 to 2024. Gaps are missing months.</figcaption>
     </figure>
 
@@ -314,6 +333,7 @@
             <li>Lehner, B., &amp; Grill, G. (2013). Global river hydrography and network routing: baseline data and new approaches to study the world's large river systems. <i>Hydrological Processes</i>, 27(15), 2171–2186. <a href="https://doi.org/10.1002/hyp.9740">doi:10.1002/hyp.9740</a></li>
             <li>Muñoz-Sabater, J., Dutra, E., Agustí-Panareda, A., et al. (2021). ERA5-Land: a state-of-the-art global reanalysis dataset for land applications. <i>Earth System Science Data</i>, 13, 4349–4383. <a href="https://doi.org/10.5194/essd-13-4349-2021">doi:10.5194/essd-13-4349-2021</a></li>
             <li>BGR &amp; UNESCO (2018). <i>Groundwater Resources of Africa</i>, WHYMAP, 1:12,500,000. Bundesanstalt für Geowissenschaften und Rohstoffe. <a href="https://www.deutsche-rohstoffagentur.de/whymap/EN/Maps_Data/Gwrafrica/gwrafrica_node_en.html">WHYMAP groundwater resources map</a>.</li>
+            <li>Zanaga, D., et al. (2022). <i>ESA WorldCover 10 m 2021 v200</i>. Zenodo. <a href="https://doi.org/10.5281/zenodo.7254221">doi:10.5281/zenodo.7254221</a></li>
             <li>Twele, A., Cao, W., Plank, S., &amp; Martinis, S. (2016). Sentinel-1-based flood mapping: a fully automated processing chain. <i>International Journal of Remote Sensing</i>, 37(13), 2990–3004.</li>
         </ol>
     </section>

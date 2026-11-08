@@ -49,12 +49,12 @@ def month_name(ym: str) -> str:
 def unit_rows(units: dict, areas: dict) -> str:
     """Table 2: the five metrics that matter most for the study (area, rainfall, soil moisture, radar, Dynamic World)."""
     def cell(x, d):
-        return "not interpreted" if x is None else f"{x:.{d}f}"
+        return "—" if x is None else f"{x:.{d}f}"
     out = []
     for z in ("Z1", "Z2", "Z3", "Z4", "Z5"):
         u = units[z]
         out.append(
-            f"<tr><th scope=\"row\" class=\"text\"><strong>{z}</strong> {UNIT_NAMES[z]}</th>"
+            f"<tr><th scope=\"row\" class=\"text\"><strong>{z}</strong> <span class=\"name-full\">{UNIT_NAMES[z]}</span></th>"
             f"<td>{areas[z]:,.0f}</td>"
             f"<td>{cell(u['rain']['mean'], 0)}</td>"
             f"<td>{cell(u['soil']['mean'], 2)}</td>"
