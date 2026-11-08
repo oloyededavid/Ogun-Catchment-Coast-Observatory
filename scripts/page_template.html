@@ -41,13 +41,12 @@
     <header class="title">
         <h1>Monthly rainfall, soil moisture and floodplain inundation in the Ogun River catchment, Nigeria, 2019–2024</h1>
         <p class="subtitle">Satellite records for four upland sub-basins and the Lagos Lagoon estuary</p>
-        <p class="authors">David Oluwayinka Oloyede · Working paper, {PRINT_DATE}</p>
     </header>
 
     <section id="abstract" data-reveal class="abstract" aria-labelledby="h-abstract">
         <h2 id="h-abstract">Abstract</h2>
         <p>The Ogun River drains about {CATCH} km² of south-west Nigeria into the Lagos Lagoon, and rainfall and soil wetness are the first controls on how much of its floodplain floods. We assembled a monthly satellite record for January 2019 to December 2024 of rainfall (CHIRPS), shallow soil moisture (ERA5-Land), radar floodplain inundation (Sentinel-1), an optical flooding reference (Dynamic World) and lagoon turbidity (Sentinel-2), averaged over four upland sub-basins and a lagoon zone, and tested whether rainfall and soil moisture are associated with inundation, and inundation with turbidity, at lags of up to two months. Associations were measured with Spearman's rho and autocorrelation-adjusted p-values, and the five headline relationships on month-to-month anomalies were corrected once for multiple testing. On raw monthly values, rainfall and inundation are negatively associated two months apart (ρ = {SEAS2_RHO}, q = {SEAS2_Q}), and soil moisture and inundation in the same month (ρ = {SM_RHO}, q = {SM_Q}); both reflect the shared wet-season cycle. Once that cycle is removed, none of the {NFAM} relationships is significant (the largest, between inundation and lagoon turbidity, is ρ = {NDTI_RHO}, q = {NDTI_Q}). The radar index ranks months like the optical reference over the seasonal cycle (ρ = {DW_SEAS_RHO}) but not in anomalies (ρ = {DW_ANOM_RHO}), and its values are far smaller than the optical extent. Over six years, rainfall, soil moisture and radar inundation share a seasonal cycle but show no robust month-to-month coupling. The radar index is uncalibrated and should be treated as a relative measure until it is validated.</p>
-        <p class="keywords"><strong>Keywords:</strong> Ogun River; floodplain inundation; Sentinel-1; CHIRPS; ERA5-Land; lagoon turbidity; time series; Nigeria</p>
+        <p class="keywords"><strong>Keywords:</strong> Ogun River; hydrology; water resources (WAVES); groundwater (GroundwatCH); surface water–groundwater interaction; groundwater context; floodplain inundation; river reaches; soil moisture; Sentinel-1; CHIRPS; ERA5-Land; Dynamic World; lagoon turbidity; Nigeria</p>
     </section>
 
     <section id="introduction" aria-labelledby="h-intro">
@@ -59,11 +58,17 @@
     <section id="study-area" aria-labelledby="h-area">
         <h2 id="h-area">Study area</h2>
         <p>The Ogun River drains about {CATCH} km² of south-west Nigeria. The catchment is divided into four hydrological sub-basins, Z1 to Z4, derived from HydroBASINS level 9 (Lehner &amp; Grill, 2013). They run from the upland headwaters in the north, through the Oyan tributary and the mainstem, to an alluvial corridor on the lower floodplain. The fifth unit, Z5, is a rectangular lagoon zone at the river's outlet. It is not a watershed, and it is used only for turbidity. Figure 2 shows the order of the units from headwaters to lagoon.</p>
-        <p>Figure 1 is an interactive map. Choose a variable, then click a unit for its values. Table 2 gives the same values as text.</p>
+        <p>Figure 1 is an interactive map. Choose a variable, then click a unit for its values. Table 1 gives the same values as text.</p>
     </section>
 
     <figure class="wide reveal" id="fig-map">
-        <div class="map-tools" role="group" aria-label="Choose the variable shown on the map">
+        <div class="map-layout">
+            <div class="map-main">
+                <div class="study-map" id="study-map" data-state="loading" role="region" aria-label="Interactive map of the Ogun units"></div>
+                <p class="map-status" id="study-map-status" role="status" aria-live="polite">Loading map…</p>
+            </div>
+            <aside class="map-side" aria-label="Map controls and legend">
+                <div class="map-tools" role="group" aria-label="Choose the variable shown on the map">
             <button type="button" class="map-btn" data-var="rain" aria-pressed="true">Mean rainfall</button>
             <button type="button" class="map-btn" data-var="wet" aria-pressed="false">Wet-season rainfall</button>
             <button type="button" class="map-btn" data-var="soil" aria-pressed="false">Soil moisture</button>
@@ -71,17 +76,17 @@
             <button type="button" class="map-btn" data-var="dw" aria-pressed="false">Dynamic World</button>
             <button type="button" class="map-btn" data-var="ndti" aria-pressed="false">Lagoon turbidity</button>
         </div>
-        <div class="study-map" id="study-map" data-state="loading" role="region" aria-label="Interactive map of the Ogun units"></div>
-        <p class="map-status" id="study-map-status" role="status" aria-live="polite">Loading map…</p>
-        <div class="map-legend" id="study-map-legend" aria-live="polite"></div>
+                <div class="map-legend" id="study-map-legend" aria-live="polite"></div>
+            </aside>
+        </div>
         <figcaption><b>Figure 1.</b> The five analytical units of the Ogun catchment, January 2019 to December 2024. Colour shows the period mean of the selected variable. Unit boundaries are WWF HydroBASINS level 9 (Z1–Z4) and a rectangular lagoon zone (Z5, dashed). Radar values are not shown for the upland units Z1 and Z2, where dry-season radar artefacts make them unreliable. Lagoon turbidity is an uncalibrated index, not NTU or mg/L. Sources: Google Earth Engine export v2.4.0; basemap © Esri.</figcaption>
     </figure>
 
-    <figure class="tablefig" id="tab-2">
-        <figcaption id="cap-t2"><b>Table 2.</b> Unit values, January 2019 to December 2024. Radar is not interpreted for Z1 and Z2. Dynamic World and turbidity are unavailable where a unit has no valid observations.</figcaption>
+    <figure class="tablefig table-units" id="tab-1">
+        <figcaption id="cap-t2"><b>Table 1.</b> Unit means, January 2019 to December 2024. Radar is not interpreted for Z1 and Z2. The mean of Dynamic World is over the months with a valid observation.</figcaption>
         <div class="table-wrap">
             <table aria-labelledby="cap-t2">
-                <thead><tr><th class="text">Unit</th><th>Area (km²)</th><th>Mean rain (mm/month)</th><th>Wet-season rain (mm/month)</th><th>Soil moisture (m³/m³)</th><th>Radar index (km²)</th><th>Dynamic World (km²)</th><th>Turbidity (NDTI)</th></tr></thead>
+                <thead><tr><th class="text">Unit</th><th>Area (km²)</th><th>Rain (mm/month)</th><th>Soil moisture (m³/m³)</th><th>Radar index (km²)</th><th>Dynamic World (km²)</th></tr></thead>
                 <tbody>
 {UNIT_ROWS}
                 </tbody>
@@ -126,18 +131,25 @@
         <h3 id="h-series">Seasonal pattern</h3>
         <p>Averaged by calendar month, rainfall peaks in {SEAS_PEAK_RAIN}, soil moisture in {SEAS_PEAK_SOIL} and the radar inundation index in {SEAS_PEAK_SAR}. The largest radar value is {SAR_MAX} km², in {PEAK_MONTH}. The optical Dynamic World series reaches {DW_MAX} km² in its largest month, so the two are on very different scales (Figure 3).</p>
     </section>
-    <figure class="wide reveal" id="fig-series">
-        <img src="assets/figures/fig2_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity">
-        <figcaption><b>Figure 3.</b> Monthly catchment series, 2019 to 2024. Gaps are months without a valid observation.</figcaption>
+    <figure class="wide reveal figure-series" id="fig-series">
+        <p class="chart-status" id="series-status" role="status">Loading the monthly series…</p>
+        <div class="series-grid">
+            <div class="chart-box" data-series="rain" aria-label="Rainfall and soil moisture, monthly, 2019 to 2024"><canvas role="img" aria-label="Bar chart of monthly catchment rainfall with a soil moisture line, 2019 to 2024"></canvas></div>
+            <div class="chart-box" data-series="radar" aria-label="Radar inundation index, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of the monthly radar inundation index, 2019 to 2024"></canvas></div>
+            <div class="chart-box" data-series="dw" aria-label="Dynamic World flooding, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of monthly Dynamic World flooding, 2019 to 2024"></canvas></div>
+            <div class="chart-box" data-series="ndti" aria-label="Lagoon turbidity, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of monthly lagoon turbidity, 2019 to 2024"></canvas></div>
+        </div>
+        <noscript><img src="assets/figures/fig2_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity"></noscript>
+        <figcaption><b>Figure 3.</b> Monthly catchment series, 2019 to 2024. Gaps are missing months.</figcaption>
     </figure>
 
     <section aria-labelledby="h-assoc-r">
         <h3 id="h-assoc-r">Associations on raw values and on anomalies</h3>
-        <p>On raw monthly values, rainfall and radar inundation are negatively associated two months apart: rain two months earlier goes with less flooding now (ρ = {SEAS2_RHO}, q = {SEAS2_Q}). A one-month lag is borderline (ρ = {SEAS1_RHO}, q = {SEAS1_Q}). Soil moisture and flooding in the same month show a negative association too (ρ = {SM_RHO}, q = {SM_Q}). These are the co-variations two series would show if both followed the same annual cycle. Once the cycle is removed, none of them is significant (Figure 4). The seasonal relationships are therefore best read as a shared wet-season pattern, not as evidence that rainfall drives flooding.</p>
+        <p>On raw monthly values, rainfall and radar inundation are negatively associated two months apart: rain two months earlier goes with less flooding now (ρ = {SEAS2_RHO}, q = {SEAS2_Q}). A one-month lag is borderline (ρ = {SEAS1_RHO}, q = {SEAS1_Q}). Soil moisture and flooding in the same month show a negative association too (ρ = {SM_RHO}, q = {SM_Q}). These are the co-variations two series would show if both followed the same annual cycle. Once the cycle is removed, none of them is significant (Figure 5). The seasonal relationships are therefore best read as a shared wet-season pattern, not as evidence that rainfall drives flooding.</p>
     </section>
     <figure class="wide reveal" id="fig-assoc">
-        <img src="assets/figures/fig3_association.png" width="1200" height="880" loading="lazy" alt="Dot plot of Spearman correlation between rainfall, soil moisture and inundation, on raw values and on anomalies, with q values">
-        <figcaption><b>Figure 4.</b> Spearman ρ between rainfall or soil moisture and radar inundation, on raw values (filled, coloured if significant) and on anomalies with the seasonal cycle removed. q is the Benjamini–Hochberg adjusted p-value.</figcaption>
+        <img class="fig-small" src="assets/figures/fig3_association.png" width="1200" height="880" loading="lazy" alt="Dot plot of Spearman correlation between rainfall, soil moisture and inundation, on raw values and on anomalies, with q values">
+        <figcaption><b>Figure 5.</b> Spearman ρ between rainfall or soil moisture and radar inundation, on raw values (filled, coloured if significant) and on anomalies with the seasonal cycle removed. q is the Benjamini–Hochberg adjusted p-value.</figcaption>
     </figure>
 
     <section aria-labelledby="h-anom-r">
@@ -148,19 +160,74 @@
 
     <section aria-labelledby="h-turb">
         <h3 id="h-turb">Flooding, lagoon turbidity and the optical reference</h3>
-        <p>Lagoon turbidity and radar inundation anomalies are positively associated (ρ = {NDTI_RHO}, q = {NDTI_Q}), the largest association among the headline relationships, but not significant after correction. The radar index ranks months like Dynamic World over the seasonal cycle (ρ = {DW_SEAS_RHO}), but not in anomalies (ρ = {DW_ANOM_RHO}, q = {DW_ANOM_Q}). Its values are far smaller than the optical extent, so it should be read as a relative measure, not as an area (Figure 5).</p>
+        <p>Lagoon turbidity and radar inundation anomalies are positively associated (ρ = {NDTI_RHO}, q = {NDTI_Q}), the largest association among the headline relationships, but not significant after correction. The radar index ranks months like Dynamic World over the seasonal cycle (ρ = {DW_SEAS_RHO}), but not in anomalies (ρ = {DW_ANOM_RHO}, q = {DW_ANOM_Q}). Its values are far smaller than the optical extent, so it should be read as a relative measure, not as an area (Figure 6).</p>
     </section>
     <figure class="wide reveal" id="fig-scatter">
-        <img src="assets/figures/fig4_scatter.png" width="1200" height="660" loading="lazy" alt="Two scatter plots of monthly anomalies: radar inundation against lagoon turbidity, and radar inundation against Dynamic World flooding">
-        <figcaption><b>Figure 5.</b> Monthly anomalies. Left: radar inundation against lagoon turbidity. Right: radar inundation against the Dynamic World flooding reference. Each point is one month with both values.</figcaption>
+        <img class="fig-small" src="assets/figures/fig4_scatter.png" width="1200" height="660" loading="lazy" alt="Two scatter plots of monthly anomalies: radar inundation against lagoon turbidity, and radar inundation against Dynamic World flooding">
+        <figcaption><b>Figure 6.</b> Monthly anomalies. Left: radar inundation against lagoon turbidity. Right: radar inundation against the Dynamic World flooding reference. Each point is one month with both values.</figcaption>
     </figure>
+
+    <section id="sw-gw" aria-labelledby="h-swgw">
+        <h2 id="h-swgw">Surface water–groundwater interaction</h2>
+        <p>Surface water and groundwater are linked. Rain that infiltrates recharges the aquifer and sustains river flow in the dry season, and a river that loses or gains water exchanges it with the aquifer beneath it. Figure 4 shows the links as the study can and cannot measure them. Every arrow here is a hypothesis to test, not a finding.</p>
+        <figure class="wide reveal flow-figure" id="fig-flow">
+        <ol class="flowdiag" aria-label="Conceptual links between rainfall, infiltration, runoff, rivers, wetlands and groundwater">
+            <li class="node measured"><strong>Rainfall</strong><span>CHIRPS, measured by satellite and gauge-adjusted</span><span class="flow-to">Flows to infiltration and runoff →</span></li>
+            <li class="node modelled"><strong>Infiltration into soil</strong><span>Soil moisture, 0–7 cm, ERA5-Land (modelled)</span><span class="flow-to">Recharges groundwater (not measured) →</span></li>
+            <li class="node unmeasured"><strong>Groundwater storage and flow</strong><span>Not measured in this study</span><span class="flow-to">Feeds rivers in the dry season (not measured) ↺</span></li>
+            <li class="node measured"><strong>Surface runoff</strong><span>Not measured here</span><span class="flow-to">Flows to rivers and wetlands →</span></li>
+            <li class="node measured"><strong>Rivers, floodplain and wetlands</strong><span>Radar and Dynamic World extent (satellite)</span><span class="flow-to">Drains to the lagoon →</span></li>
+            <li class="node measured"><strong>Lagoon</strong><span>Turbidity index (satellite, uncalibrated)</span><span class="flow-to">Outlet of the catchment</span></li>
+        </ol>
+            <figcaption><b>Figure 4.</b> Conceptual links between rainfall, infiltration, runoff, rivers, wetlands and groundwater. Labels state whether each part is measured by satellite, modelled, or not measured in this study.</figcaption>
+        </figure>
+        <p>Table 2 compares wet and dry seasons for the units where the data can be read. Soil moisture is higher in the wet season in every unit. Dynamic World water does not follow the flood pattern: in Z2 it averages {Z2_DW_DRY} km² in the dry season and {Z2_DW_WET} km² in the wet season, and in Z1 it averages {Z1_DW_DRY} km² in the dry season and {Z1_DW_WET} km² in the wet season. Flooding alone would give the reverse. The likely explanations are permanent water, including the Oyan Reservoir, and the small number of cloud-free wet-season scenes. This study cannot separate them, so the optical reference cannot show wet-season flooding in these units.</p>
+        <figure class="tablefig table-units" id="tab-2">
+            <figcaption id="cap-t2"><b>Table 2.</b> Wet-season (April–October) and dry-season means, 2019–2024. Units are the same as Table 1. Radar is not interpreted for Z1 and Z2.</figcaption>
+            <div class="table-wrap">
+                <table aria-labelledby="cap-t2">
+                    <thead><tr><th class="text">Unit</th><th>Soil moisture, wet</th><th>Soil moisture, dry</th><th>Dynamic World km², wet</th><th>Dynamic World km², dry</th></tr></thead>
+                    <tbody>
+{SEASON_ROWS}
+                    </tbody>
+                </table>
+            </div>
+        </figure>
+        <p><strong>Where to look next for groundwater.</strong> Surface water that persists through the dry season is the signal most worth testing against groundwater, because it can be supported by groundwater discharge. On this evidence, Z1 and Z2 are the first candidates, but their dry-season water extent may be reservoir or permanent water rather than groundwater-fed flow. A test needs dry-season water-level or spring observations in those units, which this repository does not contain.</p>
+    </section>
+
+    <section id="gw-context" aria-labelledby="h-gwc">
+        <h2 id="h-gwc">Groundwater context</h2>
+        <p>The study has no groundwater observations, so it does not measure groundwater. This section records what a groundwater context map needs and what is available. It is a first step, not a vulnerability assessment: contamination vulnerability would need groundwater quality and aquifer data that are not in the repository.</p>
+        <figure class="tablefig table-units" id="tab-3">
+            <figcaption id="cap-t3"><b>Table 3.</b> Groundwater context: what the map needs and its status in this repository.</figcaption>
+            <div class="table-wrap">
+                <table aria-labelledby="cap-t3">
+                    <thead><tr><th class="text">Question</th><th class="text">Layer needed</th><th class="text">Status</th></tr></thead>
+                    <tbody>
+                        <tr><th scope="row" class="text">Where are the aquifers?</th><td class="text">Hydrogeological map</td><td class="text">Not in the repository. The BGR and UNESCO WHYMAP map of Groundwater Resources of Africa (2018, 1:12.5 million) is a regional candidate; it is too coarse for catchment mapping.</td></tr>
+                        <tr><th scope="row" class="text">What geological materials occur there?</th><td class="text">Geological map, lithology</td><td class="text">Not in the repository. A finer-scale source for Lagos and Ogun states is needed. The repository describes the upland unit Z1 as lying on the Oyo Basement Complex; that label has not been checked here against a geological map.</td></tr>
+                        <tr><th scope="row" class="text">Where are groundwater observations?</th><td class="text">Borehole inventory, water levels</td><td class="text">Not in the repository. Not yet searched for in this study.</td></tr>
+                        <tr><th scope="row" class="text">How does the surface network relate to groundwater settings?</th><td class="text">Unit boundaries and river network</td><td class="text">Unit boundaries are present (Figure 1). The river network is not in the repository.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </figure>
+        <p>When these layers are available, they will be drawn on the study-area map as a groundwater context layer. Until then, no groundwater map is shown, because a map without the data would look like a finding.</p>
+    </section>
+
+    <section id="river-reaches" aria-labelledby="h-reach">
+        <h2 id="h-reach">River reaches</h2>
+        <p>The catchment-wide series average over whole units. Reach-scale monitoring would track a few named river reaches, which is where surface water is most directly visible. This is planned but not yet computed. It needs a river network layer, which the Earth Engine script uses for its riparian buffer (HydroSHEDS free-flowing rivers) but which is not exported to this repository.</p>
+        <p>The planned analysis: select reaches in Z3 and Z4, where the floodplain is; measure the monthly water extent on each reach from Sentinel-1 and Dynamic World; and relate it to rainfall and soil moisture. This measures water extent, not discharge. Discharge would need calibration against gauge records, which are not in the repository, so no discharge estimate is made or implied.</p>
+    </section>
 
     <section id="discussion" data-reveal aria-labelledby="h-disc">
         <h2 id="h-disc">Discussion</h2>
         <p>Rainfall, soil moisture and radar inundation share a seasonal cycle in this catchment, and that shared cycle is what the raw correlations show. Once it is removed, no headline relationship survives correction. A link between rainfall and flooding is plausible from the seasonal pattern, but six years cannot show that it operates from month to month. Longer records are the first requirement, because they would give more years from which to estimate the seasonal cycle.</p>
         <p>The radar index is the weakest part of the chain. It ranks months like the optical reference over the seasonal cycle, but its magnitude is much smaller, and it does not agree in anomalies. Until it is calibrated against gauge or optical water extent, conclusions about flooding should be read as indicative.</p>
         <p><strong>Relevance to WAVES.</strong> The study is about water processes: how rainfall, soil moisture, floodplain inundation and turbidity change together across a catchment, measured from satellites and tested with stated uncertainty. It does not meet the programme's requirement for independent field observations, because the study has no gauge, discharge or water-use records, and the radar index is not yet validated. A future version would need gauge or reservoir-release data to test the water balance directly.</p>
-        <p><strong>Relevance to GroundwatCH.</strong> The study is not about groundwater. It has no borehole, water-level, pumping or hydrochemical data, and soil moisture in the top 7 cm is not an aquifer measure. The study does not support groundwater conclusions.</p>
+        <p><strong>Relevance to GroundwatCH.</strong> The study does not measure groundwater. It has no borehole, water-level, pumping or hydrochemical data, and soil moisture in the top 7 cm is not an aquifer measure. Its groundwater sections identify where groundwater investigation should start, and the groundwater context map waits for the layers listed in Table 3. They support no groundwater conclusions.</p>
     </section>
 
     <section id="limitations" data-reveal aria-labelledby="h-lim">
@@ -174,6 +241,7 @@
             <li>CHIRPS (about 5 km) and ERA5-Land (about 9 km) are coarse relative to the floodplain of the sub-basins.</li>
             <li>The autocorrelation adjustment is an approximation based on an effective sample size.</li>
             <li>The study has no discharge, groundwater or coastal-impact observations, and its results are not evidence for them.</li>
+            <li>The river-reach analysis and the groundwater context map are not yet computed, for lack of river-network and geology layers.</li>
         </ul>
     </section>
 
@@ -232,6 +300,8 @@
 </footer>
 <script src="vendor/leaflet-1.9.4/leaflet.js"></script>
 <script src="assets/study-map.js"></script>
+<script src="vendor/chartjs-4.4.1/chart.umd.min.js"></script>
+<script src="assets/study-charts.js"></script>
 <script>
 (() => {
     const bar = document.getElementById('progress');

@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "docs" / "data"
 OUT = ROOT / "docs" / "index.html"
-RAW_KEYS = {"UNIT_ROWS", "SCHEMATIC"}
+RAW_KEYS = {"UNIT_ROWS", "SCHEMATIC", "SEASON_ROWS"}
 UNIT_NAMES = {"Z1": "Upper Ogun Headwaters", "Z2": "Oyan–Ofiki Tributary", "Z3": "Middle Ogun Mainstem",
               "Z4": "Lower Ogun Alluvial Corridor", "Z5": "Northwest Lagos Lagoon Estuary"}
 
@@ -41,49 +41,55 @@ def month_name(ym: str) -> str:
 
 
 def unit_rows(units: dict, areas: dict) -> str:
+    """Table 2: the five metrics that matter most for the study (area, rainfall, soil moisture, radar, Dynamic World)."""
     def cell(x, d):
         return "not interpreted" if x is None else f"{x:.{d}f}"
     out = []
     for z in ("Z1", "Z2", "Z3", "Z4", "Z5"):
         u = units[z]
         out.append(
-            f"<tr><td class=\"text\"><strong>{z}</strong> {UNIT_NAMES[z]}</td>"
+            f"<tr><th scope=\"row\" class=\"text\"><strong>{z}</strong> {UNIT_NAMES[z]}</th>"
             f"<td>{areas[z]:,.0f}</td>"
             f"<td>{cell(u['rain']['mean'], 0)}</td>"
-            f"<td>{cell(u['rain_wet_season_mean'], 0)}</td>"
-            f"<td>{cell(u['soil']['mean'], 3)}</td>"
+            f"<td>{cell(u['soil']['mean'], 2)}</td>"
             f"<td>{cell(u['sar']['mean'], 2)}</td>"
-            f"<td>{cell(u['dw']['mean'], 1)}</td>"
-            f"<td>{cell(u['ndti']['mean'], 3)}</td></tr>")
+            f"<td>{cell(u['dw']['mean'], 1)}</td></tr>")
+    return "\n".join(out)
+
+
+def season_rows(units: dict) -> str:
+    """Wet season (April to October) against dry season means for the units with valid data."""
+    out = []
+    for z in ("Z1", "Z2", "Z3", "Z4", "Z5"):
+        se = units[z]["seasonal"]
+        def pair(key, d):
+            x = se.get(key)
+            if not x:
+                return "not interpreted", "not interpreted"
+            f = (lambda v: "no data" if v is None else f"{v:.{d}f}")
+            return f(x["wet_mean"]), f(x["dry_mean"])
+        sw, sd = pair("soil", 2)
+        dw_w, dw_d = pair("dw", 1)
+        out.append(f"<tr><th scope=\"row\" class=\"text\"><strong>{z}</strong> {UNIT_NAMES[z]}</th>"
+                   f"<td>{sw}</td><td>{sd}</td><td>{dw_w}</td><td>{dw_d}</td></tr>")
     return "\n".join(out)
 
 
 def schematic(units: dict, areas: dict) -> str:
-    """Catchment-to-coast chain as an SVG. It shows the order of the units, not a routed water balance."""
-    boxes = [("Z1", "Headwaters"), ("Z2", "Oyan–Ofiki"), ("Z3", "Mainstem"), ("Z4", "Alluvial corridor"), ("Z5", "Lagoon zone")]
-    w, h, gap, x0, y0 = 150, 104, 36, 12, 16
-    width = 5 * w + 4 * gap + 24
-    parts = [f'<svg viewBox="0 0 {width} {h + 52}" role="img" aria-labelledby="schem-title schem-desc" class="schematic">',
-             '<title id="schem-title">Catchment-to-coast chain of the Ogun units</title>',
-             '<desc id="schem-desc">Five units in order: upland headwaters Z1, the Oyan tributary Z2, the mainstem Z3, '
-             'the alluvial corridor Z4 and the lagoon zone Z5. Each box gives the unit area and mean monthly rainfall.</desc>']
-    for i, (z, label) in enumerate(boxes):
-        x = x0 + i * (w + gap)
+    """Catchment-to-coast chain as HTML, so it wraps on a phone instead of shrinking."""
+    labels = {"Z1": "Headwaters", "Z2": "Oyan–Ofiki", "Z3": "Mainstem", "Z4": "Alluvial corridor", "Z5": "Lagoon zone"}
+    items = []
+    for z in ("Z1", "Z2", "Z3", "Z4", "Z5"):
         u = units[z]
-        rain = "rainfall n/a" if u["rain"]["mean"] is None else f"{u['rain']['mean']:.0f} mm per month"
-        parts.append(
-            f'<g class="unit"><rect x="{x}" y="{y0}" width="{w}" height="{h}" rx="10" class="unit-box u{z[1]}"/>'
-            f'<text x="{x + 12}" y="{y0 + 24}" class="u-id">{z}</text>'
-            f'<text x="{x + 40}" y="{y0 + 24}" class="u-name">{label}</text>'
-            f'<text x="{x + 12}" y="{y0 + 58}" class="u-val">{areas[z]:,.0f} km²</text>'
-            f'<text x="{x + 12}" y="{y0 + 80}" class="u-val">{rain}</text></g>')
-        if i < len(boxes) - 1:
-            ax = x + w + 6
-            parts.append(f'<line x1="{ax}" y1="{y0 + h / 2}" x2="{ax + gap - 12}" y2="{y0 + h / 2}" class="flow"/>')
-    parts.append(f'<text x="12" y="{h + 42}" class="axis-note">Order of the units only. The arrows show how the catchment '
-                 f'drains to the lagoon; they are not measured water transfers.</text>')
-    parts.append("</svg>")
-    return "".join(parts)
+        rain = "rainfall not interpreted" if u["rain"]["mean"] is None else f"{u['rain']['mean']:.0f} mm per month"
+        items.append(f'<li class="chain-unit u{z[1]}"><span class="u-id">{z}</span>'
+                     f'<span class="u-name">{labels[z]}</span>'
+                     f'<span class="u-val">{areas[z]:,.0f} km²</span>'
+                     f'<span class="u-val">{rain}</span></li>')
+    return ('<ol class="chain" aria-label="Catchment-to-coast chain, from headwaters Z1 to lagoon Z5">'
+            + "".join(items) + '</ol>'
+            + '<p class="chain-note">Order of the units only. The chain shows how the catchment drains to the lagoon; '
+              'it does not show measured water transfers.</p>')
 
 
 def values() -> dict[str, str]:
@@ -159,10 +165,17 @@ def values() -> dict[str, str]:
         "SEAS_PEAK_SAR": peak("sar_flood_km2"),
         "SIG_SEAS_TEXT": "; ".join(f"{'same month' if l == 'lag_0_month' else 'one month later' if l == 'lag_1_month' else 'two months later'} (ρ = {sign(r['spearman_rho'])}, q = {q(r['p_value_bh_fdr'])})" for l, r in sig_seasonal) or "none",
         "UNIT_ROWS": unit_rows(units, areas),
+        "SEASON_ROWS": season_rows(units),
         "SCHEMATIC": schematic(units, areas),
         "PRINT_DATE": date.today().strftime("%-d %B %Y"),
         "ISO_DATE": date.today().isoformat(),
     }
+    se = {z: units[z]["seasonal"] for z in ("Z1", "Z2")}
+    v.update({
+        "Z2_SOIL_WET": f"{se['Z2']['soil']['wet_mean']:.2f}", "Z2_SOIL_DRY": f"{se['Z2']['soil']['dry_mean']:.2f}",
+        "Z2_DW_WET": f"{se['Z2']['dw']['wet_mean']:.1f}", "Z2_DW_DRY": f"{se['Z2']['dw']['dry_mean']:.1f}",
+        "Z1_DW_DRY": f"{se['Z1']['dw']['dry_mean']:.1f}", "Z1_DW_WET": f"{se['Z1']['dw']['wet_mean']:.1f}",
+    })
     if v["NSIG_ANOM"] != "0":
         raise SystemExit("A headline relationship is now significant: the abstract and section 4.3 wording must be revised first.")
     return v
