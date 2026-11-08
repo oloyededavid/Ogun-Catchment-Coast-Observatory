@@ -154,3 +154,9 @@
 .unit-label { background: none !important; border: 0 !important; box-shadow: none !important; font-weight: 700; font-size: 12px; color: #111; padding: 0; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
 .share-status:empty { display: none; }
 .article > header.title h1 { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.12; }
+/* Unit chain: subtle blue shades, pale for the headwaters and a little deeper towards the lagoon */
+.chain-unit.u1 { background: #f2f7fd; border-color: #c9dcf2; }
+.chain-unit.u2 { background: #e8f1fb; border-color: #bcd3ee; }
+.chain-unit.u3 { background: #deebf9; border-color: #aec9ea; }
+.chain-unit.u4 { background: #d3e4f7; border-color: #9fbfe3; }
+.chain-unit.u5 { background: #c7dcf4; border-color: #8fb4dc; }
