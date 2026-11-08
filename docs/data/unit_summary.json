@@ -1,0 +1,126 @@
+{
+ "source": "docs/data/ogun_unit_monthly_timeseries.csv",
+ "script": "scripts/make_unit_summary.py",
+ "period": "2019-01 to 2024-12",
+ "wet_season": "April to October",
+ "sar_rule": "radar inundation not interpreted for Z1 and Z2 (as in the explorer)",
+ "units": {
+  "Z1": {
+   "rain": {
+    "mean": 109.3867,
+    "months": 72
+   },
+   "soil": {
+    "mean": 0.2916,
+    "months": 72
+   },
+   "sar": {
+    "mean": null,
+    "months": 0,
+    "note": "not interpreted in upland units"
+   },
+   "dw": {
+    "mean": 27.5524,
+    "months": 67
+   },
+   "ndti": {
+    "mean": null,
+    "months": 0
+   },
+   "rain_wet_season_mean": 168.9
+  },
+  "Z2": {
+   "rain": {
+    "mean": 106.1887,
+    "months": 72
+   },
+   "soil": {
+    "mean": 0.3034,
+    "months": 72
+   },
+   "sar": {
+    "mean": null,
+    "months": 0,
+    "note": "not interpreted in upland units"
+   },
+   "dw": {
+    "mean": 49.4672,
+    "months": 67
+   },
+   "ndti": {
+    "mean": null,
+    "months": 0
+   },
+   "rain_wet_season_mean": 165.0
+  },
+  "Z3": {
+   "rain": {
+    "mean": 111.0283,
+    "months": 72
+   },
+   "soil": {
+    "mean": 0.3073,
+    "months": 72
+   },
+   "sar": {
+    "mean": 0.4087,
+    "months": 72
+   },
+   "dw": {
+    "mean": 11.4274,
+    "months": 67
+   },
+   "ndti": {
+    "mean": null,
+    "months": 0
+   },
+   "rain_wet_season_mean": 165.8
+  },
+  "Z4": {
+   "rain": {
+    "mean": 124.1379,
+    "months": 72
+   },
+   "soil": {
+    "mean": 0.3142,
+    "months": 72
+   },
+   "sar": {
+    "mean": 0.1451,
+    "months": 72
+   },
+   "dw": {
+    "mean": 7.2367,
+    "months": 67
+   },
+   "ndti": {
+    "mean": null,
+    "months": 0
+   },
+   "rain_wet_season_mean": 182.7
+  },
+  "Z5": {
+   "rain": {
+    "mean": 138.9471,
+    "months": 72
+   },
+   "soil": {
+    "mean": 0.1781,
+    "months": 72
+   },
+   "sar": {
+    "mean": null,
+    "months": 0
+   },
+   "dw": {
+    "mean": null,
+    "months": 0
+   },
+   "ndti": {
+    "mean": -0.0372,
+    "months": 62
+   },
+   "rain_wet_season_mean": 204.8
+  }
+ }
+}

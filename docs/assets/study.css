@@ -1,0 +1,34 @@
+/* Study page additions: interactive map, legend, schematic and motion.
+   Colours: interface blue only for controls; data colours are set in study-map.js. */
+.study-map { width: 100%; height: clamp(360px, 70vw, 600px); border: 1px solid #d7e3f3; border-radius: 8px; background: #f5f6f4; }
+.study-map[data-state="failed"] { display: grid; place-items: center; }
+.map-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.map-btn { font: inherit; font-size: 13px; padding: 6px 11px; border-radius: 999px; border: 1px solid #b9cde8; background: #fff; color: #1f4f8f; cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
+.map-btn:hover { background: #eef4fc; }
+.map-btn[aria-pressed="true"] { background: #1f5fae; border-color: #1f5fae; color: #fff; }
+.map-btn:focus-visible { outline: 2px solid #1f5fae; outline-offset: 2px; }
+.map-status { font-size: 13px; color: #4a4a4a; margin: 8px 0 0; min-height: 1.4em; }
+.map-legend { margin-top: 10px; font-size: 13px; color: #222; max-width: 520px; }
+.legend-title { margin: 0 0 6px; font-weight: 500; }
+.legend-title span { display: block; font-size: 12px; color: #555; }
+.legend-bar { height: 12px; border-radius: 3px; border: 1px solid #c8c8c2; }
+.legend-ends { display: flex; justify-content: space-between; font-size: 12px; color: #444; margin-top: 3px; }
+.legend-key { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: 12px; color: #444; }
+.hatch-key { width: 16px; height: 12px; display: inline-block; border: 1px dashed #6b6b6b; background: #fff; }
+.north-arrow { background: #fff; border-radius: 6px; padding: 4px 6px; text-align: center; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.north-arrow svg { display: block; margin: 0 auto; }
+.schematic-wrap { overflow-x: auto; }
+.schematic { width: 100%; min-width: 640px; height: auto; display: block; }
+.schematic .unit-box { fill: #fff; stroke: #8aa6c9; stroke-width: 1.5; }
+.schematic .u1 { fill: #e8f1fb; } .schematic .u2 { fill: #e6f5f1; } .schematic .u3 { fill: #fbf1e2; }
+.schematic .u4 { fill: #fbe9e3; } .schematic .u5 { fill: #e9ecf3; }
+.schematic text { font-family: "Satoshi", system-ui, sans-serif; fill: #1c1c1c; }
+.schematic .u-id { font-size: 16px; font-weight: 700; }
+.schematic .u-name { font-size: 12px; fill: #444; }
+.schematic .u-val { font-size: 12px; fill: #333; }
+.schematic .axis-note { font-size: 11px; fill: #555; }
+.schematic .flow { stroke: #1f5fae; stroke-width: 2; stroke-dasharray: 6 6; marker-end: none; animation: flow 2.4s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -24; } }
+@media (prefers-reduced-motion: reduce) { .schematic .flow { animation: none; } .map-btn { transition: none; } }
+.unit-label { background: rgba(255,255,255,.85); border: 0; box-shadow: none; font-weight: 700; font-size: 12px; color: #1c1c1c; padding: 1px 5px; }
+.unit-label::before { display: none; }
