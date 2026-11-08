@@ -2398,7 +2398,7 @@
         lag: ['Lag', 'Compares rain in one month with flooding in the same month (+0), one month later (+1) or two months later (+2).'],
         rho: ['Spearman ρ', 'A rank correlation from −1 to 1: do higher values of one go with higher values of the other? Not swayed much by a single extreme month.'],
         r: ['Pearson r', 'A linear correlation from −1 to 1. One extreme month can pull it strongly, so compare it with ρ.'],
-        p: ['p-value', 'How surprising the association would be if there were really no link. Below 0.05 counts as significant here, after adjusting for autocorrelation and for testing several lags (FDR).'],
+        p: ['p-value', 'How surprising the association would be if there were really no link, using the estimator the diagnostics recommend (Spearman when either series is not normal), adjusted for autocorrelation and corrected once across the key relationships (FDR). Below 0.05 counts as significant here.'],
         neff: ['Effective n', 'The number of independent months the test really has. Neighbouring months are similar, so it can be smaller than the number of months.'],
         robust: ['Robust', 'The result still holds when any single month is left out.']
     };
