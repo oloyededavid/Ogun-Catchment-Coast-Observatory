@@ -101,6 +101,8 @@ To regenerate the diagnostics alone:
 
 ```bash
 python src/02_compile_observatory.py
+python scripts/make_figures.py      # figures for the study page (docs/assets/figures)
+python scripts/build_page.py        # study page docs/index.html, every number read from docs/data
 ```
 
 Run the tests before committing. `tests/test_published_data.py` fails if `cascade_diagnostics.json` does not match what the script produces from the published CSV:
@@ -113,22 +115,28 @@ python -m pytest -q tests
 
 ## 6. Results (2019–2024)
 
-All figures below are produced by `src/02_compile_observatory.py` from the published data and are reproduced in `docs/data/cascade_diagnostics.json`. Associations are deseasonalized (calendar-month anomalies) unless stated; p-values are Benjamini–Hochberg FDR-adjusted across lags 0–2 and autocorrelation-adjusted (Bretherton effective sample size).
+All values are produced by `src/02_compile_observatory.py` and reproduced in `docs/data/cascade_diagnostics.json`; the study page is built from them by `scripts/build_page.py`. Each headline relationship uses the estimator the diagnostics recommend (Spearman ρ, since the series are not normally distributed), with an autocorrelation-adjusted p-value. The five headline relationships on anomalies are corrected once with Benjamini–Hochberg FDR (q). Pearson r is shown for transparency and does not decide significance.
 
-| Relationship | n | Spearman ρ | Pearson r | p | Verdict |
+**Anomalies (seasonal cycle removed).**
+
+| Relationship | n | Spearman ρ | Pearson r | q | Verdict |
 | :--- | ---: | ---: | ---: | ---: | :--- |
-| Rain → floodplain SAR inundation, same month | 72 | 0.11 | 0.38 | 0.0027 | Significant, **not robust** |
-| Rain → floodplain SAR inundation, 1-month lag | 71 | 0.15 | 0.08 | 0.5198 | Not significant |
-| Rain → SAR, controlling for Oyan Reservoir area, same month | 72 | 0.12 | 0.39 | 0.0024 | Unchanged by the reservoir proxy |
-| Soil moisture (0–7 cm) → SAR inundation, same month | 72 | -0.07 | -0.05 | 0.7539 | Not significant |
-| Floodplain SAR inundation → estuary NDTI | 62 | 0.32 | 0.29 | 0.0547 | Not significant |
-| SAR inundation vs Dynamic World flooding (validation) | 67 | 0.14 | 0.08 | 0.5117 | **No agreement** |
+| Rain → floodplain SAR inundation, same month | 72 | 0.11 | 0.38 | 0.44 | Not significant |
+| Rain → floodplain SAR inundation, 1-month lag | 71 | 0.15 | 0.08 | 0.44 | Not significant |
+| Rain → SAR, controlling for Oyan Reservoir area, same month | 72 | 0.12 | 0.39 | 0.39 | Almost unchanged by the reservoir proxy |
+| Soil moisture (0–7 cm) → SAR inundation, same month | 72 | −0.07 | −0.05 | 0.65 | Not significant |
+| Floodplain SAR inundation → estuary NDTI | 62 | 0.32 | 0.29 | 0.15 | Not significant |
+| SAR inundation vs Dynamic World flooding | 67 | 0.14 | 0.08 | 0.44 | Not significant |
 
-**Robustness.** Leaving out any single month gives r = 0.19–0.42 for rain → same-month inundation. Without 2024-10 (the October 2024 flood, the wettest month in the record), r falls from 0.38 to 0.19 (ρ = 0.07, p = 0.1126), so the association rests on one extreme event.
+**Raw monthly values (seasonal co-variation).** Two associations are significant on raw values: rain → SAR inundation at a two-month lag (ρ = −0.43, q = 0.006) and soil moisture → SAR inundation in the same month (ρ = −0.38, q = 0.037). Both reflect the shared seasonal cycle and vanish once it is removed. Rain → SAR at a one-month lag is borderline (ρ = −0.29, q = 0.052).
 
-**Interpretation.** At monthly resolution, the satellite record does not show a robust link between catchment rainfall or shallow soil moisture and floodplain inundation, beyond the October 2024 event, and inundation is not significantly linked to lagoon turbidity. The SAR inundation index could not be validated: Google Dynamic World disagrees with it, largely because Dynamic World has very few cloud-free wet-season images, while the radar index retains some dry-season false alarms. These are findings about what monthly Sentinel-1/Sentinel-2 indicators can resolve here, not evidence that rainfall does not drive flooding.
+**Robustness.** Leaving out any single month gives Pearson r = 0.19 to 0.43 for rain → same-month inundation. Without 2024-10, the wettest month in the record (390.8 mm), the anomaly association falls to ρ = 0.07 (p = 0.55), so the Pearson association rests on one extreme event.
 
-**Coverage.** 72 months; rain, soil moisture and SAR complete; estuary NDTI valid in 62 months (32 of 42 wet-season months); Dynamic World available in 67 months. Peak floodplain SAR inundation: 3.6 km² in 2024-10.
+**Dynamic World agreement.** The radar index ranks months like Dynamic World in the seasonal cycle (ρ = 0.42, p < 0.001) but not in anomalies (ρ = 0.14). Its magnitude is far smaller: monthly values run 0.06 to 3.58 km², while Dynamic World runs 0 to 282.8 km² over the same months. The index should be read as relative until it is calibrated; the cause of the disagreement is not established here.
+
+**Interpretation.** Rainfall, soil moisture and radar inundation share a seasonal cycle. Month to month, the satellite record shows no robust link between catchment rainfall or soil moisture and floodplain inundation, and inundation is not significantly linked to lagoon turbidity. These are findings about what these monthly satellite indicators resolve over six years, not evidence that rainfall does not drive flooding.
+
+**Coverage.** 72 months; rain, soil moisture and SAR complete; estuary NDTI valid in 62 months (10 missing, mostly in the wet season); Dynamic World available in 67 months. Peak radar inundation index: 3.58 km² in 2024-10.
 
 **What would strengthen this:** Oyan Dam release records (supported via `--dam-releases`), independent flood extents (e.g. Copernicus Global Flood Monitoring) for validation, in-situ lagoon TSS samples to calibrate NDTI, and per-event rather than monthly analysis.
 
