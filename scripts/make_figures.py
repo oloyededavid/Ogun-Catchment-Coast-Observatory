@@ -99,8 +99,7 @@ def fig3_association(diag, phone=False):
     ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=fs)
     ax.grid(axis="x", color=RULE, lw=0.4)
     fig.subplots_adjust(left=0.52 if phone else 0.56, right=0.97, bottom=0.2, top=0.97)
-    if not phone:
-        _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant", size=8.5)
+
     return fig
 
 
