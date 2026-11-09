@@ -853,6 +853,25 @@
         }
 </style>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d4f85'/%3E%3Cpath d='M6 22c4-6 6-6 10-2s6 4 10-2' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <style>
+        /* Tour invitation: a slim bar over the map, clear of the side panel and the unit chips */
+        .toast { left: 50%; right: auto; top: 84px; bottom: auto; transform: translateX(-50%); width: auto; max-width: min(620px, calc(100vw - 32px)); flex-direction: row; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 999px; }
+        .toast p { font-size: 14px; margin: 0; white-space: nowrap; }
+        .toast-actions { flex: 0 0 auto; }
+        @media (max-width: 760px) {
+            .toast { top: auto; bottom: 12px; left: 12px; right: 12px; transform: none; max-width: none; border-radius: 14px; flex-wrap: wrap; padding: 10px 12px; }
+            .toast p { white-space: normal; flex: 1 1 100%; }
+        }
+        /* Touch targets: at least 44 px on touch screens and phone widths */
+        @media (pointer: coarse), (max-width: 760px) {
+            .btn, .seg, .chip, .tab, .tour-foot .btn, .toast .btn, .tour-skip { min-height: 44px; }
+            .appbar-actions .btn { width: 44px; height: 44px; }
+            button.info { position: relative; }
+            button.info::after { content: ""; position: absolute; inset: -13px; }
+            button.term { position: relative; }
+            button.term::after { content: ""; position: absolute; inset: -12px -6px; }
+        }
+    </style>
 </head>
 <body>
 <div class="app">
@@ -1239,7 +1258,7 @@
 </div>
 
 <div class="toast" id="tour-toast" role="region" aria-label="Guided tour" hidden>
-    <p><strong>New here?</strong> A 1-minute guided tour shows you how to read the map, the findings and the charts.</p>
+    <p><strong>New here?</strong> Take the 1-minute tour of the map, findings and charts.</p>
     <div class="toast-actions">
         <button type="button" class="btn btn-primary" data-tour-start>Start the tour</button>
         <button type="button" class="btn" id="toast-dismiss">Not now</button>
@@ -1852,7 +1871,7 @@
     function offerTour() {
         let seen = false;
         try { seen = localStorage.getItem('ogun_tour_seen') === '1'; } catch (e) {}
-        if (!seen) setTimeout(() => { if ($('tour').hidden) $('tour-toast').hidden = false; }, 1200);
+        // The tour is offered by the 'Take the 1-minute tour' button in the Overview panel; no pop-up covers the map or panels.
     }
 
     // ================= Unit =================
