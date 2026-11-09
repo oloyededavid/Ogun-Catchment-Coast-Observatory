@@ -55,7 +55,7 @@ def fig2_series(df):
             ("estuary_ndti", "Lagoon NDTI", C_NDTI)]
     for ax, (col, label, colour) in zip(axes, spec):
         ax.plot(t, df[col], color=colour, lw=1.0)
-        ax.set_ylabel(label, fontsize=7.5)
+        ax.set_ylabel(label, fontsize=10)
         ax.grid(axis="y", color=RULE, lw=0.4)
     axes[-1].set_xlabel("Month")
     _source(fig, "Catchment-wide monthly values, Google Earth Engine export v2.4.0; gaps are missing months")
@@ -82,12 +82,12 @@ def fig3_association(diag):
         colour = C_RAIN if q < 0.05 else "#9a9a9a"
         ax.plot([0, rho], [yi, yi], color=colour, lw=1.4)
         ax.plot(rho, yi, "o", color=colour, ms=5, mfc="white" if kind == "raw" else colour)
-        ax.text(0.62, yi, f"q = {q:.3f}" if q >= 0.001 else "q < 0.001", va="center", fontsize=10, color=INK2)
+        ax.text(0.62, yi, f"q = {q:.3f}" if q >= 0.001 else "q < 0.001", va="center", fontsize=13, color=INK2)
     ax.axvline(0, color=INK2, lw=0.6)
-    ax.set_yticks(y, [f"{lab}  ({kind})" for lab, kind, _, _ in rows], fontsize=10)
+    ax.set_yticks(y, [f"{lab}  ({kind})" for lab, kind, _, _ in rows], fontsize=13)
     ax.tick_params(axis="x", labelsize=10)
     ax.set_xlim(-0.6, 0.85)
-    ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=10)
+    ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=13)
     ax.grid(axis="x", color=RULE, lw=0.4)
     fig.subplots_adjust(left=0.56, right=0.97, bottom=0.2, top=0.97)
     _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant")
@@ -98,10 +98,10 @@ def _scatter(ax, x, y, xl, yl, colour, rho, q):
     ax.scatter(x, y, s=14, color=colour, alpha=0.8, lw=0)
     ax.axhline(0, color=RULE, lw=0.6)
     ax.axvline(0, color=RULE, lw=0.6)
-    ax.set_xlabel(xl, fontsize=10)
-    ax.set_ylabel(yl, fontsize=10)
+    ax.set_xlabel(xl, fontsize=13)
+    ax.set_ylabel(yl, fontsize=13)
     ax.tick_params(labelsize=10)
-    ax.text(0.03, 0.04, f"ρ = {rho:+.2f}\nq = {q:.2f}", transform=ax.transAxes, va="bottom", fontsize=10)
+    ax.text(0.03, 0.04, f"ρ = {rho:+.2f}\nq = {q:.2f}", transform=ax.transAxes, va="bottom", fontsize=13, bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=2))
     ax.grid(color=RULE, lw=0.4)
 
 
@@ -109,14 +109,14 @@ def fig4_scatter(comp, anom):
     fig, axes = plt.subplots(1, 2, figsize=(5.4, 3.6), dpi=200)
     m = anom[["sar_flood_km2_anom", "estuary_ndti_anom"]].dropna()
     r = [f for f in comp["key_findings"] if "NDTI" in f["relationship"]][0]
-    _scatter(axes[0], m["sar_flood_km2_anom"], m["estuary_ndti_anom"], "Radar index anomaly (km²)", "Lagoon NDTI anomaly",
+    _scatter(axes[0], m["sar_flood_km2_anom"], m["estuary_ndti_anom"], "Radar index (km²)", "Lagoon NDTI",
              C_NDTI, r["spearman_rho"], r["p_value"])
-    axes[0].set_title("Lagoon turbidity", fontsize=11, loc="left")
+    axes[0].set_title("Lagoon turbidity", fontsize=13, loc="left")
     m2 = anom[["sar_flood_km2_anom", "dw_flood_km2_anom"]].dropna()
     r2 = [f for f in comp["key_findings"] if "Dynamic World" in f["relationship"]][0]
-    _scatter(axes[1], m2["dw_flood_km2_anom"], m2["sar_flood_km2_anom"], "Dynamic World anomaly (km²)", "Radar index anomaly (km²)",
+    _scatter(axes[1], m2["dw_flood_km2_anom"], m2["sar_flood_km2_anom"], "Dynamic World (km²)", "Radar index (km²)",
              C_SAR, r2["spearman_rho"], r2["p_value"])
-    axes[1].set_title("Optical reference", fontsize=11, loc="left")
+    axes[1].set_title("Optical reference", fontsize=13, loc="left")
     fig.subplots_adjust(left=0.16, right=0.98, bottom=0.22, top=0.88, wspace=0.5)
     _source(fig, f"Monthly anomalies from the 2019–2024 export; n = {len(m)} and {len(m2)} pairs")
     return fig

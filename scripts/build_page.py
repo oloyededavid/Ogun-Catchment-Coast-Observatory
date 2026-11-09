@@ -94,8 +94,7 @@ def schematic(units: dict, areas: dict) -> str:
                      f'<span class="u-val">{rain}</span></li>')
     return ('<ol class="chain" aria-label="Catchment-to-coast chain, from headwaters Z1 to lagoon Z5">'
             + "".join(items) + '</ol>'
-            + '<p class="chain-note">Order of the units only. The chain shows how the catchment drains to the lagoon; '
-              'it does not show measured water transfers.</p>')
+            + '')
 
 
 def values() -> dict[str, str]:

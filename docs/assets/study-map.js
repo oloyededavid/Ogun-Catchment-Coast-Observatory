@@ -107,6 +107,8 @@
         if (typeof x !== 'number') {
             return { fillColor: '#ffffff', fillOpacity: ctxLandOn() ? 0 : 0.9, color: '#6b6b6b', weight: 1.2, dashArray: '4 4' };
         }
+        // Z5 is outside the catchment: neutral fill, except for the turbidity variable where it carries the value
+        if (f.properties.zone_id === 'Z5' && v !== 'ndti') return { fillColor: '#ebe9e2', fillOpacity: 0.9, color: '#6b6b6b', weight: 1.2, dashArray: '6 4' };
         const t = range.max > range.min ? (x - range.min) / (range.max - range.min) : 0.5;
         return { fillColor: ramp(Math.min(1, Math.max(0, t)), VARS[v].ramp), fillOpacity: op, color: '#3d3d3d', weight: 1.2, dashArray: dashed ? '6 4' : null };
     }

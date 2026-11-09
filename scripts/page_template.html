@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="only light">
-    <title>Surface water from headwaters to lagoon: a WAVES study with a groundwater context</title>
+    <title>Surface water from headwaters to lagoon: rainfall, soil moisture and flooding</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d4f85'/%3E%3Cpath d='M6 22c4-6 6-6 10-2s6 4 10-2' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
     <meta name="description" content="Satellite records of rainfall, soil moisture, radar floodplain inundation and lagoon turbidity for the Ogun River catchment, 2019–2024. Rainfall and flooding share a seasonal cycle; month-to-month coupling is not robust.">
     <meta name="author" content="David Oluwayinka Oloyede">
-    <meta name="citation_title" content="Surface water from headwaters to lagoon: a WAVES study with a groundwater context">
+    <meta name="citation_title" content="Surface water from headwaters to lagoon: rainfall, soil moisture and flooding">
     <meta name="citation_author" content="Oloyede, David Oluwayinka">
     <meta name="citation_publication_date" content="2026/11/08">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111'/%3E%3Cpath d='M6 20c3 0 3-2 6-2s3 2 6 2 3-2 6-2' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -39,7 +40,7 @@
 
 <main class="article" id="top">
     <header class="title">
-        <h1>Surface water from headwaters to lagoon: a WAVES study with a groundwater context</h1>
+        <h1>Surface water from headwaters to lagoon: rainfall, soil moisture and flooding</h1>
         <p class="subtitle">Rainfall, soil moisture and radar flooding, 2019–2024</p>
     </header>
 
@@ -51,7 +52,7 @@
             <div><dt>Analytical units</dt><dd><span data-count="5">5</span></dd></div>
             <div><dt>Catchment area, km²</dt><dd><span data-count="{CATCH_NUM}">{CATCH}</span></dd></div>
         </dl>
-        <p class="keywords"><strong>Keywords:</strong> Ogun River; hydrology; water resources (WAVES); groundwater (GroundwatCH); surface water–groundwater interaction; floodplain inundation; soil moisture; Sentinel-1; CHIRPS; ERA5-Land; Dynamic World; lagoon turbidity; Nigeria</p>
+        <p class="keywords"><strong>Keywords:</strong> Ogun River; hydrology; water resources; groundwater; surface water–groundwater interaction; floodplain inundation; soil moisture; Sentinel-1; CHIRPS; ERA5-Land; Dynamic World; lagoon turbidity; Nigeria</p>
     </section>
 
     <section id="introduction" aria-labelledby="h-intro">
@@ -90,7 +91,6 @@
                 <div class="map-legend" id="study-map-legend" aria-live="polite"></div>
             </aside>
         </div>
-        <p class="print-link"><a href="assets/figures/study_map_print.png" download>Download the print version of this map (PNG)</a>. It is a static image with the same units and context layers, not a capture of the live view.</p>
         <figcaption><b>Figure 1.</b> The five analytical units of the Ogun catchment, January 2019 to December 2024. Colour shows the period mean of the selected variable. Unit boundaries are WWF HydroBASINS level 9 (Z1–Z4) and a lagoon zone outside the catchment (Z5, dashed). Radar values are not shown for Z1 and Z2, where dry-season radar artefacts make them unreliable. Lagoon turbidity is an uncalibrated index, not NTU or mg/L. Sources: Google Earth Engine export v2.4.0; basemap © Esri.</figcaption>
     </figure>
 
@@ -110,7 +110,7 @@
         <div class="schematic-wrap">
 {SCHEMATIC}
         </div>
-        <figcaption><b>Figure 2.</b> The catchment-to-coast chain. The units run in order from the upland headwaters to the lagoon zone. The diagram shows their order and area only; it is not a water-balance or routing model.</figcaption>
+        <figcaption><b>Figure 2.</b> The catchment-to-coast chain, from the upland headwaters (Z1) to the lagoon zone (Z5). It shows order and area, not water transfers.</figcaption>
     </figure>
 
     <section id="methods" aria-labelledby="h-methods">
@@ -203,18 +203,16 @@
 
     <section id="sw-gw" aria-labelledby="h-swgw">
         <h2 id="h-swgw">Surface water–groundwater interaction</h2>
-        <p>Surface water and groundwater are linked. Rain that infiltrates recharges the aquifer and sustains river flow in the dry season, and a river that loses or gains water exchanges it with the aquifer beneath it. Figure 6 shows the links as the study can and cannot measure them. Every arrow here is a hypothesis to test, not a finding.</p>
+        <p>Figure 6 shows the four links the study measures or models, from rainfall to lagoon turbidity. Arrows give the order of the chain. They are not tested water transfers.</p>
         <figure class="wide reveal flow-figure" id="fig-flow">
-        <ol class="flowdiag" aria-label="Conceptual links between rainfall, infiltration, runoff, rivers, wetlands and groundwater">
-            <li class="node measured"><strong>Rainfall</strong><span>CHIRPS, satellite estimate adjusted with gauge data</span><span class="flow-to">Flows to infiltration and runoff →</span></li>
-            <li class="node unmeasured"><strong>Surface runoff</strong><span>Not measured here</span><span class="flow-to">Flows to rivers and wetlands →</span></li>
-            <li class="node modelled"><strong>Infiltration into soil</strong><span>Soil moisture, 0–7 cm, ERA5-Land (modelled)</span><span class="flow-to">Recharges groundwater (not measured) →</span></li>
-            <li class="node unmeasured"><strong>Groundwater storage and flow</strong><span>Not measured in this study</span><span class="flow-to">Feeds rivers in the dry season (not measured) ↺</span></li>
-            <li class="node measured"><strong>Rivers, floodplain and wetlands</strong><span>Radar and Dynamic World extent (satellite)</span><span class="flow-to">Drains to the lagoon →</span></li>
+        <ol class="flowdiag" aria-label="Measured and modelled links from rainfall to lagoon turbidity">
+            <li class="node measured"><strong>Rainfall</strong><span>CHIRPS, satellite estimate adjusted with gauge data</span><span class="flow-to">Flows to the soil →</span></li>
+            <li class="node modelled"><strong>Soil moisture</strong><span>0–7 cm, ERA5-Land (modelled)</span><span class="flow-to">Wet soil and floodplain water →</span></li>
+            <li class="node measured"><strong>Floodplain water</strong><span>Radar and Dynamic World extent (satellite)</span><span class="flow-to">Drains to the lagoon →</span></li>
             <li class="node measured"><strong>Lagoon</strong><span>Turbidity index (satellite, uncalibrated)</span><span class="flow-to">Outlet of the catchment</span></li>
         </ol>
-        <p class="flow-key"><strong>Key:</strong> measured (satellite or gauge) = solid blue, labelled "measured"; modelled = dashed, labelled "modelled"; not measured in this study = dashed grey, labelled "not measured".</p>
-            <figcaption><b>Figure 6.</b> Conceptual links between rainfall, infiltration, runoff, rivers, wetlands and groundwater. Labels state whether each part is measured by satellite, modelled, or not measured in this study.</figcaption>
+        <p class="flow-key"><strong>Key:</strong> solid blue = measured (satellite or gauge); dashed = modelled.</p>
+            <figcaption><b>Figure 6.</b> The measured and modelled links in the chain, from rainfall to lagoon turbidity.</figcaption>
         </figure>
         <p>Table 3 compares wet and dry seasons for the units where the data can be read. Soil moisture is higher in the wet season in every unit. Dynamic World water is much higher in the dry season in every unit, including the floodplain units Z3 and Z4. In Z2 it averages {Z2_DW_DRY} km² in the dry season and {Z2_DW_WET} km² in the wet season; in Z1, {Z1_DW_DRY} km² and {Z1_DW_WET} km². Permanent water is masked out of the Dynamic World series, so it is unlikely to explain this contrast. Possible explanations include few usable wet-season images and dry-season misclassification. The study cannot separate them, so Dynamic World does not show wet-season flooding here.</p>
         <figure class="tablefig table-units" id="tab-3">
@@ -253,7 +251,7 @@
 
     <section id="conclusion" data-reveal aria-labelledby="h-concl">
         <h2 id="h-concl">Conclusion</h2>
-        <p>Over 2019 to 2024, rainfall, soil moisture and radar floodplain inundation in the Ogun catchment share a seasonal cycle, but they show no robust month-to-month coupling, and the lagoon turbidity link is not significant after correction. The radar index needs calibration before its flood extent can be cited.</p>
+        <p>From 2019 to 2024, rainfall, soil moisture and radar flooding in the Ogun catchment follow the same seasonal cycle. The month-to-month links are set out in the Results.</p>
     </section>
 
     <section id="explorer" class="explore-cta" data-reveal aria-labelledby="h-explorer">
@@ -271,6 +269,7 @@
                 <a class="cta-button" href="explore.html">Open the explorer <span aria-hidden="true">→</span></a>
             </div>
         </div>
+    </section>
     
 
     <section id="data-code" data-reveal aria-labelledby="h-dc">
@@ -282,7 +281,7 @@
         <p class="small data-note">The ZIP holds the monthly series, the unit series, the unit boundaries, the unit means and the statistics behind every number on this page.</p>
         <h3 id="cite">How to cite</h3>
         <div class="citation">
-            <p id="cite-text">Oloyede, D. O. (2026). <i>Surface water from headwaters to lagoon: a WAVES study with a groundwater context</i>. https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory</p>
+            <p id="cite-text">Oloyede, D. O. (2026). <i>Surface water from headwaters to lagoon: rainfall, soil moisture and flooding</i>. https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory</p>
             <button type="button" class="button" id="copy-cite">Copy citation</button>
         </div>
     </section>

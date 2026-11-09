@@ -42,7 +42,7 @@
                 ndti: () => ({
                     type: 'line',
                     data: { labels, datasets: [{ label: 'Lagoon turbidity (NDTI, uncalibrated)', data: series('estuary_ndti'), borderColor: '#8a6d1f', backgroundColor: '#8a6d1f', borderWidth: 1.6, pointRadius: 0, spanGaps: false }] },
-                    axes: { y: 'Lagoon NDTI (uncalibrated)' },
+                    axes: { y: 'Lagoon NDTI' },
                 }),
             };
             const charts = [];
@@ -52,17 +52,17 @@
                 if (!canvas || !specs[key]) return;
                 const spec = specs[key]();
                 const scales = {
-                    x: { ticks: { maxTicksLimit: 8, autoSkip: true, color: '#4a4a4a', font: { size: 11 } }, grid: { display: false } },
-                    y: { title: { display: true, text: spec.axes.y, color: '#4a4a4a', font: { size: 11 } }, ticks: { color: '#4a4a4a', font: { size: 11 } }, grid: { color: '#e6e5df' } },
+                    x: { ticks: { maxTicksLimit: 8, autoSkip: true, color: '#4a4a4a', font: { size: 13 } }, grid: { display: false } },
+                    y: { title: { display: true, text: spec.axes.y, color: '#4a4a4a', font: { size: 13 } }, ticks: { color: '#4a4a4a', font: { size: 13 } }, grid: { color: '#e6e5df' } },
                 };
-                if (spec.axes.y2) scales.y2 = { position: 'right', title: { display: true, text: spec.axes.y2, color: '#4a4a4a', font: { size: 11 } }, ticks: { color: '#4a4a4a', font: { size: 11 } }, grid: { display: false } };
+                if (spec.axes.y2) scales.y2 = { position: 'right', title: { display: true, text: spec.axes.y2, color: '#4a4a4a', font: { size: 13 } }, ticks: { color: '#4a4a4a', font: { size: 13 } }, grid: { display: false } };
                 const chart = new Chart(canvas, {
                     type: spec.type,
                     data: spec.data,
                     options: {
                         responsive: true, maintainAspectRatio: false, animation: false,
                         interaction: { mode: 'index', intersect: false },
-                        plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y === null ? 'no valid value' : Number(c.parsed.y).toFixed(3)}` } } },
+                        plugins: { legend: { labels: { boxWidth: 12, font: { size: 13 } } }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y === null ? 'no valid value' : Number(c.parsed.y).toFixed(3)}` } } },
                         scales,
                     },
                 });
