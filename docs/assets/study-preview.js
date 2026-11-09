@@ -60,11 +60,11 @@
         const X = x => ox + (x - minX) * scale, Y = y => H - (oy + (y - minY) * scale);
         const allVals = Array.from(byMonth.values()).flatMap(o => Object.values(o));
         const lo = Math.min(...allVals), hi = Math.max(...allVals);
-        // black and white only: brighter fill = more rainfall that month
+        // blue ramp: darker blue = more rainfall that month
         const shade = v => {
             const t = Math.max(0, Math.min(1, (v - lo) / (hi - lo || 1)));
-            const c = Math.round(40 + 170 * t);
-            return `rgb(${c},${c},${c})`;
+            const mix = (a, b) => Math.round(a + (b - a) * t);
+            return `rgb(${mix(219, 29)},${mix(235, 86)},${mix(250, 153)})`;
         };
         const centre = f => {
             const ring = (f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates[0])[0];
@@ -82,9 +82,9 @@
                 ctx.beginPath();
                 polys.forEach(poly => poly[0].forEach(([x, y], i) => (i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y)))));
                 ctx.closePath();
-                ctx.fillStyle = typeof vals[z] === 'number' ? shade(vals[z]) : '#141414';
+                ctx.fillStyle = typeof vals[z] === 'number' ? shade(vals[z]) : '#e6e9ee';
                 ctx.fill();
-                ctx.strokeStyle = '#000';
+                ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 1.2;
                 ctx.stroke();
             });
@@ -92,26 +92,35 @@
         const drawCursor = (x, y, pressed) => {
             ctx.save();
             ctx.translate(x, y);
-            if (pressed) { ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2; ctx.stroke(); }
+            if (pressed) { ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(17,17,17,.6)'; ctx.lineWidth = 2; ctx.stroke(); }
             ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 18); ctx.lineTo(5, 13.5); ctx.lineTo(9, 21); ctx.lineTo(12, 19.5); ctx.lineTo(8.5, 12.5); ctx.lineTo(14, 12.5); ctx.closePath();
-            ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#111'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.fill(); ctx.stroke();
             ctx.restore();
         };
         const drawTip = (x, y, text) => {
             ctx.save();
-            ctx.font = '13px sans-serif';
-            const w = ctx.measureText(text).width + 16;
-            const tx = Math.min(W - w - 6, Math.max(6, x + 14)), ty = Math.max(8, y - 34);
-            ctx.fillStyle = '#fff'; ctx.fillRect(tx, ty, w, 26);
-            ctx.fillStyle = '#000'; ctx.fillText(text, tx + 8, ty + 17);
+            ctx.font = '600 22px sans-serif';
+            const w = ctx.measureText(text).width + 30;
+            const tx = Math.min(W - w - 6, Math.max(6, x + 14)), ty = Math.max(8, y - 52);
+            ctx.fillStyle = '#111'; ctx.fillRect(tx, ty, w, 40);
+            ctx.fillStyle = '#fff'; ctx.fillText(text, tx + 15, ty + 27);
             ctx.restore();
         };
         // Scripted click-through: the cursor visits each unit in turn, clicks, and the tooltip shows that unit's real value for the month shown.
         const steps = [];
         for (let k = 0; k < months.length; k++) zones.forEach(z => steps.push({ month: months[k], zone: z }));
         const pos = { x: W * 0.5, y: H * 0.12 };
-        let si = 0, phase = 0, t0 = performance.now();
+        let si = 0, phase = 0, t0 = performance.now(), pausedAt = null;
+        const pauseBtn = document.getElementById('preview-pause');
+        if (pauseBtn) {
+            if (reduced) pauseBtn.hidden = true;
+            pauseBtn.addEventListener('click', () => {
+                if (pausedAt === null) { pausedAt = performance.now(); pauseBtn.textContent = 'Play'; pauseBtn.setAttribute('aria-label', 'Play animation'); }
+                else { t0 += performance.now() - pausedAt; pausedAt = null; pauseBtn.textContent = 'Pause'; pauseBtn.setAttribute('aria-label', 'Pause animation'); requestAnimationFrame(frame); }
+            });
+        }
         const frame = now => {
+            if (pausedAt !== null) return;
             const st = steps[si % steps.length];
             const target = centres[st.zone];
             const k = Math.min(1, (now - t0) / 480);

@@ -194,7 +194,7 @@
 
     <section aria-labelledby="h-turb">
         <h3 id="h-turb">Flooding, lagoon turbidity and the optical reference</h3>
-        <p>Lagoon turbidity and radar inundation anomalies are positively associated (ρ = {NDTI_RHO}, q = {NDTI_Q}), the largest association among the headline relationships, but not significant after correction. The radar index ranks months like Dynamic World over the seasonal cycle (ρ = {DW_SEAS_RHO}), but not in anomalies (ρ = {DW_ANOM_RHO}, q = {DW_ANOM_Q}). Its values are far smaller than the optical extent, so it should be read as a relative measure, not as an area (5).</p>
+        <p>Lagoon turbidity and radar inundation anomalies are positively associated (ρ = {NDTI_RHO}, q = {NDTI_Q}), the largest association among the headline relationships, but not significant after correction. The radar index ranks months like Dynamic World over the seasonal cycle (ρ = {DW_SEAS_RHO}), but not in anomalies (ρ = {DW_ANOM_RHO}, q = {DW_ANOM_Q}). Its values are far smaller than the optical extent, so it should be read as a relative measure, not as an area (Figure 3).</p>
     </section>
     <figure class="wide reveal" id="fig-scatter">
         <img class="fig-small" src="assets/figures/fig4_scatter.png" width="1200" height="660" loading="lazy" alt="Two scatter plots of monthly anomalies: radar inundation against lagoon turbidity, and radar inundation against Dynamic World flooding">
@@ -235,8 +235,6 @@
         <h2 id="h-disc">Discussion</h2>
         <p>The raw correlations are negative and probably reflect dry-season radar detections rather than a shared cycle. Once the seasonal cycle is removed, no headline relationship survives correction. A link between rainfall and flooding is plausible from the seasonal pattern, but six years cannot show that it operates from month to month. Longer records are the first requirement, because they would give more years from which to estimate the seasonal cycle.</p>
         <p>The radar index is the weakest part of the chain. Its seasonal pattern resembles the optical reference only in the dry season, its magnitude is much smaller, and it does not agree in anomalies. Until it is calibrated against gauge or optical water extent, conclusions about flooding should be read as indicative.</p>
-        <p><strong>Relevance to WAVES.</strong> The study is about water processes: how rainfall, soil moisture, floodplain inundation and turbidity change together across a catchment, measured from satellites and tested with stated uncertainty. The study has no independent field observations: no gauge, discharge or water-use records, and the radar index is not yet validated. A future version would need gauge or reservoir-release data to test the water balance directly.</p>
-        <p><strong>Relevance to GroundwatCH.</strong> The study does not measure groundwater. It has no borehole, water-level, pumping or hydrochemical data, and soil moisture in the top 7 cm is not an aquifer measure. Its groundwater sections identify where groundwater investigation should start, and the groundwater context map waits for the layers listed in Table 4. They support no groundwater conclusions.</p>
     </section>
 
     <section id="limitations" data-reveal aria-labelledby="h-lim">
@@ -259,9 +257,11 @@
     </section>
 
     <section id="explorer" class="explore-cta" data-reveal aria-labelledby="h-explorer">
-        <div class="cta-black">
+        <div class="cta-card">
             <div class="cta-preview" aria-hidden="true">
+                <span class="cta-live"><i aria-hidden="true"></i>Live preview</span>
                 <canvas id="preview-canvas" width="640" height="420"></canvas>
+                <button type="button" class="preview-pause" id="preview-pause" aria-label="Pause animation">Pause</button>
                 <p class="preview-month" id="preview-month">2019-01</p>
             </div>
             <div class="cta-copy">
