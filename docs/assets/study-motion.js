@@ -66,11 +66,11 @@
     const blocks = document.querySelectorAll('main section > h2, main section > h3, main section > p, main section > figure, main section > ol, main section > ul, main section > .catch-share, main section > .band-controls, main section > .cta-card, main section > .table-wrap, main section > .pipeline');
     const io = new IntersectionObserver(entries => entries.forEach(e => {
         if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-    }), { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
+    }), { threshold: 0.02, rootMargin: '0px 0px 8% 0px' });
     let i = 0;
     blocks.forEach(el => {
         el.classList.add('rv');
-        el.style.setProperty('--d', `${((i++ % 4) * 0.09).toFixed(2)}s`);
+        el.style.setProperty('--d', `${((i++ % 3) * 0.07).toFixed(2)}s`);
         io.observe(el);
     });
 })();

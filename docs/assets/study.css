@@ -465,3 +465,31 @@ header.title { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) { .js-reveal .rv { opacity: 1; transform: none; transition: none; } }
 /* Study-area map: no flat grey panel behind the map, so the basemap (topographic) shows through as on the explorer */
 .study-map { background: #ffffff; }
+
+/* ---- Design pass: Methodology as a timeline; Figure 6 as a row of quiet cards; smoother reveal ---- */
+.pipeline { display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 18px; margin: 28px 0 12px; padding: 0; list-style: none; position: relative; }
+.pipeline::before { content: ""; position: absolute; left: 13px; right: 13px; top: 13px; height: 2px; background: linear-gradient(90deg, #1d4f85, #9fbfe3); }
+.pipeline li { border: 0 !important; background: none !important; padding: 0 !important; display: flex !important; flex-direction: column !important; gap: 8px !important; grid-template-columns: none !important; position: relative; }
+.pipeline li::after { display: none !important; }
+.pipeline .pl-n { position: relative; z-index: 1; width: 28px; height: 28px; background: #fff; color: #1d4f85; border: 2px solid #1d4f85; }
+.pipeline li strong { display: block; font-size: 17px; margin: 6px 0 0; min-width: 0 !important; }
+.pipeline li > span:not(.pl-n) { font-size: 14px; color: #444; line-height: 1.5; }
+@media (max-width: 900px) {
+    .pipeline { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .pipeline::before { left: 13px; right: auto; top: 14px; bottom: 14px; width: 2px; height: auto; background: linear-gradient(180deg, #1d4f85, #9fbfe3); }
+    .pipeline li { flex-direction: row !important; align-items: flex-start; gap: 12px !important; flex-wrap: wrap; }
+    .pipeline li strong { margin: 4px 0 0; }
+    .pipeline li > span:not(.pl-n) { flex-basis: 100%; }
+}
+.flowdiag { gap: 22px !important; }
+.flowdiag .node { background: none !important; border: 0 !important; border-top: 3px solid #1d4f85 !important; border-radius: 0 !important; padding: 14px 0 0 !important; }
+.flowdiag .node.modelled { border-top: 3px dashed #8a8a86 !important; }
+.flowdiag .node::after { display: none !important; }
+.flowdiag .node strong { font-size: 16px; }
+.flowdiag .node span { font-size: 14px; color: #444; }
+/* smoother reveal: earlier start, longer ease, a small rise */
+.js-reveal .rv { opacity: 0; transform: translateY(18px); transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1); transition-delay: var(--d, 0s); will-change: opacity, transform; }
+.js-reveal .rv.in { opacity: 1; transform: none; }
+/* header: the explorer link has no outline */
+.toc a.toc-ex { border: 0 !important; padding: 6px 10px !important; margin-left: 0 !important; border-radius: 6px !important; }
+.toc a.toc-ex:hover { background: #eef4fd; }
