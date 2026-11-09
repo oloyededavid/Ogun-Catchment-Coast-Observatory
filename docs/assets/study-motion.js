@@ -47,3 +47,30 @@
     document.querySelectorAll('[data-reveal], .reveal').forEach(el => io.observe(el));
 })();
 
+
+/* Back to top: appears after the first screen; each block in a section eases in as it reaches the viewer */
+(() => {
+    'use strict';
+    const btn = document.getElementById('to-top');
+    if (btn) {
+        const show = () => btn.classList.toggle('is-visible', scrollY > innerHeight * 0.8);
+        addEventListener('scroll', show, { passive: true });
+        btn.addEventListener('click', () => {
+            const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+        });
+        show();
+    }
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || !('IntersectionObserver' in window)) return;
+    const blocks = document.querySelectorAll('main section > h2, main section > h3, main section > p, main section > figure, main section > ol, main section > ul, main section > .catch-share, main section > .band-controls, main section > .cta-card, main section > .table-wrap, main section > .pipeline');
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
+    let i = 0;
+    blocks.forEach(el => {
+        el.classList.add('rv');
+        el.style.setProperty('--d', `${((i++ % 4) * 0.09).toFixed(2)}s`);
+        io.observe(el);
+    });
+})();

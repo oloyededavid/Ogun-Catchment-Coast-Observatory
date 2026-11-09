@@ -448,3 +448,13 @@ header.title { border-bottom: 0; }
 .band-slider { flex: 1 1 auto; margin: 0 20px; }
 .band-status { flex-basis: 100%; order: 3; margin-top: 4px; }
 .band-controls { flex-wrap: wrap; }
+
+/* Back to top: a button with an arrow, shown once the reader has scrolled */
+.to-top { position: fixed; right: 20px; bottom: 20px; z-index: 900; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #c9d6e6; border-radius: 50%; background: #fff; color: #1d4f85; cursor: pointer; box-shadow: 0 4px 14px rgba(20, 50, 90, .12); opacity: 0; pointer-events: none; transition: opacity .3s ease, transform .3s ease; }
+.to-top.is-visible { opacity: 1; pointer-events: auto; }
+.to-top:hover { transform: translateY(-2px); }
+.to-top:focus-visible { outline: 2px solid #1d4f85; outline-offset: 3px; }
+/* Scroll-in for each block: rises and fades in, staggered within its section */
+.js-reveal .rv { opacity: 0; transform: translateY(26px); transition: opacity 0.75s ease, transform 0.75s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0s); }
+.js-reveal .rv.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js-reveal .rv { opacity: 1; transform: none; transition: none; } }
