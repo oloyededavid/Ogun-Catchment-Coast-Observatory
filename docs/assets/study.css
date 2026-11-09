@@ -344,3 +344,9 @@ img, svg { height: auto; }
 .map-btn, #copy-cite, .btn-quiet, .band-play, .preview-pause, .react, .fb-btn { display: inline-flex; align-items: center; }
 /* Header navigation: the section in view */
 .toc a.is-current { background: #eef4fd; color: #1d4f85; border-radius: 10px; }
+/* Scroll cue under the title: a gentle bob, hidden once the reader has scrolled */
+.scroll-cue { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 14px; color: #1d4f85; text-decoration: none; transition: opacity 0.4s ease; }
+.scroll-cue svg { animation: cue-bob 1.6s ease-in-out infinite; }
+.scroll-cue.is-hidden { opacity: 0; pointer-events: none; }
+@keyframes cue-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .scroll-cue svg { animation: none; } .scroll-cue { transition: none; } }

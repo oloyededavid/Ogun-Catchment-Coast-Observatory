@@ -46,3 +46,13 @@
     }), { threshold: 0.12 });
     document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
 })();
+
+/* Scroll cue: hide it once the reader has scrolled past the title */
+(() => {
+    'use strict';
+    const cue = document.querySelector('.scroll-cue');
+    if (!cue) return;
+    const hide = () => { if (scrollY > 80) { cue.classList.add('is-hidden'); removeEventListener('scroll', hide); } };
+    addEventListener('scroll', hide, { passive: true });
+    hide();
+})();

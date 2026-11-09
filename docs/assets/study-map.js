@@ -147,7 +147,7 @@
             <li><span class="zbadge">Z2</span>Oyan–Ofiki tributary</li>
             <li><span class="zbadge">Z3</span>Middle Ogun mainstem</li>
             <li><span class="zbadge">Z4</span>Lower Ogun alluvial corridor</li>
-            <li><span class="zbadge dashed">Z5</span>Lagos Lagoon zone, outside the catchment (dashed outline)</li></ul></div>`;
+            <li><span class="zbadge dashed">Z5</span>Lagoon zone, outside the catchment (dashed outline)</li></ul></div>`;
     }
 
     function landcoverBlock() {
@@ -215,7 +215,7 @@
             const dark = lum(fill) < 0.55 && ctxLandOn() === false;
             const tt = L.tooltip({ permanent: true, direction: id === 'Z5' ? 'right' : 'center', offset: id === 'Z5' ? [10, 0] : [0, 0], className: 'unit-label' + (id === 'Z5' ? ' z5' : '') + (dark ? ' on-dark' : ''), interactive: false })
                 .setLatLng([pt[1], pt[0]]).setContent(id);
-            tt.addTo(map); labelLayers.push(tt);
+            // unit names are not written on the map: the key and the hover popups identify each unit
         });
         map.fitBounds(layer.getBounds(), { padding: mapPad() });
         if (!titleCtl) {

@@ -41,6 +41,7 @@
 <main class="article" id="top">
     <header class="title">
         <h1>Surface water from headwaters to lagoon: rainfall, soil moisture and flooding</h1>
+        <a class="scroll-cue" href="#abstract" aria-label="Scroll to the abstract"><span>Scroll</span><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <p class="subtitle">Rainfall, soil moisture and radar flooding, 2019–2024</p>
     </header>
 
@@ -199,21 +200,11 @@
         <figcaption><b>Figure 5.</b> Monthly anomalies. Left: radar inundation against lagoon turbidity. Right: radar inundation against the Dynamic World flooding reference. Each point is one month with both values.</figcaption>
     </figure>
 
-        <p>Figure 6 maps the wet- and dry-season means for each unit. The colour scale is shared by the two seasons within each variable, so the panels can be compared directly.</p>
-        <figure class="wide reveal" id="fig-seasonal">
-        <picture><source media="(max-width: 760px)" srcset="assets/figures/study_seasonal_maps_phone.png"><img src="assets/figures/study_seasonal_maps.png" width="1867" height="1446" loading="lazy" alt="Six maps of the five units: wet-season and dry-season means of rainfall, soil moisture and Dynamic World water"></picture>
-        <figcaption><b>Figure 6.</b> Wet-season (April–October) and dry-season (November–March) means by unit, 2019–2024, for rainfall, soil moisture and Dynamic World water. Each map has its own colour scale. Z5 is the lagoon zone, outside the catchment (dashed); grey means no valid value. Source: seasonal means of the unit values in docs/data/unit_summary.json.</figcaption>
-    </figure>
-
-        <p>Figure 7 maps two land-cover shares per unit. Built-up surfaces shed more rain as runoff than vegetated ground, and cropland is where land use has changed. Both are shares of each unit’s area from the 2021 land-cover map.</p>
-        <figure class="wide reveal" id="fig-landcover">
-        <picture><source media="(max-width: 760px)" srcset="assets/figures/study_landcover_maps_phone.png"><img src="assets/figures/study_landcover_maps.png" width="1541" height="1051" loading="lazy" alt="Two maps of the units: built-up share and cropland share of each unit’s area, 2021"></picture>
-        <figcaption><b>Figure 7.</b> Built-up and cropland shares of each unit’s area, from ESA WorldCover 2021. Z5 is the lagoon zone, outside the catchment, and is not included.</figcaption>
-    </figure>
-
+        
+        
     <section id="sw-gw" aria-labelledby="h-swgw">
         <h2 id="h-swgw"><span class="sec-no">5</span> Surface water–groundwater interaction</h2>
-        <p>Figure 8 shows the four links the study measures or models, from rainfall to lagoon turbidity. Arrows give the order of the chain. They are not tested water transfers.</p>
+        <p>Figure 6 shows the four links the study measures or models, from rainfall to lagoon turbidity. Arrows give the order of the chain. They are not tested water transfers.</p>
         <figure class="wide reveal flow-figure" id="fig-flow">
         <ol class="flowdiag" aria-label="Measured and modelled links from rainfall to lagoon turbidity">
             <li class="node measured"><strong>Rainfall</strong><span>CHIRPS, satellite estimate adjusted with gauge data</span><span class="flow-to">Rainfall to soil moisture →</span></li>
@@ -222,7 +213,7 @@
             <li class="node measured"><strong>Lagoon</strong><span>Turbidity index (satellite, uncalibrated)</span><span class="flow-to">Outlet of the catchment</span></li>
         </ol>
         <p class="flow-key"><span class="key-item"><span class="key-sw measured" aria-hidden="true"></span>Measured (satellite)</span><span class="key-item"><span class="key-sw modelled" aria-hidden="true"></span>Modelled</span></p>
-            <figcaption><b>Figure 8.</b> The four measured and modelled links in the chain, from rainfall to lagoon turbidity.</figcaption>
+            <figcaption><b>Figure 6.</b> The four measured and modelled links in the chain, from rainfall to lagoon turbidity.</figcaption>
         </figure>
         <p>Table 3 compares wet and dry seasons for the units where the data can be read. Soil moisture is higher in the wet season in every unit. Dynamic World water is much higher in the dry season in every unit, including the floodplain units Z3 and Z4. In Z2 it averages {Z2_DW_DRY} km² in the dry season and {Z2_DW_WET} km² in the wet season; in Z1, {Z1_DW_DRY} km² and {Z1_DW_WET} km². Permanent water is masked out of the Dynamic World series, so it is unlikely to explain this contrast. Possible explanations include few usable wet-season images and dry-season misclassification. The study cannot separate them, so Dynamic World does not show wet-season flooding here.</p>
         <figure class="tablefig table-units" id="tab-3">

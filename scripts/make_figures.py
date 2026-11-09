@@ -34,7 +34,7 @@ _FONT_DIR = Path.home() / ".cache" / "ogun-fonts"  # Satoshi TTF from Fontshare,
 for _f in _FONT_DIR.glob("Satoshi-*.ttf"):
     _fm.fontManager.addfont(str(_f))
 _FAMILY = "Satoshi" if any(f.name == "Satoshi" for f in _fm.fontManager.ttflist) else "DejaVu Sans"
-plt.rcParams.update({"font.family": _FAMILY, "font.size": 10.5, "axes.linewidth": 0.6,
+plt.rcParams.update({"font.family": [_FAMILY, "DejaVu Sans"], "font.size": 10.5, "axes.linewidth": 0.6,
                      "axes.spines.top": False, "axes.spines.right": False})
 C_RAIN, C_SOIL, C_SAR, C_DW, C_NDTI = "#2d6cb0", "#3c8d6e", "#c0501a", "#7a5aa6", "#8a6d1f"
 
@@ -81,7 +81,7 @@ def fig3_association(diag):
                        ("Rain → inundation, one month later", "Rain -> floodplain SAR inundation (1-month lag, deseasonalized)"),
                        ("Soil moisture → inundation, same month", "Soil moisture -> floodplain SAR inundation (same month, deseasonalized)")):
         rows.append((label, "anomaly", fam[key]["spearman_rho"], fam[key]["p_value"]))
-    fig, ax = plt.subplots(figsize=(5.0, 4.8), dpi=200)
+    fig, ax = plt.subplots(figsize=(5.4, 5.0), dpi=200)
     y = np.arange(len(rows))[::-1]
     for yi, (lab, kind, rho, q) in zip(y, rows):
         colour = C_RAIN if q < 0.05 else "#9a9a9a"
@@ -95,7 +95,7 @@ def fig3_association(diag):
     ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=13)
     ax.grid(axis="x", color=RULE, lw=0.4)
     fig.subplots_adjust(left=0.56, right=0.97, bottom=0.2, top=0.97)
-    _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant")
+    _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant", size=8.5)
     return fig
 
 
@@ -185,11 +185,6 @@ def _carto(ax, bounds, bar=False, north=False, ticks=True, scale_km=20, step_km=
         ax.tick_params(length=2.5, width=0.5, colors="#222", pad=2)
         ax.set_xlabel("Easting, km (UTM 31N)", fontsize=fs + 0.5, color="#222", labelpad=2)
         ax.set_ylabel("Northing, km", fontsize=fs + 0.5, color="#222", labelpad=2)
-        # graticule drawn above the unit shading so it is visible: dotted lines at every tick
-        for x_ in xt:
-            ax.plot([x_, x_], [s_, n], color="#333333", lw=0.5, ls=(0, (1.5, 2)), alpha=0.7, zorder=4)
-        for y_ in yt:
-            ax.plot([w, e], [y_, y_], color="#333333", lw=0.5, ls=(0, (1.5, 2)), alpha=0.7, zorder=4)
     else:
         ax.set_xticks([]); ax.set_yticks([])
     halo = [pe.withStroke(linewidth=2, foreground="white")]
@@ -198,10 +193,9 @@ def _carto(ax, bounds, bar=False, north=False, ticks=True, scale_km=20, step_km=
         x0, y0 = w + 0.06 * (e - w), (n - 0.09 * (n - s_)) if bar_pos == "top" else (s_ + 0.06 * (n - s_))
         ax.add_patch(Rectangle((x0, y0), L / 2, h, fc="#111", ec="#111", lw=0.5, zorder=8))
         ax.add_patch(Rectangle((x0 + L / 2, y0), L / 2, h, fc="#fff", ec="#111", lw=0.5, zorder=8))
-        ax.text(x0, y0 + 1.6 * h, "0", ha="center", va="bottom", fontsize=fs, color="#111", zorder=9, path_effects=halo)
-        if fs >= 6:
-            ax.text(x0 + L / 2, y0 + 1.6 * h, f"{scale_km // 2}", ha="center", va="bottom", fontsize=fs, color="#111", zorder=9, path_effects=halo)
-        ax.text(x0 + L + 0.015 * (e - w), y0 + 1.6 * h, f"{scale_km} km", ha="left", va="bottom", fontsize=fs, color="#111", zorder=9, path_effects=halo)
+        ax.text(x0, y0 - 1.2 * h, "0", ha="center", va="top", fontsize=fs, color="#111", zorder=9, path_effects=halo)
+
+        ax.text(x0 + L + 0.015 * (e - w), y0 - 1.2 * h, f"{scale_km} km", ha="left", va="top", fontsize=fs, color="#111", zorder=9, path_effects=halo)
     if north:
         ww = 0.018 * (e - w); H = 0.075 * (n - s_)
         x = e - 0.07 * (e - w); top = n - 0.09 * (n - s_); base = top - H
@@ -221,6 +215,16 @@ def _unit_key(fig, y=0.005, ncol=5, fs=5.5):
 def _panel_letters(axes):
     for k, ax in enumerate(axes):
         ax.text(0.02, 0.97, f"({chr(97 + k)})", transform=ax.transAxes, ha="left", va="top", fontsize=7, fontweight="bold", color="#111", zorder=12)
+
+
+def _panel_title(ax, letter, head, vals, dec, fs=7.5):
+    """Panel title above the frame: letter and heading, then the unit values in order Z1 to Z5. Nothing is written
+    inside the map. vals maps zone to value (None = no value)."""
+    parts = []
+    for z in ("Z1", "Z2", "Z3", "Z4", "Z5"):
+        v = vals.get(z)
+        parts.append(f"{z} {v:.{dec}f}" if v is not None else f"{z} no value")
+    ax.set_title(f"({letter}) {head}\n" + "  ".join(parts), fontsize=fs, loc="left", color="#111", pad=4, linespacing=1.5)
 
 
 def _label(ax, z, c, txt, x_out, fs=8):
@@ -257,11 +261,7 @@ def fig_study_map_print():
         t = (rain[z] - lo) / max(hi - lo, 1e-9)
         ax.add_patch(MPoly(ring, closed=True, facecolor=cmap(0.25 + 0.6 * t), alpha=0.6, edgecolor=role[z], lw=1.2, zorder=3,
                            linestyle="--" if z == "Z5" else "-"))
-        c = ring.mean(axis=0)
-        if z == "Z5":
-            _label(ax, z, c, z, ring[:, 0].max() + 0.12 * (bounds[1] - bounds[0]), fs=8)
-        else:
-            ax.text(c[0], c[1], z, ha="center", va="center", fontsize=8, fontweight="bold", zorder=4, color="#111", path_effects=[pe_halo()])
+        pass
     _carto(ax, bounds, bar=True, north=True, ticks=True, scale_km=20, step_km=20, fs=6)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(lo, hi))
     cb = fig.colorbar(sm, ax=ax, fraction=0.05, pad=0.03, shrink=0.55)
@@ -294,8 +294,8 @@ def fig_seasonal_maps():
     rings = _utm_rings(gj)
     bounds = _utm_bounds(rings)
     x_out = max(r[:, 0].max() for _, r in rings) + 0.08 * (bounds[1] - bounds[0])
-    fig, axes = plt.subplots(3, 2, figsize=(5.8, 8.6), dpi=220)
-    fig.subplots_adjust(left=0.13, right=0.84, top=0.91, bottom=0.13, wspace=0.07, hspace=0.1)
+    fig, axes = plt.subplots(3, 2, figsize=(6.0, 9.4), dpi=220)
+    fig.subplots_adjust(left=0.13, right=0.84, top=0.93, bottom=0.11, wspace=0.07, hspace=0.36)
     for r, (var, row_label, cmap_name, cb_label) in enumerate(rows):
         vals = [seas[z][var][k] for z in seas for k, _ in cols if seas[z].get(var, {}).get(k) is not None]
         lo, hi = min(vals), max(vals)
@@ -307,15 +307,13 @@ def fig_seasonal_maps():
                 v = seas[z].get(var, {}).get(key)
                 fc = cmap(0.15 + 0.75 * norm(v)) if v is not None else "#d9d9d3"
                 ax.add_patch(MPoly(ring, closed=True, facecolor=fc, edgecolor="#1a1a1a", lw=1.1, linestyle="--" if z == "Z5" else "-", zorder=3))
-                cen = ring.mean(axis=0)
-                txt = z if v is None else (f"{z}  {v:.{dec}f}" if z in ("Z3", "Z4", "Z5") else f"{z}\n{v:.{dec}f}")
-                _label(ax, z, cen, txt, x_out, fs=7.5)
+                pass
             _carto(ax, bounds, bar=(r == 2 and c_ == 0), north=(r == 0 and c_ == 0), ticks=True, scale_km=20, step_km=40, fs=6, bar_pos="bottom")
             ax.set_xlim(bounds[0], x_out + 0.6 * (bounds[1] - bounds[0]))
             if c_ != 0: ax.set_yticklabels([]); ax.set_ylabel("")
             if r != 2: ax.set_xticklabels([]); ax.set_xlabel("")
-            ax.text(0.03, 0.97, f"({chr(97 + 2 * r + c_)})", transform=ax.transAxes, ha="left", va="top", fontsize=7, fontweight="bold", color="#111", zorder=12)
-            if r == 0: ax.set_title(col_label, fontsize=7.5, color="#111", pad=4)
+            vals_here = {z: seas[z].get(var, {}).get(key) for z in seas}
+            _panel_title(ax, chr(97 + 2 * r + c_), col_label, vals_here, dec, fs=7.5)
             if c_ == 0: ax.set_ylabel(row_label, fontsize=7.5, color="#111", labelpad=4)
         pos = axes[r][1].get_position()
         cax = fig.add_axes([pos.x1 + 0.025, pos.y0, 0.018, pos.height])
@@ -344,12 +342,10 @@ def fig_unit_landcover_maps():
             v = vals.get(z)
             fc = cmap(0.1 + 0.75 * norm(v)) if v is not None else "#e9e9e4"
             ax.add_patch(MPoly(ring, closed=True, facecolor=fc, edgecolor="#3d3d3d", lw=0.7, linestyle="--" if z == "Z5" else "-"))
-            c = ring.mean(axis=0)
-            txt = z if v is None else (f"{z}  {v:.1f}%" if z in ("Z3", "Z4", "Z5") else f"{z}\n{v:.1f}%")
-            _label(ax, z, c, txt, x_out, fs=7.5)
+            pass
         _carto(ax, bounds, bar=(k == 0), north=(k == 0), ticks=(k == 0), scale_km=20, step_km=40, fs=6, bar_pos="bottom")
         ax.set_xlim(bounds[0], x_out + 0.6 * (bounds[1] - bounds[0]))
-        ax.set_title(title, fontsize=7.5, loc="left", color="#111")
+        _panel_title(ax, "ab"[k], title.replace(" of unit area, %", ", % of unit area"), {z: vals.get(z) for z in ("Z1", "Z2", "Z3", "Z4", "Z5")}, 1, fs=7.5)
     fig.subplots_adjust(left=0.1, right=0.98, top=0.9, bottom=0.2, wspace=0.14)
     _panel_letters(axes)
     _unit_key(fig, y=0.02)
@@ -377,8 +373,8 @@ def _seasonal_phone():
     cols = [("wet_mean", "Wet season (April-October)"), ("dry_mean", "Dry season (November-March)")]
     rings = _utm_rings(gj); bounds = _utm_bounds(rings)
     x_out = max(r[:, 0].max() for _, r in rings) + 0.08 * (bounds[1] - bounds[0])
-    fig, axes = plt.subplots(6, 1, figsize=(3.9, 12.4), dpi=220)
-    fig.subplots_adjust(left=0.2, right=0.8, top=0.97, bottom=0.1, hspace=0.22)
+    fig, axes = plt.subplots(6, 1, figsize=(3.9, 15.5), dpi=220)
+    fig.subplots_adjust(left=0.2, right=0.8, top=0.975, bottom=0.075, hspace=0.42)
     for r, (var, row_label, cmap_name, cb_label) in enumerate(rows):
         vals = [seas[z][var][k] for z in seas for k, _ in cols if seas[z].get(var, {}).get(k) is not None]
         lo, hi = min(vals), max(vals)
@@ -390,12 +386,10 @@ def _seasonal_phone():
                 v = seas[z].get(var, {}).get(key)
                 fc = cmap(0.15 + 0.75 * norm(v)) if v is not None else "#d9d9d3"
                 ax.add_patch(MPoly(ring, closed=True, facecolor=fc, edgecolor="#1a1a1a", lw=1.1, linestyle="--" if z == "Z5" else "-", zorder=3))
-                cen = ring.mean(axis=0)
-                txt = z if v is None else (f"{z}  {v:.{dec}f}" if z in ("Z3", "Z4", "Z5") else f"{z}\n{v:.{dec}f}")
-                _label(ax, z, cen, txt, x_out, fs=8)
+                pass
             _carto(ax, bounds, bar=(r == 0 and c_ == 0), north=(r == 0 and c_ == 0), ticks=(r == 2 and c_ == 1), scale_km=20, step_km=40, fs=6.5, bar_pos="bottom")
             ax.set_xlim(bounds[0], x_out + 0.6 * (bounds[1] - bounds[0]))
-            ax.set_title(f"({chr(97 + 2 * r + c_)}) {col_label}", fontsize=8, loc="left", color="#111", pad=3)
+            _panel_title(ax, chr(97 + 2 * r + c_), col_label, {z: seas[z].get(var, {}).get(key) for z in seas}, dec, fs=7.5)
             if not (r == 2 and c_ == 1):
                 ax.set_xticklabels([]); ax.set_yticklabels([]); ax.set_xlabel(""); ax.set_ylabel("")
         if r == 0 or True:
@@ -426,12 +420,10 @@ def _landcover_phone():
             v = vals.get(z)
             fc = cmap(0.1 + 0.75 * norm(v)) if v is not None else "#e9e9e4"
             ax.add_patch(MPoly(ring, closed=True, facecolor=fc, edgecolor="#1a1a1a", lw=1.1, linestyle="--" if z == "Z5" else "-", zorder=3))
-            c = ring.mean(axis=0)
-            txt = z if v is None else (f"{z}  {v:.1f}%" if z in ("Z3", "Z4", "Z5") else f"{z}\n{v:.1f}%")
-            _label(ax, z, c, txt, x_out, fs=8)
+            pass
         _carto(ax, bounds, bar=(k == 1), north=(k == 0), ticks=(k == 1), scale_km=20, step_km=40, fs=6.5, bar_pos="bottom")
         ax.set_xlim(bounds[0], x_out + 0.6 * (bounds[1] - bounds[0]))
-        ax.set_title(f"({chr(97 + k)}) {title}", fontsize=8, loc="left", color="#111", pad=3)
+        _panel_title(ax, chr(97 + k), title.replace(" of unit area, %", ", % of unit area"), {z: vals.get(z) for z in ("Z1", "Z2", "Z3", "Z4", "Z5")}, 1, fs=7.5)
         if k == 0:
             ax.set_xticklabels([]); ax.set_xlabel("")
     _unit_key(fig, y=0.003, ncol=2, fs=7)
