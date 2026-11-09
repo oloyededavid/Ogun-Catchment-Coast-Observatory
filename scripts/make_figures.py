@@ -41,10 +41,10 @@ def _compiler():
     return mod
 
 
-def _source(fig, text):
+def _source(fig, text, size=6.5, color=None):
     import textwrap
     lines = textwrap.wrap(f"Source: {text}", width=105)
-    fig.text(0.02, 0.012, "\n".join(lines), fontsize=6.5, color=INK2, va="bottom", linespacing=1.3)
+    fig.text(0.02, 0.012, "\n".join(lines), fontsize=size, color=color or INK2, va="bottom", linespacing=1.3)
 
 
 def fig2_series(df):
@@ -124,20 +124,24 @@ def fig4_scatter(comp, anom):
 
 def fig_study_map_print():
     """Print version of the study-area map: units coloured by mean rainfall, terrain and land cover as context,
-    with legend, scale bar and north arrow. The live map is the interactive version on the page."""
+    with legends, scale bar and north arrow. The live map is the interactive version on the page."""
     import matplotlib.image as mpimg
-    from matplotlib.patches import Polygon as MPoly
+    import matplotlib.patheffects as pe
+    from matplotlib.patches import Patch, Polygon as MPoly
     gj = json.loads((DATA / "ogun_subbasins.geojson").read_text())
     units = json.loads((DATA / "unit_summary.json").read_text())["units"]
     rj = json.loads((DATA / "rasters" / "rasters.json").read_text())
+    names = {"Z1": "Upper Ogun headwaters", "Z2": "Oyan–Ofiki tributary", "Z3": "Middle Ogun mainstem",
+             "Z4": "Lower Ogun alluvial corridor", "Z5": "Lagoon zone (outside catchment)"}
     b = rj["bounds"]
     extent = (b["west"], b["east"], b["south"], b["north"])
-    fig, ax = plt.subplots(figsize=(6.0, 6.4), dpi=220)
+    fig, ax = plt.subplots(figsize=(6.0, 7.4), dpi=220)
     ax.imshow(mpimg.imread(DATA / "rasters" / "terrain.png"), extent=extent, alpha=0.55, zorder=1)
     ax.imshow(mpimg.imread(DATA / "rasters" / "landcover.png"), extent=extent, alpha=0.5, zorder=2)
     rain = {z: units[z]["rain"]["mean"] for z in units}
     lo, hi = min(rain.values()), max(rain.values())
     cmap = plt.get_cmap("Blues")
+    halo = [pe.withStroke(linewidth=3, foreground="white")]
     for f in gj["features"]:
         z = f["properties"]["zone_id"]
         ring = np.array(f["geometry"]["coordinates"][0]) if f["geometry"]["type"] == "Polygon" else np.array(f["geometry"]["coordinates"][0][0])
@@ -145,26 +149,44 @@ def fig_study_map_print():
         ax.add_patch(MPoly(ring, closed=True, facecolor=cmap(0.25 + 0.6 * t), alpha=0.6, edgecolor=f["properties"]["role_color"], lw=1.6, zorder=3,
                            linestyle="--" if z == "Z5" else "-"))
         c = ring.mean(axis=0)
-        ax.text(c[0], c[1], z, ha="center", va="center", fontsize=11, fontweight="bold", zorder=4,
-                bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1.5))
+        if z == "Z5":
+            # outside the catchment: label with a leader line to the right of the zone
+            tx = ring[:, 0].max() + 0.07 * (extent[1] - extent[0])
+            ax.annotate(z, xy=(c[0], c[1]), xytext=(tx, c[1]), ha="left", va="center", fontsize=10, fontweight="bold",
+                        zorder=4, path_effects=halo, arrowprops=dict(arrowstyle="-", color="#222", lw=0.8))
+        else:
+            ax.text(c[0], c[1], z, ha="center", va="center", fontsize=11, fontweight="bold", zorder=4, color="#111", path_effects=halo)
     ax.set_xlim(extent[0], extent[1]); ax.set_ylim(extent[2], extent[3])
     ax.set_aspect(1 / np.cos(np.radians((extent[2] + extent[3]) / 2)))
-    ax.set_xlabel("Longitude (°E), WGS 84", fontsize=10); ax.set_ylabel("Latitude (°N)", fontsize=10)
-    ax.tick_params(labelsize=9); ax.grid(color="#ffffff", lw=0.6, alpha=0.6)
+    ax.set_xlabel("Longitude (°E), WGS 84", fontsize=9, color="#222"); ax.set_ylabel("Latitude (°N)", fontsize=9, color="#222")
+    ax.tick_params(labelsize=8, colors="#222"); ax.grid(color="#ffffff", lw=0.6, alpha=0.6)
     # scale bar (20 km) and north arrow
     km_deg = 1 / (111.32 * np.cos(np.radians((extent[2] + extent[3]) / 2)))
-    x0, y0 = extent[0] + 0.08 * (extent[1] - extent[0]), extent[2] + 0.06 * (extent[3] - extent[2])
+    x0, y0 = extent[0] + 0.08 * (extent[1] - extent[0]), extent[2] + 0.05 * (extent[3] - extent[2])
     ax.plot([x0, x0 + 20 * km_deg], [y0, y0], color="#111", lw=3, solid_capstyle="butt", zorder=5)
-    ax.text(x0 + 10 * km_deg, y0 + 0.012, "20 km", ha="center", fontsize=9, zorder=5)
+    ax.text(x0 + 10 * km_deg, y0 + 0.02 * (extent[3] - extent[2]), "20 km", ha="center", va="bottom", fontsize=8.5, color="#111",
+            zorder=5, path_effects=halo)
     ax.annotate("N", xy=(extent[1] - 0.08 * (extent[1] - extent[0]), extent[3] - 0.04 * (extent[3] - extent[2])),
                 xytext=(extent[1] - 0.08 * (extent[1] - extent[0]), extent[3] - 0.12 * (extent[3] - extent[2])),
                 ha="center", fontsize=11, fontweight="bold", arrowprops=dict(arrowstyle="-|>", color="#111", lw=1.5), zorder=5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(lo, hi))
-    cb = fig.colorbar(sm, ax=ax, fraction=0.04, pad=0.02, shrink=0.7)
-    cb.set_label("Mean rainfall, mm per month (2019–2024)", fontsize=9); cb.ax.tick_params(labelsize=8)
-    ax.set_title("Ogun catchment and lagoon zone: units, mean rainfall, terrain and land cover", fontsize=11, loc="left")
-    fig.subplots_adjust(left=0.1, right=0.9, top=0.93, bottom=0.17)
-    _source(fig, f"Unit boundaries: WWF HydroBASINS level 9 (Z1–Z4), Z5 lagoon zone; rainfall: CHIRPS via Google Earth Engine; terrain: Copernicus DEM GLO-30 and land cover: ESA WorldCover 2021 (accuracy for Africa {rj['landcover']['accuracy_africa_pct']}%), via Microsoft Planetary Computer")
+    cb = fig.colorbar(sm, ax=ax, fraction=0.04, pad=0.02, shrink=0.6)
+    cb.set_label("Mean rainfall, mm per month (2019–2024)", fontsize=8.5, color="#222"); cb.ax.tick_params(labelsize=8, colors="#222")
+    # legend: units with names, terrain, and land-cover classes present in the catchment
+    role = {f["properties"]["zone_id"]: f["properties"]["role_color"] for f in gj["features"]}
+    handles = [Patch(facecolor=cmap(0.25 + 0.6 * ((rain[z] - lo) / max(hi - lo, 1e-9))), alpha=0.6,
+                     edgecolor=role[z], lw=1.2, label=f"{z}  {names[z]}")
+               for z in ["Z1", "Z2", "Z3", "Z4", "Z5"]]
+    handles.append(Patch(facecolor="#d9d4c4", edgecolor="#8a7f66", label=f"Terrain: hillshade, elevation {rj['terrain']['elevation_min_m']:.0f}–{rj['terrain']['elevation_max_m']:.0f} m"))
+    for lc in rj["landcover"]["legend"]:
+        handles.append(Patch(facecolor=lc["colour"], edgecolor="#555", lw=0.4, label=f"Land cover: {lc['label']} ({lc['share_pct']:.1f}%)"))
+    ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.0, -0.12), ncol=2, fontsize=7.5, frameon=False,
+              handlelength=1.4, columnspacing=1.2, labelcolor="#222")
+    ax.set_title("Ogun catchment and lagoon zone, 2019–2024: units by mean rainfall, with terrain and land cover (WorldCover 2021)",
+                 fontsize=9.5, loc="left", color="#111")
+    fig.subplots_adjust(left=0.1, right=0.9, top=0.94, bottom=0.36)
+    _source(fig, f"Unit boundaries: WWF HydroBASINS level 9 (Z1–Z4), Z5 lagoon zone; rainfall: CHIRPS via Google Earth Engine; terrain: Copernicus DEM GLO-30 and land cover: ESA WorldCover 2021 (accuracy for Africa {rj['landcover']['accuracy_africa_pct']}%), via Microsoft Planetary Computer",
+            size=7.5, color="#222")
     return fig
 
 
