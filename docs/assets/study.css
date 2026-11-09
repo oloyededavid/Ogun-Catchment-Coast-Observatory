@@ -268,7 +268,7 @@
 .band-id { font-size: 24px; font-weight: 700; }
 .band-name { font-size: 15px; }
 .band-val { font-size: 14px; opacity: .9; }
-.band-seg:last-child::after { content: "Lagoon"; position: absolute; right: 10px; bottom: 10px; font-size: 13px; opacity: .8; }
+.band-seg:last-child::after { content: "Lagoon"; position: absolute; right: 10px; bottom: 10px; font-size: 14px; opacity: .8; }
 @media (max-width: 760px) {
     .band { flex-direction: column; height: auto; min-height: 520px; }
     .band-seg { min-width: 0; min-height: 84px; flex-basis: auto; border-right: 0; border-bottom: 2px solid #fff; flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 12px; }
@@ -317,7 +317,7 @@ img, svg { height: auto; }
 .react.pop { animation: react-pop 0.35s ease; }
 @keyframes react-pop { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
 .react-status { font-size: 15px; color: #1d4f85; }
-.meta-row { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 24px 0 0; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #6b6b6b; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 24px 0 0; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: #6b6b6b; }
 .meta-row [hidden] { display: none; }
 .sec-no { color: #6b6b6b; font-variant-numeric: tabular-nums; margin-right: 6px; }
 @media (prefers-reduced-motion: reduce) { .react.pop { animation: none; } }
@@ -333,9 +333,9 @@ img, svg { height: auto; }
 .band-rain { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 .band-live { display: block; font-size: 14px; margin-top: 6px; font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { .band-water { transition: none; } }
-.sig-meta { display: inline-flex; gap: 18px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; color: #6b6b6b; }
+.sig-meta { display: inline-flex; gap: 18px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 14px; color: #6b6b6b; }
 .sig-meta [hidden] { display: none; }
-.band-live { white-space: normal; overflow-wrap: anywhere; font-size: 13px; }
+.band-live { white-space: normal; overflow-wrap: anywhere; font-size: 14px; }
 .band-live { font-size: 14px; }
 /* Touch targets: at least 44 px tall at every width */
 .map-btn, #copy-cite, .btn-quiet, .band-play, .preview-pause, .react, .fb-btn, #share-view { min-height: 44px; }
@@ -356,7 +356,7 @@ img, svg { height: auto; }
 /* Unit labels on the interactive map: larger, lighter halo */
 .unit-label { font-size: 15px; font-weight: 700; color: #111; text-shadow: 0 0 2px rgba(255,255,255,.55), 0 0 1px rgba(255,255,255,.4); background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
 .unit-label.z5 { font-size: 15px; background: rgba(255,255,255,.85) !important; padding: 1px 5px !important; border-radius: 4px; }
-@media (max-width: 480px) { .unit-label { display: block !important; font-size: 13px; } }
+@media (max-width: 480px) { .unit-label { display: block !important; font-size: 14px; } }
 /* Header: the Explorer is a separate page, so it is an outlined button, not a section highlight */
 .toc a.toc-ex { color: #1d4f85; border: 1px solid #c9dcf2; border-radius: 999px; padding: 5px 12px; margin-left: 6px; }
 .toc a.toc-ex:hover { background: #eef4fd; }
@@ -388,7 +388,7 @@ header.title { border-bottom: 0; }
 .pipeline { list-style: none; counter-reset: step; margin: 22px 0 8px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
 .pipeline li { position: relative; border: 1px solid #c8d8ec; border-radius: 12px; padding: 14px 14px 16px; background: #f6f9fd; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.45; color: #222; }
 .pipeline li:not(:last-child)::after { content: "→"; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: #1d4f85; font-size: 18px; background: #fff; }
-.pipeline .pl-n { width: 26px; height: 26px; border-radius: 50%; background: #1d4f85; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+.pipeline .pl-n { width: 26px; height: 26px; border-radius: 50%; background: #1d4f85; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
 .pipeline strong { font-size: 16px; color: #111; }
 .js-reveal .pipeline li { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
 .js-reveal .pipeline.in li { opacity: 1; transform: none; }
@@ -454,11 +454,14 @@ header.title { border-bottom: 0; }
 .to-top.is-visible { opacity: 1; pointer-events: auto; }
 .to-top:hover { transform: translateY(-2px); }
 .to-top:focus-visible { outline: 2px solid #1d4f85; outline-offset: 3px; }
+/* small text: a 14 px floor across the study pages */
+.article small, .article .small, .article figcaption, .article .sig, .article .keywords, .article .legend-source { font-size: 14px; }
+/* the explorer's back link sits at the same size as the header buttons */
+.back-link { min-height: 34px; }
+
 /* Scroll-in for each block: rises and fades in, staggered within its section */
 .js-reveal .rv { opacity: 0; transform: translateY(26px); transition: opacity 0.75s ease, transform 0.75s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0s); }
 .js-reveal .rv.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .js-reveal .rv { opacity: 1; transform: none; transition: none; } }
-
-/* the explorer's back link sits at the same size as the header buttons */
-.back-link { min-height: 34px; }
-
+/* Study-area map: no flat grey panel behind the map, so the basemap (topographic) shows through as on the explorer */
+.study-map { background: #ffffff; }
