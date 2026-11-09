@@ -55,7 +55,7 @@
     host.addEventListener('click', e => { if (e.target.closest('.leaflet-control-zoom')) userMoved = true; });
     if ('ResizeObserver' in window) new ResizeObserver(() => {
         map.invalidateSize();
-        if (!userMoved && layer) map.fitBounds(layer.getBounds(), { padding: [18, 18] });
+        if (!userMoved && layer) map.fitBounds(layer.getBounds(), { padding: mapPad() });
     }).observe(host);
     L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
     const north = L.control({ position: 'topright' });
@@ -91,6 +91,8 @@
     };
     let labelLayers = [];
     let titleCtl = null;
+    // leave room at the bottom for the attribution on narrow screens so it does not cover the lagoon zone
+    const mapPad = () => (host.clientWidth < 600 ? [18, 56] : [18, 18]);
 
     function valuesFor(v) {
         const catch4 = geo.features.filter(f => f.properties.zone_id !== 'Z5').map(f => VARS[v].key(units[f.properties.zone_id] || {})).filter(x => typeof x === 'number');
@@ -215,7 +217,7 @@
                 .setLatLng([pt[1], pt[0]]).setContent(id);
             tt.addTo(map); labelLayers.push(tt);
         });
-        map.fitBounds(layer.getBounds(), { padding: [18, 18] });
+        map.fitBounds(layer.getBounds(), { padding: mapPad() });
         if (!titleCtl) {
             titleCtl = L.control({ position: 'topleft' });
             titleCtl.onAdd = () => { const d = L.DomUtil.create('div', 'map-title'); d.id = 'map-title'; return d; };
@@ -251,5 +253,5 @@
 
     buttons.forEach(b => b.addEventListener('click', () => { if (geo) draw(b.dataset.var); }));
     [ctxTerrain, ctxLand].forEach(c => c && c.addEventListener('change', () => { if (geo) { drawContext(); draw(current); } }));
-    window.addEventListener('resize', () => { map.invalidateSize(); if (layer) map.fitBounds(layer.getBounds(), { padding: [18, 18] }); });
+    window.addEventListener('resize', () => { map.invalidateSize(); if (layer) map.fitBounds(layer.getBounds(), { padding: mapPad() }); });
 })();

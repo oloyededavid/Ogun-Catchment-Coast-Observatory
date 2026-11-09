@@ -95,12 +95,18 @@ def schematic(units: dict, areas: dict) -> str:
     items = []
     for z in zones:
         txt_colour = "#fff" if (rain[z] - lo) / (hi - lo or 1) > 0.55 else "#111"
-        items.append(f'<li class="band-seg u{z[1]}" style="flex-grow:{areas[z]:.1f};background:{colour(rain[z])};color:{txt_colour}">'
+        items.append(f'<li class="band-seg u{z[1]}" data-zone="{z}" style="flex-grow:{areas[z]:.1f};background:{colour(rain[z])};color:{txt_colour}"><span class="band-water" aria-hidden="true"></span><canvas class="band-rain" aria-hidden="true"></canvas>'
                      f'<span class="band-id">{z}</span>'
                      f'<span class="band-name">{labels[z]}</span>'
                      f'<span class="band-val">{areas[z]:,.0f} km²</span>'
                      f'<span class="band-val">{rain[z]:.0f} mm/month</span></li>')
-    return ('<ol class="band" aria-label="Catchment-to-coast band: units from headwaters Z1 to lagoon Z5, width proportional to area">'
+    controls = ('<div class="band-controls">'
+                '<button type="button" class="band-play" id="band-play" aria-pressed="true">Pause</button>'
+                '<input type="range" id="band-month" min="0" value="0" aria-label="Month">'
+                '<output id="band-month-label" for="band-month" aria-live="off"></output>'
+                '<span class="band-status" id="band-status" role="status"></span>'
+                '</div>')
+    return (controls + '<ol class="band" aria-label="Catchment-to-coast band: units from headwaters Z1 to lagoon Z5, width proportional to area">'
             + "".join(items) + '</ol>')
 
 

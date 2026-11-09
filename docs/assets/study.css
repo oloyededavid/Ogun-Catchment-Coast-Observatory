@@ -321,3 +321,26 @@ img, svg { height: auto; }
 .meta-row [hidden] { display: none; }
 .sec-no { color: #6b6b6b; font-variant-numeric: tabular-nums; margin-right: 6px; }
 @media (prefers-reduced-motion: reduce) { .react.pop { animation: none; } }
+/* Figure 2 monthly rainfall animation */
+.band-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 14px 0 0; font-size: 15px; }
+.band-play { min-height: 44px; padding: 8px 16px; border: 1px solid #1d4f85; border-radius: 999px; background: #fff; color: #1d4f85; font: inherit; cursor: pointer; }
+.band-play:hover { background: #eef4fc; }
+.band-play:focus-visible, #band-month:focus-visible { outline: 2px solid #1d4f85; outline-offset: 3px; }
+#band-month { flex: 1 1 220px; min-width: 160px; accent-color: #1d4f85; }
+#band-month-label { font-variant-numeric: tabular-nums; min-width: 6.5em; color: #111; }
+.band-status { flex-basis: 100%; font-size: 14px; color: #555; }
+.band-seg { position: relative; overflow: hidden; }
+.band-seg > *:not(.band-water):not(.band-rain) { position: relative; z-index: 2; }
+.band-water { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: rgba(29, 79, 133, 0.22); transition: height 0.7s ease; z-index: 1; }
+.band-rain { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.band-live { display: block; font-size: 14px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .band-water { transition: none; } }
+.sig-meta { display: inline-flex; gap: 18px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; color: #6b6b6b; }
+.sig-meta [hidden] { display: none; }
+.band-live { white-space: normal; overflow-wrap: anywhere; font-size: 13px; }
+.band-live { font-size: 14px; }
+/* Touch targets: at least 44 px tall at every width */
+.map-btn, #copy-cite, .btn-quiet, .band-play, .preview-pause, .react, .fb-btn, #share-view { min-height: 44px; }
+.map-btn, #copy-cite, .btn-quiet, .band-play, .preview-pause, .react, .fb-btn { display: inline-flex; align-items: center; }
+/* Header navigation: the section in view */
+.toc a.is-current { background: #eef4fd; color: #1d4f85; border-radius: 10px; }

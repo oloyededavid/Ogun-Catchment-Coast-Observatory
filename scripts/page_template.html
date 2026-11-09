@@ -171,7 +171,7 @@
             <div class="chart-box" data-series="dw" aria-label="Dynamic World flooding, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of monthly Dynamic World flooding, 2019 to 2024"></canvas></div>
             <div class="chart-box" data-series="ndti" aria-label="Lagoon turbidity, monthly, 2019 to 2024"><canvas role="img" aria-label="Line chart of monthly lagoon turbidity, 2019 to 2024"></canvas></div>
         </div>
-        <noscript><img src="assets/figures/fig2_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity"></noscript>
+        <noscript><img src="assets/figures/fig3_series.png" width="1200" height="1480" loading="lazy" alt="Five stacked time series, January 2019 to December 2024: catchment rainfall, soil moisture, radar inundation index, Dynamic World flooding and lagoon turbidity"></noscript>
         <figcaption><b>Figure 3.</b> Monthly catchment series, 2019 to 2024. Gaps are missing months.</figcaption>
     </figure>
 
@@ -180,7 +180,7 @@
         <p>On raw monthly values, rainfall and radar inundation are negatively associated two months apart: rain two months earlier goes with less flooding now (ρ = {SEAS2_RHO}, q = {SEAS2_Q}). A one-month lag is borderline (ρ = {SEAS1_RHO}, q = {SEAS1_Q}). Soil moisture and flooding in the same month show a negative association too (ρ = {SM_RHO}, q = {SM_Q}). Two series that followed the same annual cycle would correlate positively; these correlations are negative. The most likely reading is that dry-season radar detections drive them, which would be an artefact rather than a hydrological link. Once the seasonal cycle is removed, none of them is significant (Figure 4). The seasonal relationships are therefore not evidence that rainfall drives flooding.</p>
     </section>
     <figure class="wide reveal" id="fig-assoc">
-        <img class="fig-small" src="assets/figures/fig3_association.png" width="1200" height="880" loading="lazy" alt="Dot plot of Spearman correlation between rainfall, soil moisture and inundation, on raw values and on anomalies, with q values">
+        <img class="fig-small" src="assets/figures/fig4_association.png" width="1200" height="880" loading="lazy" alt="Dot plot of Spearman correlation between rainfall, soil moisture and inundation, on raw values and on anomalies, with q values">
         <figcaption><b>Figure 4.</b> Spearman ρ between rainfall or soil moisture and radar inundation. Raw values (hollow markers) carry q from a correction across the three lags of each pair. Anomalies (filled markers) carry q from the correction across the five headline relationships. Blue: significant; grey: not significant.</figcaption>
     </figure>
 
@@ -195,19 +195,19 @@
         <p>Lagoon turbidity and radar inundation anomalies are positively associated (ρ = {NDTI_RHO}, q = {NDTI_Q}), the largest association among the headline relationships, but not significant after correction. The radar index ranks months like Dynamic World over the seasonal cycle (ρ = {DW_SEAS_RHO}), but not in anomalies (ρ = {DW_ANOM_RHO}, q = {DW_ANOM_Q}). Its values are far smaller than the optical extent, so it should be read as a relative measure, not as an area (Figure 3).</p>
     </section>
     <figure class="wide reveal" id="fig-scatter">
-        <img class="fig-small" src="assets/figures/fig4_scatter.png" width="1200" height="660" loading="lazy" alt="Two scatter plots of monthly anomalies: radar inundation against lagoon turbidity, and radar inundation against Dynamic World flooding">
+        <img class="fig-small" src="assets/figures/fig5_scatter.png" width="1200" height="660" loading="lazy" alt="Two scatter plots of monthly anomalies: radar inundation against lagoon turbidity, and radar inundation against Dynamic World flooding">
         <figcaption><b>Figure 5.</b> Monthly anomalies. Left: radar inundation against lagoon turbidity. Right: radar inundation against the Dynamic World flooding reference. Each point is one month with both values.</figcaption>
     </figure>
 
         <p>Figure 6 maps the wet- and dry-season means for each unit. The colour scale is shared by the two seasons within each variable, so the panels can be compared directly.</p>
-        <figure class="wide reveal fig-scroll" id="fig-seasonal">
-        <img src="assets/figures/study_seasonal_maps.png" width="1867" height="1446" loading="lazy" alt="Six maps of the five units: wet-season and dry-season means of rainfall, soil moisture and Dynamic World water">
-        <figcaption><b>Figure 6.</b> Wet-season (April–October) and dry-season (November–March) means by unit, 2019–2024, for rainfall, soil moisture and Dynamic World water. Each map has its own colour scale; the values shown are the unit means.</figcaption>
+        <figure class="wide reveal" id="fig-seasonal">
+        <picture><source media="(max-width: 760px)" srcset="assets/figures/study_seasonal_maps_phone.png"><img src="assets/figures/study_seasonal_maps.png" width="1867" height="1446" loading="lazy" alt="Six maps of the five units: wet-season and dry-season means of rainfall, soil moisture and Dynamic World water"></picture>
+        <figcaption><b>Figure 6.</b> Wet-season (April–October) and dry-season (November–March) means by unit, 2019–2024, for rainfall, soil moisture and Dynamic World water. Each map has its own colour scale. Z5 is the lagoon zone, outside the catchment (dashed); grey means no valid value. Source: seasonal means of the unit values in docs/data/unit_summary.json.</figcaption>
     </figure>
 
         <p>Figure 7 maps two land-cover shares per unit. Built-up surfaces shed more rain as runoff than vegetated ground, and cropland is where land use has changed. Both are shares of each unit’s area from the 2021 land-cover map.</p>
         <figure class="wide reveal" id="fig-landcover">
-        <img src="assets/figures/study_landcover_maps.png" width="1541" height="1051" loading="lazy" alt="Two maps of the units: built-up share and cropland share of each unit’s area, 2021">
+        <picture><source media="(max-width: 760px)" srcset="assets/figures/study_landcover_maps_phone.png"><img src="assets/figures/study_landcover_maps.png" width="1541" height="1051" loading="lazy" alt="Two maps of the units: built-up share and cropland share of each unit’s area, 2021"></picture>
         <figcaption><b>Figure 7.</b> Built-up and cropland shares of each unit’s area, from ESA WorldCover 2021. Z5 is the lagoon zone, outside the catchment, and is not included.</figcaption>
     </figure>
 
@@ -313,7 +313,6 @@
             </div>
             <span class="react-status" id="react-status" role="status"></span>
         </div>
-        <p class="meta-row"><span>Version 0.3</span><span id="views" hidden></span></p>
     </section>
 
     <section id="references" aria-labelledby="h-refs">
@@ -332,7 +331,7 @@
 
 <footer>
     <div class="inner">
-        <p class="sig"><span>David Oloyede</span><span><a href="https://github.com/oloyededavid">github.com/oloyededavid</a></span><span>Last updated <time datetime="{ISO_DATE}">{PRINT_DATE}</time></span></p>
+        <p class="sig"><span>David Oloyede</span><span><a href="https://github.com/oloyededavid">github.com/oloyededavid</a></span><span>Last updated <time datetime="{ISO_DATE}">{PRINT_DATE}</time></span><span class="sig-meta"><span>Version 1.3</span><span id="views" hidden></span></span></p>
         <p>Code MIT, derived data CC BY 4.0. Source data keep their own terms: CHIRPS (Climate Hazards Center, UC Santa Barbara), ERA5-Land (Copernicus), Sentinel-1 and Sentinel-2 (Copernicus), Dynamic World (Google and World Resources Institute), HydroBASINS (WWF / HydroSHEDS).</p>
         <p>Other studies: <a href="https://oloyededavid.github.io/Oueme-Ogun-Groundwater-Recharge/">Ouémé–Ogun water balance</a> · <a href="https://oloyededavid.github.io/Lagos-Urban-Heat-Analytics/">Lagos Urban Heat and Exposure Analytics</a></p>
     </div>
@@ -341,6 +340,7 @@
 <script src="assets/study-map.js"></script>
 <script src="assets/study-motion.js"></script>
 <script src="assets/study-feedback.js"></script>
+<script src="assets/study-band.js"></script>
 <script src="vendor/chartjs-4.4.1/chart.umd.min.js"></script>
 <script src="assets/study-charts.js"></script>
 <script src="assets/study-preview.js"></script>
