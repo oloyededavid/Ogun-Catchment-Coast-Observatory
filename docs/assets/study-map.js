@@ -28,7 +28,7 @@
         ndti: { label: 'Lagoon turbidity (NDTI)', unit: 'uncalibrated index, Z5 only', ramp: ['#e4eef3', '#1f4e5f'], key: u => u.ndti && u.ndti.mean, fmt: v => v.toFixed(3), decimals: 3, source: 'Sentinel-2 NDTI over open water, uncalibrated, 2019–2024' },
     };
     const BASEMAPS = {
-        light: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        light: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
         none: null,
     };
     const params = new URLSearchParams(location.hash.replace(/^#/, ''));
@@ -189,7 +189,7 @@
             onEachFeature: (f, lyr) => {
                 const id = f.properties.zone_id, u = units[id] || {};
                 const x = VARS[v].key(u);
-                const shown = typeof x === 'number' ? `${VARS[v].fmt(x)} ${VARS[v].unit.split(',')[0]}` : absentText(v);
+                const shown = typeof x === 'number' ? `${VARS[v].fmt(x)} ${VARS[v].unit.split(/[,;]/)[0].trim()}` : absentText(v);
                 lyr.bindPopup(`<strong>${id} · ${f.properties.zone_name}</strong><br>${VARS[v].label}: ${shown}<br>Area ${Math.round(f.properties.area_km2).toLocaleString('en-GB')} km²`);
 
                 lyr.on('add', () => {
@@ -198,7 +198,7 @@
                     el.dataset.keyboard = '1';
                     el.setAttribute('tabindex', '0');
                     el.setAttribute('role', 'button');
-                    el.setAttribute('aria-label', `${id} ${f.properties.zone_name}: ${VARS[v].label}, ${typeof VARS[v].key(u) === 'number' ? VARS[v].fmt(VARS[v].key(u)) + ' ' + VARS[v].unit.split(',')[0] : 'not interpreted'}. Press Enter for details.`);
+                    el.setAttribute('aria-label', `${id} ${f.properties.zone_name}: ${VARS[v].label}, ${typeof VARS[v].key(u) === 'number' ? VARS[v].fmt(VARS[v].key(u)) + ' ' + VARS[v].unit.split(/[,;]/)[0].trim() : 'not interpreted'}. Press Enter for details.`);
                     el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lyr.openPopup(); } });
                 });
                 lyr.on('mouseover', () => lyr.setStyle({ weight: 3.5 }));
@@ -215,7 +215,7 @@
             const dark = lum(fill) < 0.55 && ctxLandOn() === false;
             const tt = L.tooltip({ permanent: true, direction: id === 'Z5' ? 'right' : 'center', offset: id === 'Z5' ? [10, 0] : [0, 0], className: 'unit-label' + (id === 'Z5' ? ' z5' : '') + (dark ? ' on-dark' : ''), interactive: false })
                 .setLatLng([pt[1], pt[0]]).setContent(id);
-            // unit names are not written on the map: the key and the hover popups identify each unit
+            tt.addTo(map); labelLayers.push(tt);
         });
         map.fitBounds(layer.getBounds(), { padding: mapPad() });
         if (!titleCtl) {

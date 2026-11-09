@@ -11,6 +11,8 @@
     const status = document.getElementById('band-status');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const setStatus = m => { if (status) status.textContent = m; };
+    const thumb = document.getElementById('band-thumb');
+    const fill = document.getElementById('band-fill');
     // The static monthly-mean line is replaced by the live monthly value.
     bands.forEach(li => { const vals = li.querySelectorAll('.band-val'); if (vals.length) vals[vals.length - 1].style.display = 'none'; });
 
@@ -35,6 +37,11 @@
                 canvas: li.querySelector('.band-rain'), drops: [], ctx: null }));
             state.forEach(s => {
                 s.ctx = s.canvas.getContext('2d');
+                // drops contrast with the segment: white on dark segments, dark blue on light ones
+                const m = getComputedStyle(s.li).backgroundColor.match(/\d+(\.\d+)?/g) || [255, 255, 255];
+                const lum = (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255;
+                s.drop = lum < 0.5 ? 'rgba(255,255,255,1)' : 'rgba(29,79,133,1)';
+                s.alpha = lum < 0.5 ? 0.42 : 0.3;
                 const r = s.li.getBoundingClientRect();
                 s.canvas.width = Math.max(1, Math.round(r.width));
                 s.canvas.height = Math.max(1, Math.round(r.height));
@@ -48,6 +55,9 @@
                 const m = monthList[i];
                 slider.value = String(i);
                 out.textContent = m;
+                const pct = monthList.length > 1 ? (i / (monthList.length - 1)) * 100 : 0;
+                if (thumb) thumb.style.left = pct.toFixed(2) + '%';
+                if (fill) fill.style.width = pct.toFixed(2) + '%';
                 state.forEach(s => {
                     const v = valueAt(s.zone, i);
                     const frac = v === null ? 0 : Math.min(1, v / maxRain);
@@ -60,7 +70,7 @@
                     const n = v === null ? 0 : Math.min(60, Math.round(v / 4));
                     s.drops = Array.from({ length: n }, () => ({ x: Math.random(), y: Math.random(), sp: 0.4 + Math.random() * 0.6 }));
                 });
-                setStatus(`${m}: monthly rainfall per unit`);
+                setStatus(`${m}. Blue fill height and drops show each unit's rainfall that month. Full height is the wettest unit-month in the record, ${maxRain.toFixed(0)} mm.`);
             }
 
             function draw(now) {
@@ -68,8 +78,7 @@
                 state.forEach(s => {
                     const { ctx, canvas } = s;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    const col = getComputedStyle(s.li).color;
-                    ctx.strokeStyle = col; ctx.globalAlpha = 0.22; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+                    ctx.strokeStyle = s.drop; ctx.globalAlpha = s.alpha; ctx.lineWidth = 1.3; ctx.lineCap = 'round';
                     s.drops.forEach(d => {
                         d.y += d.sp * dt * 0.9; if (d.y > 1.05) { d.y = -0.05; d.x = Math.random(); }
                         const x = d.x * canvas.width, y = d.y * canvas.height;
@@ -81,12 +90,12 @@
             }
 
             function start() {
-                play.textContent = 'Pause'; play.setAttribute('aria-pressed', 'true');
+                play.dataset.state = 'playing'; play.querySelector('.bp-label').textContent = 'Pause animation'; play.setAttribute('aria-pressed', 'true');
                 timer = setInterval(() => show((idx + 1) % monthList.length), 900);
                 if (!reduced) { last = 0; raf = requestAnimationFrame(draw); }
             }
             function stop() {
-                play.textContent = 'Play'; play.setAttribute('aria-pressed', 'false');
+                play.dataset.state = 'paused'; play.querySelector('.bp-label').textContent = 'Play animation'; play.setAttribute('aria-pressed', 'false');
                 clearInterval(timer); timer = null; cancelAnimationFrame(raf);
             }
 

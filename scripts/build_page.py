@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "docs" / "data"
 OUT = ROOT / "docs" / "index.html"
-RAW_KEYS = {"UNIT_ROWS", "SCHEMATIC", "SEASON_ROWS"}
+RAW_KEYS = {"UNIT_ROWS", "SCHEMATIC", "SEASON_ROWS", "AREA_BAR"}
 UNIT_NAMES = {"Z1": "Upper Ogun Headwaters", "Z2": "Oyan–Ofiki Tributary", "Z3": "Middle Ogun Mainstem",
               "Z4": "Lower Ogun Alluvial Corridor", "Z5": "Northwest Lagos Lagoon Estuary"}
 
@@ -81,6 +81,21 @@ def season_rows(units: dict) -> str:
     return "\n".join(out)
 
 
+def area_bar(areas: dict) -> str:
+    """Share of the catchment area (Z1 to Z4) by unit, as a stacked bar. Z5 is outside the catchment and is left out."""
+    zones = ("Z1", "Z2", "Z3", "Z4")
+    total = sum(areas[z] for z in zones)
+    names = {"Z1": "Headwaters", "Z2": "Oyan–Ofiki", "Z3": "Mainstem", "Z4": "Alluvial corridor"}
+    segs = "".join(f'<span class="catch-share-seg u{z[1]}" style="flex-basis:{100 * areas[z] / total:.1f}%" title="{z} {names[z]}"></span>' for z in zones)
+    keys = "".join(f'<li><span class="sw u{z[1]}" aria-hidden="true"></span>{z} {names[z]}, {100 * areas[z] / total:.0f}%</li>' for z in zones)
+    return ('<div class="catch-share">'
+            f'<p class="catch-share-title">Where the catchment area lies</p>'
+            f'<div class="catch-share-track" role="img" aria-label="Share of the catchment area by unit: ' + "; ".join(f"{z} {100 * areas[z] / total:.0f} per cent" for z in zones) + '">' + segs + '</div>'
+            f'<ul class="catch-share-key">{keys}</ul>'
+            f'<p class="catch-share-note">Share of the {total:,.0f} km² catchment (Z1 to Z4). Z5, the lagoon zone, lies outside the catchment and is not included.</p>'
+            '</div>')
+
+
 def schematic(units: dict, areas: dict) -> str:
     """Catchment-to-coast band: each unit is a segment whose width is its area, coloured by mean monthly rainfall.
     Built as HTML so it reflows to a column on a phone."""
@@ -101,13 +116,16 @@ def schematic(units: dict, areas: dict) -> str:
                      f'<span class="band-val">{areas[z]:,.0f} km²</span>'
                      f'<span class="band-val">{rain[z]:.0f} mm/month</span></li>')
     controls = ('<div class="band-controls">'
-                '<button type="button" class="band-play" id="band-play" aria-pressed="true">Pause</button>'
-                '<input type="range" id="band-month" min="0" value="0" aria-label="Month">'
-                '<output id="band-month-label" for="band-month" aria-live="off"></output>'
+                '<button type="button" class="band-play" id="band-play" aria-pressed="true"><span class="bp-icon" aria-hidden="true"></span><span class="bp-label">Pause animation</span></button>'
+                '<div class="band-slider">'
+                '<div class="bs-track"><div class="bs-fill" id="band-fill"></div></div>'
+                '<div class="bs-thumb" id="band-thumb"><output id="band-month-label" class="bs-tip" for="band-month" aria-hidden="true"></output></div>'
+                '<input type="range" id="band-month" class="bs-input" min="0" value="0" aria-label="Month of rainfall shown in the band">'
+                '</div>'
                 '<span class="band-status" id="band-status" role="status"></span>'
                 '</div>')
-    return (controls + '<ol class="band" aria-label="Catchment-to-coast band: units from headwaters Z1 to lagoon Z5, width proportional to area">'
-            + "".join(items) + '</ol>')
+    return ('<ol class="band" aria-label="Catchment-to-coast band: units from headwaters Z1 to lagoon Z5, width proportional to area">'
+            + "".join(items) + '</ol>' + controls)
 
 
 def values() -> dict[str, str]:
@@ -186,6 +204,7 @@ def values() -> dict[str, str]:
         "UNIT_ROWS": unit_rows(units, areas),
         "SEASON_ROWS": season_rows(units),
         "SCHEMATIC": schematic(units, areas),
+        "AREA_BAR": area_bar(areas),
         "PRINT_DATE": date.today().strftime("%-d %B %Y"),
         "ISO_DATE": date.today().isoformat(),
     }

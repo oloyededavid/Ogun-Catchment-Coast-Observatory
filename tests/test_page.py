@@ -16,10 +16,26 @@ def test_no_unfilled_placeholders():
 
 def test_every_image_and_download_exists():
     html = _page()
-    for src in re.findall(r'<img src="([^"]+)"', html):
+    srcs = re.findall(r'<img[^>]*\ssrc="([^"]+)"', html) + re.findall(r'<source[^>]*\ssrcset="([^"]+)"', html)
+    assert srcs, "no images found"
+    for src in srcs:
         assert (DOCS / src).exists(), src
-    for href in re.findall(r'<a href="(data/[^"]+)" download>', html):
+    downloads = re.findall(r'<a[^>]*\shref="(data/[^"]+)"[^>]*\sdownload', html)
+    assert downloads, "no data download link found"
+    for href in downloads:
         assert (DOCS / href).exists(), href
+
+
+def test_figure_numbers_run_in_order():
+    numbers = [int(n) for n in re.findall(r"<b>Figure (\d+)\.</b>", _page())]
+    assert numbers == sorted(numbers) and numbers == list(range(1, len(numbers) + 1)), numbers
+
+
+def test_months_and_units_come_from_the_data():
+    import csv
+    rows = list(csv.DictReader((DOCS / "data" / "ogun_unit_monthly_timeseries.csv").open(encoding="utf-8")))
+    months = {r["year_month"] for r in rows}
+    assert f'data-count="{len(months)}"' in _page()
 
 
 def test_headline_numbers_are_the_corrected_ones():

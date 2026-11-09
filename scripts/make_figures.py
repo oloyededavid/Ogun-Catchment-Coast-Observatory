@@ -67,7 +67,7 @@ def fig2_series(df):
     return fig
 
 
-def fig3_association(diag):
+def fig3_association(diag, phone=False):
     """Spearman rho, raw values and anomalies. Raw rows carry q from the correction across each pair's three lags;
     anomaly rows carry q from the correction across the five headline relationships (key_findings), as in the text."""
     fam = {f["relationship"]: f for f in diag["key_findings"]}
@@ -81,21 +81,26 @@ def fig3_association(diag):
                        ("Rain → inundation, one month later", "Rain -> floodplain SAR inundation (1-month lag, deseasonalized)"),
                        ("Soil moisture → inundation, same month", "Soil moisture -> floodplain SAR inundation (same month, deseasonalized)")):
         rows.append((label, "anomaly", fam[key]["spearman_rho"], fam[key]["p_value"]))
-    fig, ax = plt.subplots(figsize=(5.4, 5.0), dpi=200)
+    fig, ax = plt.subplots(figsize=(3.6, 4.6) if phone else (5.4, 5.0), dpi=220 if phone else 200)
+    fs = 12 if phone else 13
     y = np.arange(len(rows))[::-1]
     for yi, (lab, kind, rho, q) in zip(y, rows):
         colour = C_RAIN if q < 0.05 else "#9a9a9a"
         ax.plot([0, rho], [yi, yi], color=colour, lw=1.4)
         ax.plot(rho, yi, "o", color=colour, ms=5, mfc="white" if kind == "raw" else colour)
-        ax.text(0.62, yi, f"q = {q:.3f}" if q >= 0.001 else "q < 0.001", va="center", fontsize=13, color=INK2)
+        ax.text(0.62, yi, f"q = {q:.3f}" if q >= 0.001 else "q < 0.001", va="center", fontsize=fs, color=INK2)
     ax.axvline(0, color=INK2, lw=0.6)
-    ax.set_yticks(y, [f"{lab}  ({kind})" for lab, kind, _, _ in rows], fontsize=13)
-    ax.tick_params(axis="x", labelsize=10)
+    short = {"Rain → inundation, same month": "Rain, same month", "Rain → inundation, one month later": "Rain, +1 month",
+             "Rain → inundation, two months later": "Rain, +2 months", "Soil moisture → inundation, same month": "Soil moisture, same month"}
+    labels = [f"{short.get(lab, lab) if phone else lab} ({kind})" for lab, kind, _, _ in rows]
+    ax.set_yticks(y, labels, fontsize=fs)
+    ax.tick_params(axis="x", labelsize=fs - 2)
     ax.set_xlim(-0.6, 0.85)
-    ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=13)
+    ax.set_xlabel("Spearman ρ (recommended estimator)", fontsize=fs)
     ax.grid(axis="x", color=RULE, lw=0.4)
-    fig.subplots_adjust(left=0.56, right=0.97, bottom=0.2, top=0.97)
-    _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant", size=8.5)
+    fig.subplots_adjust(left=0.52 if phone else 0.56, right=0.97, bottom=0.2, top=0.97)
+    if not phone:
+        _source(fig, "cascade_diagnostics.json. Hollow: raw values; filled: anomalies. Blue: q < 0.05; grey: not significant", size=8.5)
     return fig
 
 
@@ -109,8 +114,11 @@ def _scatter(ax, x, y, xl, yl, colour, rho, q):
     ax.grid(color=RULE, lw=0.4)
 
 
-def fig4_scatter(comp, anom):
-    fig, axes = plt.subplots(1, 2, figsize=(5.4, 4.2), dpi=200)
+def fig4_scatter(comp, anom, phone=False):
+    if phone:
+        fig, axes = plt.subplots(2, 1, figsize=(3.6, 6.2), dpi=220)
+    else:
+        fig, axes = plt.subplots(1, 2, figsize=(5.4, 4.2), dpi=200)
     m = anom[["sar_flood_km2_anom", "estuary_ndti_anom"]].dropna()
     r = [f for f in comp["key_findings"] if "NDTI" in f["relationship"]][0]
     _scatter(axes[0], m["sar_flood_km2_anom"], m["estuary_ndti_anom"], "Radar index (km²)", "Lagoon NDTI",
@@ -121,8 +129,11 @@ def fig4_scatter(comp, anom):
     _scatter(axes[1], m2["dw_flood_km2_anom"], m2["sar_flood_km2_anom"], "Dynamic World (km²)", "Radar index (km²)",
              C_SAR, r2["spearman_rho"], r2["p_value"])
     axes[1].set_title("Optical reference", fontsize=13, loc="left")
-    fig.subplots_adjust(left=0.16, right=0.98, bottom=0.34, top=0.88, wspace=0.5)
-    _source(fig, f"Monthly anomalies from the 2019-2024 export; n = {len(m)} and {len(m2)} pairs")
+    if phone:
+        fig.subplots_adjust(left=0.2, right=0.97, bottom=0.1, top=0.95, hspace=0.45)
+    else:
+        fig.subplots_adjust(left=0.16, right=0.98, bottom=0.34, top=0.88, wspace=0.5)
+        _source(fig, f"Monthly anomalies from the 2019-2024 export; n = {len(m)} and {len(m2)} pairs")
     return fig
 
 
@@ -447,6 +458,8 @@ def main():
         "fig3_series": fig2_series(df),
         "fig4_association": fig3_association(diag),
         "fig5_scatter": fig4_scatter(comp, anom),
+        "fig4_association_phone": fig3_association(diag, phone=True),
+        "fig5_scatter_phone": fig4_scatter(comp, anom, phone=True),
         "study_map_print": fig_study_map_print(),
         "study_seasonal_maps": fig_seasonal_maps(),
         "study_landcover_maps": fig_unit_landcover_maps(),
