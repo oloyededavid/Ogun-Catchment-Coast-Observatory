@@ -1,0 +1,123 @@
+{
+ "script": "scripts/make_unit_landcover.py",
+ "source": "ESA WorldCover 2021 v200 via Microsoft Planetary Computer (esa-worldcover)",
+ "classes": [
+  "Tree cover",
+  "Shrubland",
+  "Grassland",
+  "Cropland",
+  "Built-up",
+  "Bare or sparse vegetation",
+  "Permanent water",
+  "Herbaceous wetland",
+  "Mangroves"
+ ],
+ "units": {
+  "Z1": {
+   "valid_pixels": 256784,
+   "share_pct": {
+    "Tree cover": 37.18,
+    "Shrubland": 24.05,
+    "Grassland": 13.55,
+    "Cropland": 23.23,
+    "Built-up": 1.52,
+    "Bare or sparse vegetation": 0.07,
+    "Permanent water": 0.39,
+    "Herbaceous wetland": 0.01,
+    "Mangroves": 0.0
+   }
+  },
+  "Z2": {
+   "valid_pixels": 250243,
+   "share_pct": {
+    "Tree cover": 40.2,
+    "Shrubland": 29.22,
+    "Grassland": 12.8,
+    "Cropland": 16.81,
+    "Built-up": 0.7,
+    "Bare or sparse vegetation": 0.03,
+    "Permanent water": 0.18,
+    "Herbaceous wetland": 0.06,
+    "Mangroves": 0.0
+   }
+  },
+  "Z3": {
+   "valid_pixels": 64568,
+   "share_pct": {
+    "Tree cover": 41.92,
+    "Shrubland": 21.7,
+    "Grassland": 15.23,
+    "Cropland": 13.18,
+    "Built-up": 7.73,
+    "Bare or sparse vegetation": 0.09,
+    "Permanent water": 0.02,
+    "Herbaceous wetland": 0.13,
+    "Mangroves": 0.0
+   }
+  },
+  "Z4": {
+   "valid_pixels": 22543,
+   "share_pct": {
+    "Tree cover": 40.09,
+    "Shrubland": 12.97,
+    "Grassland": 18.8,
+    "Cropland": 3.48,
+    "Built-up": 20.17,
+    "Bare or sparse vegetation": 0.27,
+    "Permanent water": 2.18,
+    "Herbaceous wetland": 0.47,
+    "Mangroves": 1.57
+   }
+  }
+ },
+ "catchment_check": {
+  "max_abs_diff_pp": 0.05,
+  "classes": {
+   "Tree cover": {
+    "from_pixels": 39.08,
+    "from_rasters_json": 39.1,
+    "diff_pp": -0.02
+   },
+   "Shrubland": {
+    "from_pixels": 25.55,
+    "from_rasters_json": 25.6,
+    "diff_pp": -0.05
+   },
+   "Grassland": {
+    "from_pixels": 13.62,
+    "from_rasters_json": 13.6,
+    "diff_pp": 0.02
+   },
+   "Cropland": {
+    "from_pixels": 18.68,
+    "from_rasters_json": 18.7,
+    "diff_pp": -0.02
+   },
+   "Built-up": {
+    "from_pixels": 2.56,
+    "from_rasters_json": 2.6,
+    "diff_pp": -0.04
+   },
+   "Bare or sparse vegetation": {
+    "from_pixels": 0.06,
+    "from_rasters_json": 0.1,
+    "diff_pp": -0.04
+   },
+   "Permanent water": {
+    "from_pixels": 0.33,
+    "from_rasters_json": 0.3,
+    "diff_pp": 0.03
+   },
+   "Herbaceous wetland": {
+    "from_pixels": 0.06,
+    "from_rasters_json": 0.1,
+    "diff_pp": -0.04
+   },
+   "Mangroves": {
+    "from_pixels": 0.06,
+    "from_rasters_json": 0.1,
+    "diff_pp": -0.04
+   }
+  }
+ }
+}

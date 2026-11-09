@@ -13,8 +13,6 @@
     const buttons = Array.from(document.querySelectorAll('[data-var]'));
     const ctxTerrain = document.getElementById('ctx-terrain');
     const ctxLand = document.getElementById('ctx-landcover');
-    const shareBtn = document.getElementById('share-view');
-    const shareStatus = document.getElementById('share-status');
     const setState = (state, msg) => {
         host.dataset.state = state;
         if (status) status.textContent = msg || '';
@@ -246,7 +244,7 @@
         if (ctxLand && !rasters) ctxLand.disabled = true;
         drawContext();
         draw(current);
-        setState('ready', 'Click a unit for its values. Radar values are not shown for the units Z1 and Z2.');
+        setState('ready', '');
     }).catch(() => {
         setState('failed', 'The map data could not be loaded. The unit values are listed in Table 1.');
     });
@@ -254,10 +252,4 @@
     buttons.forEach(b => b.addEventListener('click', () => { if (geo) draw(b.dataset.var); }));
     [ctxTerrain, ctxLand].forEach(c => c && c.addEventListener('change', () => { if (geo) { drawContext(); draw(current); } }));
     window.addEventListener('resize', () => { map.invalidateSize(); if (layer) map.fitBounds(layer.getBounds(), { padding: [18, 18] }); });
-    if (shareBtn) shareBtn.addEventListener('click', () => {
-        const url = share();
-        const done = () => { if (shareStatus) shareStatus.textContent = 'Link copied.'; };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => { if (shareStatus) shareStatus.textContent = 'Copy failed. The address bar holds the link.'; });
-        else if (shareStatus) shareStatus.textContent = 'The address bar holds the link.';
-    });
 })();

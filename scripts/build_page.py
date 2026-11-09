@@ -82,19 +82,26 @@ def season_rows(units: dict) -> str:
 
 
 def schematic(units: dict, areas: dict) -> str:
-    """Catchment-to-coast chain as HTML, so it wraps on a phone instead of shrinking."""
+    """Catchment-to-coast band: each unit is a segment whose width is its area, coloured by mean monthly rainfall.
+    Built as HTML so it reflows to a column on a phone."""
     labels = {"Z1": "Headwaters", "Z2": "Oyan–Ofiki", "Z3": "Mainstem", "Z4": "Alluvial corridor", "Z5": "Lagoon zone"}
+    zones = ("Z1", "Z2", "Z3", "Z4", "Z5")
+    rain = {z: units[z]["rain"]["mean"] for z in zones}
+    lo, hi = min(rain.values()), max(rain.values())
+    light, dark = (0xDC, 0xEA, 0xF8), (0x1D, 0x4F, 0x85)
+    def colour(v):
+        t = (v - lo) / (hi - lo or 1)
+        return "#%02x%02x%02x" % tuple(round(a + (b - a) * t) for a, b in zip(light, dark))
     items = []
-    for z in ("Z1", "Z2", "Z3", "Z4", "Z5"):
-        u = units[z]
-        rain = "rainfall not interpreted" if u["rain"]["mean"] is None else f"{u['rain']['mean']:.0f} mm per month"
-        items.append(f'<li class="chain-unit u{z[1]}"><span class="u-id">{z}</span>'
-                     f'<span class="u-name">{labels[z]}</span>'
-                     f'<span class="u-val">{areas[z]:,.0f} km²</span>'
-                     f'<span class="u-val">{rain}</span></li>')
-    return ('<ol class="chain" aria-label="Catchment-to-coast chain, from headwaters Z1 to lagoon Z5">'
-            + "".join(items) + '</ol>'
-            + '')
+    for z in zones:
+        txt_colour = "#fff" if (rain[z] - lo) / (hi - lo or 1) > 0.55 else "#111"
+        items.append(f'<li class="band-seg u{z[1]}" style="flex-grow:{areas[z]:.1f};background:{colour(rain[z])};color:{txt_colour}">'
+                     f'<span class="band-id">{z}</span>'
+                     f'<span class="band-name">{labels[z]}</span>'
+                     f'<span class="band-val">{areas[z]:,.0f} km²</span>'
+                     f'<span class="band-val">{rain[z]:.0f} mm/month</span></li>')
+    return ('<ol class="band" aria-label="Catchment-to-coast band: units from headwaters Z1 to lagoon Z5, width proportional to area">'
+            + "".join(items) + '</ol>')
 
 
 def values() -> dict[str, str]:
@@ -211,6 +218,13 @@ def main() -> None:
         text = text.replace("{" + k + "}", val if k in RAW_KEYS else html.escape(val, quote=False))
     left = sorted(set(__import__("re").findall(r"\{[A-Z][A-Z0-9_]+\}", text)))
     assert not left, left
+    import re
+    def _newtab(m):
+        tag = m.group(0)
+        if 'target=' in tag or not re.search(r'href="https?://', tag):
+            return tag
+        return tag[:-1] + ' target="_blank" rel="noopener">'
+    text = re.sub(r'<a [^>]*>', _newtab, text)
     OUT.write_text(text, encoding="utf-8")
     print("wrote", OUT, "| values filled:", len(v))
 

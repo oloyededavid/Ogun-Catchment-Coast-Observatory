@@ -102,8 +102,9 @@
             ctx.font = '600 22px sans-serif';
             const w = ctx.measureText(text).width + 30;
             const tx = Math.min(W - w - 6, Math.max(6, x + 14)), ty = Math.max(8, y - 52);
-            ctx.fillStyle = '#111'; ctx.fillRect(tx, ty, w, 40);
-            ctx.fillStyle = '#fff'; ctx.fillText(text, tx + 15, ty + 27);
+            ctx.fillStyle = '#fff'; ctx.strokeStyle = '#cdd8e6'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.roundRect(tx, ty, w, 40, 8); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#1d2b3a'; ctx.fillText(text, tx + 15, ty + 27);
             ctx.restore();
         };
         // Scripted click-through: the cursor visits each unit in turn, clicks, and the tooltip shows that unit's real value for the month shown.
