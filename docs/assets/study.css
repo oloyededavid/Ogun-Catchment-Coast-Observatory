@@ -119,17 +119,20 @@
 
 /* ---- Round 2 of the study page: plain, black accents, small motion (all stop for reduced motion) ---- */
 .explore-cta { margin: 56px 0 40px; }
-.cta-black { background: #0b0b0b; color: #f4f4f2; border-radius: 16px; padding: 22px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: center; }
-.cta-preview { position: relative; background: #050505; border-radius: 10px; overflow: hidden; }
+.cta-card { background: #fff; color: #111; border: 1px solid #d9dfe8; border-radius: 16px; padding: 22px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: center; box-shadow: 0 10px 30px rgba(20, 60, 110, .08); transition: box-shadow 220ms ease, transform 220ms ease; }
+.cta-card:hover { box-shadow: 0 16px 40px rgba(20, 60, 110, .16); transform: translateY(-2px); }
+.cta-preview { position: relative; background: #f3f7fc; border: 1px solid #d9e4f2; border-radius: 10px; overflow: hidden; cursor: pointer; }
 .cta-preview canvas { width: 100%; height: auto; display: block; }
-.preview-month { position: absolute; left: 12px; bottom: 10px; margin: 0; font-size: 12px; color: #b8b8b2; font-variant-numeric: tabular-nums; }
-.cta-kicker { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #9a9a94; margin: 0 0 8px; }
-.cta-h { font-family: "Zodiak", Georgia, serif; font-size: 28px; line-height: 1.15; margin: 0 0 10px; color: #fff; }
-.cta-desc { font-size: 15px; line-height: 1.5; color: #c9c9c3; margin: 0 0 18px; }
-.cta-button { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #0b0b0b; text-decoration: none; padding: 11px 18px; border-radius: 999px; font-weight: 500; transition: transform 180ms ease; }
-.cta-button:hover { transform: translateX(3px); }
-.cta-button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-@media (max-width: 720px) { .cta-black { grid-template-columns: minmax(0, 1fr); padding: 16px; } .cta-h { font-size: 24px; } }
+.cta-live { position: absolute; top: 10px; left: 10px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #cfdcec; border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #1d4f85; }
+.cta-live i { width: 7px; height: 7px; border-radius: 50%; background: #2b6cb0; animation: cta-pulse 1.6s ease-out infinite; }
+@keyframes cta-pulse { 0% { box-shadow: 0 0 0 0 rgba(43,108,176,.55); } 70% { box-shadow: 0 0 0 8px rgba(43,108,176,0); } 100% { box-shadow: 0 0 0 0 rgba(43,108,176,0); } }
+.cta-kicker { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #2b6cb0; margin: 0 0 8px; }
+.cta-h { font-family: "Zodiak", Georgia, serif; font-size: 28px; line-height: 1.15; margin: 0 0 10px; color: #111; }
+.cta-desc { font-size: 15px; line-height: 1.5; color: #444; margin: 0 0 18px; }
+.cta-button { display: inline-flex; align-items: center; gap: 8px; background: #1d4f85; color: #fff; text-decoration: none; padding: 11px 18px; border-radius: 999px; font-weight: 500; transition: transform 180ms ease, background 180ms ease; }
+.cta-button:hover { background: #163f6b; transform: translateX(3px); }
+.cta-button:focus-visible { outline: 2px solid #1d4f85; outline-offset: 3px; }
+@media (max-width: 720px) { .cta-card { grid-template-columns: minmax(0, 1fr); padding: 16px; } .cta-h { font-size: 24px; } }
 
 .stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 22px 0 6px; }
 .stat-row div { border-top: 1px solid #111; padding-top: 10px; }
@@ -148,7 +151,7 @@
 .chain-unit, .chain-unit.u1, .chain-unit.u2, .chain-unit.u3, .chain-unit.u4, .chain-unit.u5 { background: #fff; border-color: #cfcfca; }
 .chain-unit:not(:last-child)::after { color: #111; animation: nudge 2.6s ease-in-out infinite; }
 @keyframes nudge { 0%, 100% { transform: translate(-50%, -50%); opacity: .55; } 50% { transform: translate(-30%, -50%); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .chain-unit:not(:last-child)::after { animation: none; } .cta-button { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .chain-unit:not(:last-child)::after { animation: none; } .cta-button, .cta-card { transition: none; } .cta-live i { animation: none; } }
 
 /* Map: unit labels are plain codes with no box, so they do not cover the units */
 .unit-label { background: none !important; border: 0 !important; box-shadow: none !important; font-weight: 700; font-size: 12px; color: #111; padding: 0; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
@@ -160,3 +163,50 @@
 .chain-unit.u3 { background: #deebf9; border-color: #aec9ea; }
 .chain-unit.u4 { background: #d3e4f7; border-color: #9fbfe3; }
 .chain-unit.u5 { background: #c7dcf4; border-color: #8fb4dc; }
+/* Unit labels: white halo so they read on any fill, without a box */
+.unit-label { text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 1px #fff; }
+.legend-ticks { display: flex; justify-content: space-between; font-size: 11px; color: #444; margin-top: 3px; }
+.map-title { background: rgba(255,255,255,.92); padding: 4px 9px; border-radius: 6px; font-size: 13px; font-weight: 500; color: #111; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.unit-label { background: none !important; border: 0 !important; box-shadow: none !important; font-size: 12px; font-weight: 700; color: #111; padding: 0; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 1px #fff; }
+.unit-label.on-dark { color: #fff; text-shadow: 0 0 3px #000, 0 0 2px #000; }
+.unit-label::before { display: none; }
+@media (max-width: 480px) { .unit-label.z5 { display: none; } }
+.lc-list .swatch[style*="dashed"] { border-style: dashed; }
+
+/* Review fixes: phone tables, explorer caption and pause, Z5 label, phone chain, touch targets */
+@media (max-width: 640px) {
+    .table-units { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-units table { table-layout: auto; min-width: 560px; width: 100%; }
+    .table-units th, .table-units td { font-size: 12.5px; white-space: normal; vertical-align: bottom; }
+}
+.cta-preview .preview-month { position: absolute; left: 12px; bottom: 10px; margin: 0; font-size: 13px; color: #444; background: rgba(255,255,255,.92); border: 1px solid #d9e4f2; border-radius: 999px; padding: 4px 10px; z-index: 2; }
+.preview-pause { position: absolute; right: 10px; bottom: 10px; z-index: 2; font: inherit; font-size: 13px; background: #fff; color: #1d4f85; border: 1px solid #cfdcec; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.preview-pause:hover { background: #eef4fc; }
+.preview-pause:focus-visible { outline: 2px solid #1d4f85; outline-offset: 2px; }
+.unit-label.z5, .unit-label.z5.on-dark { background: rgba(255,255,255,.92) !important; color: #111 !important; text-shadow: none !important; padding: 2px 6px !important; border-radius: 4px; }
+@media (max-width: 480px) {
+    .chain { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .chain-unit { position: relative; }
+    .chain-unit::after { display: block !important; content: "↓"; position: absolute; left: 50%; right: auto; top: auto; bottom: -16px; transform: translateX(-50%); font-size: 16px; color: #1f5fae; animation: none; }
+    .chain-unit:last-child::after { display: none; }
+}
+@media (pointer: coarse) { button, .btn-quiet, .cta-button { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .preview-pause { display: none; } }
+.preview-pause { top: 10px; bottom: auto; right: 10px; }
+.cta-preview .preview-month { bottom: 10px; }
+@media (max-width: 480px) {
+    .chain .chain-unit::after { content: "↓" !important; display: block !important; }
+    .chain .chain-unit:nth-child(5)::after { display: none !important; }
+}
+/* map fills the height of its column so there is no gap under it; plain background if tiles fail */
+@media (min-width: 761px) {
+    .map-layout { align-items: stretch; }
+    .map-main { display: flex; flex-direction: column; }
+    .map-main .study-map { flex: 1 1 auto; min-height: 520px; max-height: 900px; height: auto; }
+}
+.study-map { background: #f3f5f7; }
+.zbadge { display: inline-block; min-width: 26px; text-align: center; font-weight: 700; font-size: 11px; border: 1px solid #3d3d3d; border-radius: 3px; padding: 0 3px; margin-right: 2px; background: #fff; color: #111; }
+.zbadge.dashed { border-style: dashed; }
+.legend-ticks { font-size: 12px; }
+@media (min-width: 761px) { .map-side { max-height: 900px; overflow-y: auto; padding-right: 4px; } }
+@media (max-width: 480px) { .study-map .leaflet-control-attribution { max-width: 62%; font-size: 10px; line-height: 1.3; } }
