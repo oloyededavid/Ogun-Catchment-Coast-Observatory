@@ -871,6 +871,11 @@
             button.term { position: relative; }
             button.term::after { content: ""; position: absolute; inset: -12px -6px; }
         }
+        @media (max-width: 760px) {
+            .eyebrow, .chip .code, .tour-step, .zone-pin span, .zone-pin.is-compact, .legend-source, .legend-note, .timeline-note,
+            .multiple-unit, td .sub, .flag, .menu-list a span, .leaflet-control-attribution, .verdict { font-size: 12px; }
+            button.info { min-width: 24px; min-height: 24px; }
+        }
     </style>
 </head>
 <body>
@@ -1151,7 +1156,7 @@
 
                 <footer class="site-footer" id="site-footer">
                     <p class="byline">Research, analysis and design by <strong>David Oloyede</strong>.</p>
-                    <p>Version 1.11</p>
+                    <p>Version 1.12</p>
                     <nav aria-label="Project links">
                         <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory" target="_blank" rel="noopener">Source code</a>
                         <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory/blob/main/CITATION.cff" target="_blank" rel="noopener">How to cite</a>
