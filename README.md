@@ -65,15 +65,18 @@ Ogun-Catchment-Coast-Observatory/
 ├── src/
 │   ├── 01_ingest_gee_exports.py           # Validates Earth Engine exports and installs them in docs/data/
 │   └── 02_compile_observatory.py          # Pairwise complete-case statistical & lag audit
+├── scripts/                               # Figures, unit summaries, data bundle and the study page build
 ├── tests/                                 # pytest suite (statistics, ingest validation, published-data check)
-└── docs/                                  # Static GitHub Pages WebGIS deployment
-    ├── index.html                         # Single-page WebGIS interface
+└── docs/                                  # Static GitHub Pages deployment
+    ├── index.html                         # Study page, built by scripts/build_page.py
+    ├── explore.html                       # Interactive explorer
+    ├── assets/                            # Stylesheets, scripts and figures
     ├── vendor/                            # Bundled Leaflet 1.9.4 and Chart.js 4.4.1 (no CDN dependency)
     └── data/
         ├── ogun_subbasins.geojson         # 5 analytical units (Z1–Z4 sub-basins + Z5 estuary)
         ├── ogun_monthly_timeseries.csv    # 72-month catchment-wide time series with observation counts & nulls
         ├── ogun_unit_monthly_timeseries.csv  # (after export) 72-month series per unit, used by the chart
-        └── cascade_diagnostics.json       # Statistical output consumed by docs/index.html (never edit by hand)
+        └── cascade_diagnostics.json       # Statistical output consumed by docs/explore.html and the study page (never edit by hand)
 ```
 
 ---
