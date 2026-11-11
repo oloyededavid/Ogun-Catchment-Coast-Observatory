@@ -145,7 +145,7 @@ All values are produced by `src/02_compile_observatory.py` and reproduced in `do
 ## 7. Known Limitations
 
 * **Oyan Dam regulation:** release records are not public. The Sentinel-1 open-water area of the Oyan Reservoir (`oyan_reservoir_km2`) is used as a proxy and partialled out of the rain → inundation association.
-* **Non-random NDTI gaps:** cloud-masked months cluster in the wet season (April–October), so SAR → NDTI associations are weighted towards dry-season conditions. Coverage by season is reported in `cascade_diagnostics.json`.
+* **Non-random NDTI gaps:** all months without an NDTI value fall in June to September, the core wet months, so SAR → NDTI associations lack the wettest conditions. Coverage by season is reported in `cascade_diagnostics.json`.
 * **Short record:** six years give six values per calendar month for deseasonalising, and serial autocorrelation leaves a small effective sample size.
 * **Other turbidity drivers:** tides, dredging, sand mining and Lagos urban runoff are not modelled.
 * **No ground validation:** no independent flood extents or gravimetric TSS samples were available, so the SAR and NDTI layers are uncalibrated proxies.
