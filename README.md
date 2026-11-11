@@ -128,13 +128,13 @@ All values are produced by `src/02_compile_observatory.py` and reproduced in `do
 | Floodplain SAR inundation → estuary NDTI | 62 | 0.32 | 0.29 | 0.15 | Not significant |
 | SAR inundation vs Dynamic World flooding | 67 | 0.14 | 0.08 | 0.44 | Not significant |
 
-**Raw monthly values (seasonal co-variation).** Two associations are significant on raw values: rain → SAR inundation at a two-month lag (ρ = −0.43, q = 0.006) and soil moisture → SAR inundation in the same month (ρ = −0.38, q = 0.037). Both reflect the shared seasonal cycle and vanish once it is removed. Rain → SAR at a one-month lag is borderline (ρ = −0.29, q = 0.052).
+**Raw monthly values (seasonal co-variation).** Two associations are significant on raw values: rain → SAR inundation at a two-month lag (ρ = −0.43, q = 0.006) and soil moisture → SAR inundation in the same month (ρ = −0.38, q = 0.037). Both are negative. A shared wet-season cycle would give positive values, so the likely cause is dry-season radar detections (see the study page), and the sign counts against the radar index as a measure of inundation. Both vanish once the seasonal cycle is removed. Rain → SAR at a one-month lag is borderline (ρ = −0.29, q = 0.052).
 
 **Robustness.** Leaving out any single month gives Pearson r = 0.19 to 0.43 for rain → same-month inundation. Without 2024-10, the wettest month in the record (390.8 mm), the anomaly association falls to ρ = 0.07 (p = 0.55), so the Pearson association rests on one extreme event.
 
 **Dynamic World agreement.** The radar index ranks months like Dynamic World in the seasonal cycle (ρ = 0.42, p < 0.001) but not in anomalies (ρ = 0.14). Its magnitude is far smaller: monthly values run 0.06 to 3.58 km², while Dynamic World runs 0 to 282.8 km² over the same months. The index should be read as relative until it is calibrated; the cause of the disagreement is not established here.
 
-**Interpretation.** Rainfall, soil moisture and radar inundation share a seasonal cycle. Month to month, the satellite record shows no robust link between catchment rainfall or soil moisture and floodplain inundation, and inundation is not significantly linked to lagoon turbidity. These are findings about what these monthly satellite indicators resolve over six years, not evidence that rainfall does not drive flooding.
+**Interpretation.** Rainfall and soil moisture peak in the wet season, but the radar index also peaks in the dry months, so it does not follow the rainfall cycle. Month to month, the satellite record shows no robust link between catchment rainfall or soil moisture and floodplain inundation, and inundation is not significantly linked to lagoon turbidity. These are findings about what these monthly satellite indicators resolve over six years, not evidence that rainfall does not drive flooding.
 
 **Coverage.** 72 months; rain, soil moisture and SAR complete; estuary NDTI valid in 62 months (10 missing, mostly in the wet season); Dynamic World available in 67 months. Peak radar inundation index: 3.58 km² in 2024-10.
 
