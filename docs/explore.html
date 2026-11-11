@@ -1103,7 +1103,7 @@
                                 <option value="reservoir">Rain → inundation, controlling for Oyan Reservoir</option>
                                 <option value="dam">Rain → inundation, controlling for Oyan Dam releases</option>
                                 <option value="ndti">Inundation → lagoon turbidity</option>
-                                <option value="dw">Validation: radar vs Dynamic World</option>
+                                <option value="dw">Cross-check: radar vs Dynamic World</option>
                             </select>
                         </div>
                         <div class="field" style="flex: 0 0 auto;">
@@ -1151,7 +1151,7 @@
 
                 <footer class="site-footer" id="site-footer">
                     <p class="byline">Research, analysis and design by <strong>David Oloyede</strong>.</p>
-                    <p>Version 1.6</p>
+                    <p>Version 1.9</p>
                     <nav aria-label="Project links">
                         <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory" target="_blank" rel="noopener">Source code</a>
                         <a href="https://github.com/oloyededavid/Ogun-Catchment-Coast-Observatory/blob/main/CITATION.cff" target="_blank" rel="noopener">How to cite</a>
@@ -1198,7 +1198,7 @@
                 <p>Sentinel-2 L2A scenes are masked using the Scene Classification Layer (<span class="mono">SCL</span>) to remove clouds, cirrus, and shadows, and restricted to open water (<span class="mono">MNDWI &gt; 0</span> and <span class="mono">SCL == 6</span>). <span class="mono">NDTI = (B4 &minus; B3)/(B4 + B3)</span> is a relative spectral proxy for water optical properties and is not calibrated to NTU or gravimetric Total Suspended Solids (<span class="mono">mg/L</span>). Months with fewer than 100 valid cloud-free water pixels in the estuary are preserved as <span class="mono">null</span> (<span class="mono">NaN</span>) and never replaced with zero or interpolated prior to statistical testing.</p>
 
                 <h4>4. Per-Pass Detection, Optical Cross-Check &amp; Robustness</h4>
-                <p>Flooding is detected on every Sentinel-1 pass; the monthly value is the mean flooded area (each pixel's fraction of flooded passes &times; its area), and the maximum extent is also exported. As an independent check, Google Dynamic World (Sentinel-2) pixels labelled water or flooded vegetation are measured over the same floodplain. The two do not agree (see Validation in the audit table): Dynamic World has 40&ndash;60 clear images a month in the dry season but only 1&ndash;3 in the wet season, so its signal is dominated by cloud availability, while the radar index retains some dry-season false alarms. The rain&ndash;inundation association is also tested with each month left out in turn; it depends strongly on the October 2024 flood. Treat the SAR series as an unvalidated index.</p>
+                <p>Flooding is detected on every Sentinel-1 pass; the monthly value is the mean flooded area (each pixel's fraction of flooded passes &times; its area), and the maximum extent is also exported. As a cross-check, Google Dynamic World (Sentinel-2) pixels labelled water or flooded vegetation are measured over the same floodplain. The two do not agree (see Cross-check in the audit table): Dynamic World has 40&ndash;60 clear images a month in the dry season but only 1&ndash;3 in the wet season, so its signal is dominated by cloud availability, while the radar index retains some dry-season false alarms. The rain&ndash;inundation association is also tested with each month left out in turn; it depends strongly on the October 2024 flood. Treat the SAR series as an unvalidated index.</p>
 
                 <h4>5. Oyan Dam Regulation</h4>
                 <p>The Oyan–Ofiki tributary (Z2) is regulated by the Oyan Dam, whose releases can drive lower-Ogun flooding independently of rainfall. Release records are not publicly available, so the monthly Sentinel-1 open-water area of the Oyan Reservoir is exported as a regulation proxy and partialled out of the rain&ndash;inundation association. If release records are added (<span class="mono">--dam-releases</span>), they are partialled out as well.</p>
@@ -2323,7 +2323,7 @@
         subbasin: ['Sub-basin', 'The land area that drains to one point on the river. Z1–Z4 are built from HydroBASINS level-9 units.'],
         floodplain: ['Floodplain', 'Low, flat land beside a river that goes under water when the river overflows. Here, mainly Z3–Z4.'],
         sar: ['Radar (SAR)', 'Sentinel-1 synthetic aperture radar sends microwaves that pass through cloud. Smooth open water reflects little back and looks dark, which is how flooding is detected.'],
-        dw: ['Dynamic World', 'A Google land-cover map made from every Sentinel-2 image. Used as an independent optical check on the radar flooding; it cannot see through cloud.'],
+        dw: ['Dynamic World', 'A Google land-cover map made from every Sentinel-2 image. Used as an optical cross-check on the radar flooding, not as independent validation; it cannot see through cloud.'],
         ndti: ['NDTI', 'Normalized Difference Turbidity Index, (red − green) / (red + green) from Sentinel-2. Higher means murkier water; below 0 means relatively clear. A relative index, not a lab measurement.'],
         ndvi: ['NDVI', 'Normalized Difference Vegetation Index from Sentinel-2. Higher means denser, greener vegetation (about 0.2 is sparse, 0.6 or more is dense).'],
         hand: ['Height above drainage', 'How high a point sits above the nearest river channel (MERIT Hydro). Flooding is only counted below 15 m.'],
