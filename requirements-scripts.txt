@@ -1,0 +1,6 @@
+# For the figure and page scripts in scripts/ (not needed for the statistical pipeline or the tests).
+-r requirements.txt
+rasterio
+shapely
+pillow
+matplotlib

@@ -104,6 +104,7 @@ To regenerate the diagnostics alone:
 
 ```bash
 python src/02_compile_observatory.py
+pip install -r requirements-scripts.txt   # rasterio, shapely, pillow, matplotlib
 python scripts/make_figures.py      # figures for the study page (docs/assets/figures)
 python scripts/build_page.py        # study page docs/index.html, every number read from docs/data
 ```
