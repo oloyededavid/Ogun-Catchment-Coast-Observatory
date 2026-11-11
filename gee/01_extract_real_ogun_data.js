@@ -224,7 +224,7 @@ function floodMask(vvImg) {
     .and(handMask);
 }
 
-// Independent optical cross-check: Google Dynamic World (Sentinel-2) pixels labelled
+// Optical cross-check, not independent validation: Google Dynamic World (Sentinel-2) pixels labelled
 // water (0) or flooded vegetation (3), outside permanent water and < 15 m above drainage.
 var dwLabels = ee.ImageCollection('GOOGLE/DYNAMICWORLD/V1').select('label')
   .filterBounds(fullStudyGeom).filterDate(startDateStr, endDateStr);
