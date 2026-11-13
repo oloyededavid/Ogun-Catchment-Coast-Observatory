@@ -250,9 +250,25 @@ def main() -> None:
             return tag
         return tag[:-1] + ' target="_blank" rel="noopener">'
     text = re.sub(r'<a [^>]*>', _newtab, text)
-    OUT.write_text(text, encoding="utf-8")
+    OUT.write_text(_study_links(text, OUT.parent), encoding="utf-8")
     print("wrote", OUT, "| values filled:", len(v))
 
+
+
+def _study_links(html, docs):
+    """Re-insert the cross-site links that the portfolio's tools/sync_nav.py keeps in docs/assets/study-*.html."""
+    import re as _re
+    for key, where in (("study-bar", "top"), ("study-nav", "end")):
+        f = docs / "assets" / f"{key}.html"
+        if not f.exists():
+            continue
+        block = f.read_text(encoding="utf-8").strip()
+        html = _re.sub(rf"<!-- {key}:start -->.*?<!-- {key}:end -->\n?", "", html, flags=_re.S)
+        if where == "top":
+            html = _re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + block, html, count=1)
+        else:
+            html = html.replace("</body>", block + "\n</body>", 1)
+    return html
 
 if __name__ == "__main__":
     main()
