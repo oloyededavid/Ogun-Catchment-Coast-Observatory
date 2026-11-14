@@ -697,3 +697,7 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 .react-row { margin-bottom: 16px; }
 .react-row .reactions { margin-bottom: 0; }
 .explore-page .ex-intro h1 { margin-bottom: 10px; }
+
+/* consistency with the portfolio: left-aligned text, portfolio blue */
+:root { --accent: #1f5fae; }
+.article section > p, .article section li, .note p, .citation p, figcaption, .eqx-text { text-align: left; hyphens: manual; -webkit-hyphens: manual; }
