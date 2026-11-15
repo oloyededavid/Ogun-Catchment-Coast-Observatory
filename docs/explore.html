@@ -882,6 +882,18 @@
         }
         /* touch: sliders and checkboxes at least 24 px for a finger */
         @media (pointer: coarse), (max-width: 760px) { input[type="range"] { min-height: 32px; } input[type="checkbox"] { width: 24px; height: 24px; } }
+        /* ===== match the portfolio and study pages: white, grey hairlines, no shadows, quiet active states ===== */
+        :root { --page: #ffffff; --surface: #ffffff; --surface-2: #f6f6f4; --surface-raised: #ffffff; --shadow-float: none;
+                --accent: #1f5fae; --accent-ink: #1f5fae; --accent-soft: #f6f6f4; --radius: 10px; --radius-sm: 6px; }
+        .brand-mark { display: none; }
+        .layer-switch .seg[aria-checked="true"], .chip[aria-pressed="true"] { background: #ffffff; color: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+        .segmented .seg[aria-checked="true"] { box-shadow: inset 0 0 0 1px var(--ink); }
+        .btn-primary { background: #ffffff; color: var(--ink); border-color: var(--ink); }
+        .btn-primary:hover { background: var(--surface-2); border-color: var(--ink); }
+        .intro { background: #ffffff; border-color: var(--border-strong); }
+        .intro li { border-left-color: var(--border-strong); }
+        .intro-short { border-top-color: var(--border); }
+        .status-chip { background: #ffffff; }
     </style>
 </head>
 <body>
