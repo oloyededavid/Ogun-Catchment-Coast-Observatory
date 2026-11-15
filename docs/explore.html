@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Ogun River catchment-to-coast observatory: how rainfall and soil moisture across the Ogun catchment relate to floodplain inundation and turbidity in the northwest Lagos Lagoon, 2019–2024, from Google Earth Engine.">
     <meta name="color-scheme" content="only light">
-    <title>Explorer: monthly rainfall, soil moisture and floodplain inundation, Ogun catchment, 2019–2024</title>
+    <title>Explorer · Ogun surface water, 2019–2024</title>
 
     <link rel="preconnect" href="https://api.fontshare.com">
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
@@ -910,7 +910,7 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"/><path d="M3 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"/><path d="M12 3c-2.2 3-3.5 5-3.5 6.5a3.5 3.5 0 0 0 7 0C15.5 8 14.2 6 12 3z"/></svg>
             </div>
             <div class="brand-text">
-                <h1 class="brand-title">Ogun Catchment-to-Coast Observatory</h1>
+                <h1 class="brand-title">Ogun surface water</h1>
                 <p class="brand-sub">Rainfall, soil moisture, floodplain inundation and lagoon turbidity · 2019–2024</p>
             </div>
         </div>
@@ -2113,7 +2113,7 @@
     }));
 
     // ================= Figure downloads (PNG) =================
-    const FIG_CREDIT = 'David Oloyede · Ogun Catchment-to-Coast Observatory · CC BY 4.0 · github.com/oloyededavid/Ogun-Catchment-Coast-Observatory';
+    const FIG_CREDIT = 'David Oloyede · Ogun surface water · CC BY 4.0 · github.com/oloyededavid/Ogun-Catchment-Coast-Observatory';
 
     function saveCanvas(canvas, filename) {
         canvas.toBlob(blob => {
@@ -2149,7 +2149,7 @@
         const H = top + heights.reduce((a, h) => a + h + 34, 0) + 50;
         const zone = STATE.zone === 'ALL' ? 'Whole system' : `${STATE.zone} · ${shortName(featureById(STATE.zone).properties)}`;
         const mode = STATE.seriesMode === 'seasonal' ? 'seasonal cycle (calendar-month means)' : 'monthly, 2019–2024';
-        const { c, ctx } = figureFrame(W, H, 'Ogun Catchment-to-Coast Observatory', `${zone} · ${mode}`);
+        const { c, ctx } = figureFrame(W, H, 'Ogun surface water', `${zone} · ${mode}`);
         let y = top;
         ids.forEach((id, i) => {
             ctx.fillStyle = css('--ink'); ctx.font = '900 15px Satoshi, system-ui, sans-serif';
@@ -2165,7 +2165,7 @@
         $('download-menu').open = false;
         if (!LAST_MAP) return;
         const W = 1200, H = 1240, top = 100, bottom = 150, pad = 40;
-        const { c, ctx } = figureFrame(W, H, 'Ogun Catchment-to-Coast Observatory', LAST_MAP.title);
+        const { c, ctx } = figureFrame(W, H, 'Ogun surface water', LAST_MAP.title);
         let minLon = 180, maxLon = -180, minLat = 90, maxLat = -90;
         const rings = f => (f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates);
         STATE.features.forEach(f => rings(f).forEach(poly => poly[0].forEach(([x, y]) => {
