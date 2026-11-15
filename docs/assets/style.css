@@ -8,14 +8,14 @@
    em dash. The en dash alone is taken from a system sans; if none is found, Satoshi's is used. */
 @font-face {
     font-family: 'Range Dash';
-    src: local('Arial'), local('ArialMT'), local('Helvetica'), local('Roboto'), local('Roboto-Regular'),
+    src: url(fonts/range-dash.woff) format('woff'), local('Arial'), local('ArialMT'), local('Helvetica'), local('Roboto'), local('Roboto-Regular'),
          local('Liberation Sans'), local('LiberationSans'), local('DejaVu Sans'), local('DejaVuSans');
     unicode-range: U+2013;
     font-weight: 100 599;
 }
 @font-face {
     font-family: 'Range Dash';
-    src: local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Helvetica-Bold'), local('Roboto Bold'), local('Roboto-Bold'),
+    src: url(fonts/range-dash-bold.woff) format('woff'), local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Helvetica-Bold'), local('Roboto Bold'), local('Roboto-Bold'),
          local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('DejaVu Sans Bold'), local('DejaVuSans-Bold');
     unicode-range: U+2013;
     font-weight: 600 900;

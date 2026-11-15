@@ -22,7 +22,7 @@
 .schematic .unit-box { fill: #fff; stroke: #8aa6c9; stroke-width: 1.5; }
 .schematic .u1 { fill: #e8f1fb; } .schematic .u2 { fill: #e6f5f1; } .schematic .u3 { fill: #fbf1e2; }
 .schematic .u4 { fill: #fbe9e3; } .schematic .u5 { fill: #e9ecf3; }
-.schematic text { font-family: "Satoshi", system-ui, sans-serif; fill: #1c1c1c; }
+.schematic text { font-family: "Range Dash", "Satoshi", system-ui, sans-serif; fill: #1c1c1c; }
 .schematic .u-id { font-size: 16px; font-weight: 700; }
 .schematic .u-name { font-size: 14px; fill: #444; }
 .schematic .u-val { font-size: 14px; fill: #333; }
