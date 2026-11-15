@@ -164,6 +164,13 @@ def values() -> dict[str, str]:
         "CATCH": f"{catch:,.0f}",
         "CATCH_NUM": f"{catch:.0f}",
         "NMONTHS": str(cov["n_total_months"]),
+        # annual rainfall per unit: the map's annual export against twelve times the mean of the monthly series
+        **(lambda ann, mon: (lambda z: {
+            "RAIN_MAXZ": z, "RAIN_MAXZ_MAP": f"{ann[z]:,.0f}", "RAIN_MAXZ_MONTHLY": f"{mon[z]:,.0f}",
+            "RAIN_OTHER_MAXDIFF": f"{max(abs(ann[k] - mon[k]) for k in ann if k != z):.0f}",
+        })(max(ann, key=lambda k: abs(ann[k] - mon[k]))))(
+            {f["properties"]["zone_id"]: f["properties"]["rain_mm"] for f in g["features"]},
+            {z: units[z]["rain"]["mean"] * 12 for z in units}),
         "NDW": str(cov["valid_dynamic_world_months"]),
         "NNDTI": str(cov["valid_ndti_months"]),
         "NNDTIMISS": str(cov["missing_ndti_months"]),
