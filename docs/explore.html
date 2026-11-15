@@ -2365,8 +2365,8 @@
             ? '<circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5h.01"/>'
             : '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>';
         const ver = prov && prov.gee_script_version ? ` v${prov.gee_script_version}` : '';
-        $('data-chip-text').textContent = !prov ? 'Provenance not confirmed' : demo ? 'Demonstration data' : `Earth Engine export${ver}`;
-        chip.title = prov && prov.gee_export_utc ? `Exported ${prov.gee_export_utc}` : '';
+        $('data-chip-text').textContent = !prov ? 'Provenance not confirmed' : demo ? 'Demonstration data' : 'Study data, 2019–2024';
+        chip.title = prov ? `Google Earth Engine export${ver}${prov.gee_export_utc ? `, ${prov.gee_export_utc}` : ''}` : '';
     }
 
     // ================= Glossary =================
@@ -2549,7 +2549,7 @@
         setTab(STATE.tab);
         selectZone(STATE.zone, { fly: false });
         requestAnimationFrame(() => { if (STATE.zone === 'ALL') fitAll(false); else selectZone(STATE.zone); });
-    }).catch(err => fail('Data could not be loaded', `Failed to load files from docs/data/ (${err.message}).`));
+    }).catch(err => fail('The map data did not load', 'Check the connection and reload the page. The study page has the same results as text and tables.'));
 })();
 </script>
 <script>document.addEventListener("DOMContentLoaded",function(){function f(){document.querySelectorAll(".leaflet-control-attribution a").forEach(function(a){a.target="_blank";a.rel="noopener"});}f();setTimeout(f,1500);});</script>
