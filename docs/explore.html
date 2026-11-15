@@ -816,7 +816,7 @@
             .status-chip { flex: 1 1 auto; min-width: 0; }
             .status-chip span { overflow: hidden; text-overflow: ellipsis; }
             .appbar-actions { flex: 0 0 auto; }
-            .appbar-actions .label-text { display: none; }
+            .appbar-actions .label-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* hidden but still the button name */
             .appbar-actions .btn { width: 34px; padding: 0; justify-content: center; }
             .tab { padding: 9px 8px 11px; font-size: 13px; }
             .unit-picker, .tabs { padding-left: 16px; padding-right: 16px; }
