@@ -708,3 +708,6 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
   .site-header .site-inner { height: auto; min-height: var(--bar-h); flex-wrap: wrap; row-gap: 0; padding-top: 8px; }
   .site-header .toc { display: flex; flex: 1 0 100%; margin: 0 -12px; padding: 0 36px 6px 12px; -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent); mask-image: linear-gradient(90deg, #000 86%, transparent); }
 }
+
+/* touch: sliders and checkboxes at least 24 px for a finger */
+@media (pointer: coarse), (max-width: 760px) { input[type="range"] { min-height: 32px; } input[type="checkbox"] { width: 24px; height: 24px; } }
