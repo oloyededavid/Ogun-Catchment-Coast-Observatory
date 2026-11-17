@@ -714,3 +714,10 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 
 /* Leaflet's plus-lighter blend leaves light seams between map tiles at fractional zoom on a light basemap */
 .leaflet-container img.leaflet-tile { mix-blend-mode: normal; }
+
+/* Key terms: the same plain-language list as on the hydrology study */
+.glossary { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); gap: 0; margin: 0; border-top: 1px solid var(--rule); }
+.glossary dt, .glossary dd { margin: 0; padding: 11px 0; border-bottom: 1px solid var(--rule); font-size: 15px; line-height: 1.5; }
+.glossary dt { font-weight: 700; padding-right: 16px; }
+.glossary dd { color: var(--ink-2); }
+@media (max-width: 860px) { .glossary { grid-template-columns: 1fr; } .glossary dt { border-bottom: 0; padding-bottom: 0; } .glossary dd { padding-top: 3px; } }
