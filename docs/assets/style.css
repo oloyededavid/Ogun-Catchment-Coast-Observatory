@@ -721,3 +721,16 @@ figcaption { hyphens: manual; -webkit-hyphens: manual; }
 .glossary dt { font-weight: 700; padding-right: 16px; }
 .glossary dd { color: var(--ink-2); }
 @media (max-width: 860px) { .glossary { grid-template-columns: 1fr; } .glossary dt { border-bottom: 0; padding-bottom: 0; } .glossary dd { padding-top: 3px; } }
+
+/* End of the page, sized as on the hydrology study so that all six study sites end the same way */
+#key-terms h2, #data-code h2 { font-size: 30px; }
+.note h2, #feedback h2, h2#references, #references h2 { font-size: 26px; }
+#feedback { border-top: 0; margin-top: 0; padding-top: 48px; }
+#feedback h2 { margin: 8px 0 14px; }
+.note { margin-top: 72px; padding-top: 28px; }
+#data-code .button, #feedback .button { height: auto; min-height: 36px; padding: 6px 13px; font-size: 14px; border-radius: 8px; color: var(--ink); }
+#feedback .react .rc { color: inherit; }
+.refs { color: var(--ink); }
+.refs li { padding-left: 1.5em; text-indent: -1.5em; margin: 0 0 9px; }
+.react-note { margin: 10px 0 0; font-size: 13.5px; color: var(--ink-3); }
+@media (max-width: 760px) { #key-terms h2, #data-code h2 { font-size: 27px; } #data-code .button, #feedback .button { min-height: 44px; } }
