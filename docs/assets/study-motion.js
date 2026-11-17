@@ -53,7 +53,7 @@
     'use strict';
     const btn = document.getElementById('to-top');
     if (btn) {
-        const show = () => btn.classList.toggle('is-visible', scrollY > innerHeight * 0.8);
+        const show = () => { const on = scrollY > innerHeight * 0.8; btn.classList.toggle('is-visible', on); btn.hidden = !on; };
         addEventListener('scroll', show, { passive: true });
         btn.addEventListener('click', () => {
             const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
