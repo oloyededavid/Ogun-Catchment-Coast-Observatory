@@ -275,6 +275,10 @@ def _study_links(html, docs):
             html = _re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + block, html, count=1)
         else:
             html = html.replace("</body>", block + "\n</body>", 1)
+    f = docs / "assets" / "study-others.html"  # the "Other studies" line in the footer, kept in place
+    if f.exists():
+        block = f.read_text(encoding="utf-8").strip()
+        html = _re.sub(r"<!-- study-others:start -->.*?<!-- study-others:end -->", lambda m: block, html, flags=_re.S)
     return html
 
 if __name__ == "__main__":
