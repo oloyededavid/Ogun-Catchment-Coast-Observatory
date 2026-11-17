@@ -294,10 +294,10 @@
         <dl class="glossary">
             <dt>Sub-basin</dt><dd>The land area that drains to one point on the river. Z1–Z4 are built from HydroBASINS level-9 units.</dd>
             <dt>Floodplain</dt><dd>Low, flat land beside a river that goes under water when the river overflows. Here, mainly Z3–Z4.</dd>
-            <dt>Radar (SAR)</dt><dd>Sentinel-1 synthetic aperture radar sends microwaves that pass through cloud. Smooth open water reflects little back and looks dark, which is how flooding is detected.</dd>
+            <dt>Radar (SAR)</dt><dd>Sentinel-1 synthetic aperture radar sends microwaves that pass through cloud. Smooth open water reflects little back and looks dark, which is how flooding is detected. Smooth dry ground can also look dark, and flooded vegetation can look bright, so dark pixels are not always water.</dd>
             <dt>Dynamic World</dt><dd>A Google land-cover map made from every Sentinel-2 image. Used as an optical cross-check on the radar flooding, not as independent validation; it cannot see through cloud.</dd>
             <dt>NDTI</dt><dd>Normalized Difference Turbidity Index, (red − green) / (red + green) from Sentinel-2. Higher means murkier water; below 0 means relatively clear. A relative index, not a lab measurement.</dd>
-            <dt>Height above drainage</dt><dd>How high a point sits above the nearest river channel (MERIT Hydro). Flooding is only counted below 15 m.</dd>
+            <dt>Height above drainage</dt><dd>How high a point sits above the river channel it drains to (MERIT Hydro). Flooding is only counted below 15 m.</dd>
             <dt>CHIRPS</dt><dd>A rainfall dataset combining satellite estimates and rain gauges, at about 5 km resolution.</dd>
             <dt>ERA5-Land</dt><dd>A weather-model reconstruction of past conditions; here, the water held in the top 7 cm of soil.</dd>
             <dt>Deseasonalized</dt><dd>Each month minus the average for that calendar month, so the normal wet and dry seasons do not create false correlations.</dd>
@@ -338,6 +338,7 @@
             </div>
             <span class="react-status" id="react-status" role="status"></span>
         </div>
+        <p class="react-note">One reaction per browser. Counts are anonymous and kept by a public counter.</p>
     </section>
 
     <section id="references" aria-labelledby="h-refs">
@@ -362,7 +363,7 @@
     </div>
 </footer>
 <script src="vendor/leaflet-1.9.4/leaflet.js"></script>
-    <button type="button" class="to-top" id="to-top" aria-label="Back to top"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button type="button" class="to-top" id="to-top" aria-label="Back to top" hidden><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <script src="assets/study-map.js"></script>
 <script src="assets/study-motion.js"></script>
 <script src="assets/study-feedback.js"></script>
